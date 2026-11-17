@@ -1,0 +1,11 @@
+{
+  "pulled": 92,
+  "dispatched": {
+    "done": 19,
+    "waiting": 77,
+    "digest": 3,
+    "exhausted": 1
+  },
+  "digests": 0,
+  "reported_unreached": 1
+}

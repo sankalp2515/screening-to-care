@@ -1,0 +1,145 @@
+{
+  "verification": {
+    "ok": true,
+    "checked": 15,
+    "broken_at_seq": null,
+    "problem": null
+  },
+  "events": [
+    {
+      "seq": 1,
+      "type": "CASE_OPENED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-10-17T23:15:37.419142Z",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "e35d9f9baad3d8571b1da62f737bf8b5b3495c7627b360eed2b542c42a88691d"
+    },
+    {
+      "seq": 2,
+      "type": "STAGE_REACHED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-10-18T23:15:37.419142Z",
+      "prev_hash": "e35d9f9baad3d8571b1da62f737bf8b5b3495c7627b360eed2b542c42a88691d",
+      "hash": "2ec4496814c731ff6d85239e07125b47440e7c43ebd909d107ea047c8d3b8b35"
+    },
+    {
+      "seq": 3,
+      "type": "STAGE_REACHED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-10-21T23:15:37.419142Z",
+      "prev_hash": "2ec4496814c731ff6d85239e07125b47440e7c43ebd909d107ea047c8d3b8b35",
+      "hash": "b2a8f587ca3c3a665ad125cc6beb37dd71bd1dddc4d5446ef25710eca1e380be"
+    },
+    {
+      "seq": 4,
+      "type": "STAGE_REACHED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-10-22T23:15:37.419142Z",
+      "prev_hash": "b2a8f587ca3c3a665ad125cc6beb37dd71bd1dddc4d5446ef25710eca1e380be",
+      "hash": "9fcefa1d99e82b0c16f78ed836c4a172d4933429c719a699f07170917ab03123"
+    },
+    {
+      "seq": 5,
+      "type": "ADMIN_STATUS_CHANGED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-10-22T23:15:37.419142Z",
+      "prev_hash": "9fcefa1d99e82b0c16f78ed836c4a172d4933429c719a699f07170917ab03123",
+      "hash": "8061c915b8dfdea6536a6900cc22103cebf3b82eb7dbc500d0e04ad99c1867f3"
+    },
+    {
+      "seq": 6,
+      "type": "STAGE_REACHED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-10-24T23:15:37.419142Z",
+      "prev_hash": "8061c915b8dfdea6536a6900cc22103cebf3b82eb7dbc500d0e04ad99c1867f3",
+      "hash": "1105d0740fb4302a6b60502fe47bce3a3b908f51f1f6ce6e1a42d7b8f8b79f67"
+    },
+    {
+      "seq": 7,
+      "type": "ADMIN_STATUS_CHANGED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-10-24T23:15:37.419142Z",
+      "prev_hash": "1105d0740fb4302a6b60502fe47bce3a3b908f51f1f6ce6e1a42d7b8f8b79f67",
+      "hash": "a0e2a5e58b603f71fc4d739d1ca82c16b9260dabbb0ce2cafaf6dd3393a6c1fa"
+    },
+    {
+      "seq": 8,
+      "type": "STAGE_REACHED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-10-26T23:15:37.419142Z",
+      "prev_hash": "a0e2a5e58b603f71fc4d739d1ca82c16b9260dabbb0ce2cafaf6dd3393a6c1fa",
+      "hash": "bb83ab547794a7af4c74bd278662be7d500d389ef8c29134b518374a715e7413"
+    },
+    {
+      "seq": 9,
+      "type": "ADMIN_STATUS_CHANGED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-10-26T23:15:37.419142Z",
+      "prev_hash": "bb83ab547794a7af4c74bd278662be7d500d389ef8c29134b518374a715e7413",
+      "hash": "89e50f8734178efc0e90a4110062fd08b1edf125cdb592c56e93b05cc2adc4ce"
+    },
+    {
+      "seq": 10,
+      "type": "STAGE_REACHED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-11-02T23:15:37.419142Z",
+      "prev_hash": "89e50f8734178efc0e90a4110062fd08b1edf125cdb592c56e93b05cc2adc4ce",
+      "hash": "d4818deb4c50358ff25c466d1bf7fcd51dd31f6776b5cff616d9c96a1be56181"
+    },
+    {
+      "seq": 11,
+      "type": "ADMIN_STATUS_CHANGED",
+      "actor_id": "malaffi-sim",
+      "actor_type": "integration",
+      "occurred_at": "2026-11-03T23:15:37.419142Z",
+      "prev_hash": "d4818deb4c50358ff25c466d1bf7fcd51dd31f6776b5cff616d9c96a1be56181",
+      "hash": "c4d45e70735745ef0a7e86fd3cf486a3bfc0d0db6d50002b5c2de60b23297957"
+    },
+    {
+      "seq": 12,
+      "type": "STALL_FLAGGED",
+      "actor_id": "system",
+      "actor_type": "system",
+      "occurred_at": "2026-11-07T06:00:00Z",
+      "prev_hash": "c4d45e70735745ef0a7e86fd3cf486a3bfc0d0db6d50002b5c2de60b23297957",
+      "hash": "0e0175cac87d16f4cd8b5caf4745bb6a41da789ce47167a3472de2bfb9d7b93b"
+    },
+    {
+      "seq": 13,
+      "type": "ESCALATED",
+      "actor_id": "system",
+      "actor_type": "system",
+      "occurred_at": "2026-11-07T06:00:00Z",
+      "prev_hash": "0e0175cac87d16f4cd8b5caf4745bb6a41da789ce47167a3472de2bfb9d7b93b",
+      "hash": "9bbd42aa8ec6f01abf2f03340f2f51c8239f30e7d762d8add07b87589b886ead"
+    },
+    {
+      "seq": 14,
+      "type": "ESCALATED",
+      "actor_id": "system",
+      "actor_type": "system",
+      "occurred_at": "2026-11-11T06:00:00Z",
+      "prev_hash": "9bbd42aa8ec6f01abf2f03340f2f51c8239f30e7d762d8add07b87589b886ead",
+      "hash": "3e40be89f3b06c6769bbd4db65d22cab66a34d5b0d39338d170b6c9c28cdb71e"
+    },
+    {
+      "seq": 15,
+      "type": "ESCALATED",
+      "actor_id": "system",
+      "actor_type": "system",
+      "occurred_at": "2026-11-15T06:00:00Z",
+      "prev_hash": "3e40be89f3b06c6769bbd4db65d22cab66a34d5b0d39338d170b6c9c28cdb71e",
+      "hash": "af09251a6514e8965e3b4df8747eb15cc5ba98c757fa6591f8ad3038029fb8b6"
+    }
+  ]
+}

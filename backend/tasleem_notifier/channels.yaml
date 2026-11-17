@@ -1,0 +1,47 @@
+# Channel policy: which channel reaches which kind of person, in what order, and when to give up.
+# Deterministic configuration owned by the programme office; the notifier never improvises a channel.
+#
+# steps: tried one after another. A step succeeds when the provider reports `success_on`
+#        (sent = accepted by the system, delivered = reached the device, read = opened by the person).
+#        If it fails, or `wait_hours` pass without success, the next step is tried.
+# urgent_steps: for urgent messages (distress alerts). Sent together, not one after another.
+# on_exhausted: report_patient_unreached -> the case-core opens a navigator call task.
+
+timezone_offset_hours: 4        # Gulf Standard Time; the UAE has no daylight saving
+quiet_hours: {start: 21, end: 8} # local hours; non-urgent patient messages wait until morning
+digest_hour: 7                   # local hour for daily digests
+
+channels:
+  sahatna_push:  {success_on: read,      audience: patient, carries_content: true}
+  sms_nudge:     {success_on: delivered, audience: patient, carries_content: false}
+  emr_task:      {success_on: sent,      audience: staff,   carries_content: true}
+  sms_page:      {success_on: delivered, audience: staff,   carries_content: false}
+  worklist:      {success_on: sent,      audience: staff,   carries_content: true}
+  email:         {success_on: sent,      audience: staff,   carries_content: true}
+  email_digest:  {success_on: sent,      audience: staff,   carries_content: true}
+
+recipients:
+  patient:
+    quiet_hours: true
+    steps:
+      - {channel: sahatna_push, wait_hours: 24}
+      - {channel: sms_nudge, wait_hours: 24}
+    on_exhausted: report_patient_unreached
+  family_physician:
+    steps: [{channel: emr_task}]
+    urgent_steps: [{channel: emr_task}, {channel: sms_page}]
+  clinic_lead:
+    steps: [{channel: emr_task}]
+    urgent_steps: [{channel: emr_task}, {channel: sms_page}]
+  gi_specialist:
+    steps: [{channel: emr_task}]
+    urgent_steps: [{channel: emr_task}, {channel: sms_page}]
+  navigator:
+    steps: [{channel: worklist}]
+    urgent_steps: [{channel: worklist}, {channel: sms_page}]
+  program_coordinator:
+    steps: [{channel: email_digest}]
+    urgent_steps: [{channel: email}, {channel: sms_page}]
+  default:
+    steps: [{channel: emr_task}]
+    urgent_steps: [{channel: emr_task}, {channel: sms_page}]

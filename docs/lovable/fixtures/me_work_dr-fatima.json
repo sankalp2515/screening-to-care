@@ -1,0 +1,632 @@
+{
+  "person": "dr-fatima",
+  "needs_action": 5,
+  "sections": [
+    {
+      "kind": "distress",
+      "label": "Patient messages that need a clinician",
+      "count": 0,
+      "items": []
+    },
+    {
+      "kind": "escalated",
+      "label": "Stalled cases you own or that were escalated to you",
+      "count": 5,
+      "items": [
+        {
+          "id": "case_7e5d680065a6",
+          "patient": {
+            "id": "p-ahmed",
+            "name": "Ahmed S. (64)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "REFERRED",
+              "step": 3,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "SENT",
+              "implied_stage": "REFERRED",
+              "step": 3,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "STEP_OVERDUE",
+              "label": "Next step overdue",
+              "level": 2
+            },
+            {
+              "reason": "REFERRAL_REJECTED",
+              "label": "Referral rejected",
+              "level": 3
+            }
+          ],
+          "escalation_level": 3,
+          "days_since_progress": 10.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "escalated",
+            "refs": [
+              "REFERRAL_REJECTED",
+              "STEP_OVERDUE"
+            ],
+            "since": "2026-11-08T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_21a99d58776a",
+          "patient": {
+            "id": "p-fatma",
+            "name": "Fatma N. (70)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "PATIENT_INVITED",
+              "step": 1,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "NONE",
+              "implied_stage": null,
+              "step": 0,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "STEP_OVERDUE",
+              "label": "Next step overdue",
+              "level": 1
+            },
+            {
+              "reason": "HANDOFF_NOT_ACCEPTED",
+              "label": "Handoff not accepted",
+              "level": 2
+            }
+          ],
+          "escalation_level": 2,
+          "days_since_progress": 9.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "escalated",
+            "refs": [
+              "HANDOFF_NOT_ACCEPTED",
+              "STEP_OVERDUE"
+            ],
+            "since": "2026-11-13T06:00:00Z"
+          }
+        },
+        {
+          "id": "case_ee7f1a00158f",
+          "patient": {
+            "id": "p-rajesh",
+            "name": "Rajesh K. (58)",
+            "language": "en"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "ATTENDED",
+              "step": 6,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "COMPLETED",
+              "implied_stage": "OUTCOME_COMMUNICATED",
+              "step": 9,
+              "of": 9
+            },
+            "gap": true
+          },
+          "stalls": [
+            {
+              "reason": "CLOSED_WITHOUT_EVIDENCE",
+              "label": "Marked completed without a report",
+              "level": 3
+            }
+          ],
+          "escalation_level": 3,
+          "days_since_progress": 14.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "escalated",
+            "refs": [
+              "CLOSED_WITHOUT_EVIDENCE"
+            ],
+            "since": "2026-11-07T06:00:00Z"
+          }
+        },
+        {
+          "id": "case_bccdb1a3c498",
+          "patient": {
+            "id": "p-noura",
+            "name": "Noura A. (52)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "SCHEDULED",
+              "implied_stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "BOOKED_NOT_ATTENDED",
+              "label": "Booked but not attended",
+              "level": 2
+            }
+          ],
+          "escalation_level": 2,
+          "days_since_progress": 21.0,
+          "open_barriers": 1,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "escalated",
+            "refs": [
+              "BOOKED_NOT_ATTENDED"
+            ],
+            "since": "2026-11-10T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_b6cf1f4d3acc",
+          "patient": {
+            "id": "p-hamad",
+            "name": "Hamad J. (46)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "hba1c-diabetes-range",
+            "name": "HbA1c in diabetes range to confirmed care plan"
+          },
+          "status": "open",
+          "priority": "medium",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "PATIENT_INVITED",
+              "step": 1,
+              "of": 5
+            },
+            "reported": {
+              "admin_status": "NONE",
+              "implied_stage": null,
+              "step": 0,
+              "of": 5
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "STEP_OVERDUE",
+              "label": "Next step overdue",
+              "level": 2
+            }
+          ],
+          "escalation_level": 2,
+          "days_since_progress": 18.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "escalated",
+            "refs": [
+              "STEP_OVERDUE"
+            ],
+            "since": "2026-11-06T06:00:00Z"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "handoff",
+      "label": "Cases offered to you",
+      "count": 0,
+      "items": []
+    },
+    {
+      "kind": "consult",
+      "label": "E-consult questions for you",
+      "count": 0,
+      "items": []
+    },
+    {
+      "kind": "task",
+      "label": "Barrier tasks assigned to you",
+      "count": 0,
+      "items": []
+    },
+    {
+      "kind": "owner",
+      "label": "All open cases you own",
+      "count": 6,
+      "items": [
+        {
+          "id": "case_7e5d680065a6",
+          "patient": {
+            "id": "p-ahmed",
+            "name": "Ahmed S. (64)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "REFERRED",
+              "step": 3,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "SENT",
+              "implied_stage": "REFERRED",
+              "step": 3,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "STEP_OVERDUE",
+              "label": "Next step overdue",
+              "level": 2
+            },
+            {
+              "reason": "REFERRAL_REJECTED",
+              "label": "Referral rejected",
+              "level": 3
+            }
+          ],
+          "escalation_level": 3,
+          "days_since_progress": 10.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-11-01T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_21a99d58776a",
+          "patient": {
+            "id": "p-fatma",
+            "name": "Fatma N. (70)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "PATIENT_INVITED",
+              "step": 1,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "NONE",
+              "implied_stage": null,
+              "step": 0,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "STEP_OVERDUE",
+              "label": "Next step overdue",
+              "level": 1
+            },
+            {
+              "reason": "HANDOFF_NOT_ACCEPTED",
+              "label": "Handoff not accepted",
+              "level": 2
+            }
+          ],
+          "escalation_level": 2,
+          "days_since_progress": 9.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-11-06T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_ee7f1a00158f",
+          "patient": {
+            "id": "p-rajesh",
+            "name": "Rajesh K. (58)",
+            "language": "en"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "ATTENDED",
+              "step": 6,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "COMPLETED",
+              "implied_stage": "OUTCOME_COMMUNICATED",
+              "step": 9,
+              "of": 9
+            },
+            "gap": true
+          },
+          "stalls": [
+            {
+              "reason": "CLOSED_WITHOUT_EVIDENCE",
+              "label": "Marked completed without a report",
+              "level": 3
+            }
+          ],
+          "escalation_level": 3,
+          "days_since_progress": 14.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-10-17T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_bccdb1a3c498",
+          "patient": {
+            "id": "p-noura",
+            "name": "Noura A. (52)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "SCHEDULED",
+              "implied_stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "BOOKED_NOT_ATTENDED",
+              "label": "Booked but not attended",
+              "level": 2
+            }
+          ],
+          "escalation_level": 2,
+          "days_since_progress": 21.0,
+          "open_barriers": 1,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-10-17T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_b6cf1f4d3acc",
+          "patient": {
+            "id": "p-hamad",
+            "name": "Hamad J. (46)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "hba1c-diabetes-range",
+            "name": "HbA1c in diabetes range to confirmed care plan"
+          },
+          "status": "open",
+          "priority": "medium",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "PATIENT_INVITED",
+              "step": 1,
+              "of": 5
+            },
+            "reported": {
+              "admin_status": "NONE",
+              "implied_stage": null,
+              "step": 0,
+              "of": 5
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "STEP_OVERDUE",
+              "label": "Next step overdue",
+              "level": 2
+            }
+          ],
+          "escalation_level": 2,
+          "days_since_progress": 18.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-10-27T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_df980dd190cb",
+          "patient": {
+            "id": "p-yousef",
+            "name": "Yousef H. (55)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "SCHEDULED",
+              "implied_stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [],
+          "escalation_level": 0,
+          "days_since_progress": 3.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-11-04T23:15:37.419142Z"
+          }
+        }
+      ]
+    }
+  ]
+}

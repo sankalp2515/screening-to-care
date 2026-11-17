@@ -1,0 +1,3335 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "Tasleem API",
+  "description": "Verified screening-to-care follow-through beside Malaffi and Sahatna.",
+  "version": "0.2.0"
+ },
+ "paths": {
+  "/healthz": {
+   "get": {
+    "tags": [
+     "system"
+    ],
+    "summary": "Healthz",
+    "description": "Liveness: the process is up. Never touches the database, so a DB blip does not restart pods.",
+    "operationId": "healthz_healthz_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "string"
+         },
+         "type": "object",
+         "title": "Response Healthz Healthz Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/readyz": {
+   "get": {
+    "tags": [
+     "system"
+    ],
+    "summary": "Readyz",
+    "description": "Readiness: the database answers. Load balancers stop routing here when it does not.",
+    "operationId": "readyz_readyz_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "string"
+         },
+         "type": "object",
+         "title": "Response Readyz Readyz Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/ingest/fhir": {
+   "post": {
+    "tags": [
+     "ingest"
+    ],
+    "summary": "Ingest Fhir",
+    "operationId": "ingest_fhir_v1_ingest_fhir_post",
+    "parameters": [
+     {
+      "name": "x-message-id",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Message-Id"
+      }
+     },
+     {
+      "name": "x-integration-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Integration-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Payload"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Ingest Fhir V1 Ingest Fhir Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/ingest/referral-status": {
+   "post": {
+    "tags": [
+     "ingest"
+    ],
+    "summary": "Ingest Referral Status",
+    "operationId": "ingest_referral_status_v1_ingest_referral_status_post",
+    "parameters": [
+     {
+      "name": "x-integration-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Integration-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReferralStatusMessage"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Ingest Referral Status V1 Ingest Referral Status Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases": {
+   "get": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "List Cases",
+    "operationId": "list_cases_v1_cases_get",
+    "parameters": [
+     {
+      "name": "owner",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Owner"
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "pattern": "^(open|closed|all)$"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "default": "open",
+       "title": "Status"
+      }
+     },
+     {
+      "name": "stalled",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "boolean"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Stalled"
+      }
+     },
+     {
+      "name": "pathway",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Pathway"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 500,
+       "minimum": 1,
+       "default": 100,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "offset",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 100000,
+       "minimum": 0,
+       "default": 0,
+       "title": "Offset"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response List Cases V1 Cases Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}": {
+   "get": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Get Case",
+    "operationId": "get_case_v1_cases__case_id__get",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Get Case V1 Cases  Case Id  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/notifications": {
+   "get": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Case Notifications",
+    "operationId": "case_notifications_v1_cases__case_id__notifications_get",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Case Notifications V1 Cases  Case Id  Notifications Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/handoff": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Handoff",
+    "operationId": "handoff_v1_cases__case_id__handoff_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/HandoffIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Handoff V1 Cases  Case Id  Handoff Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/handoff/accept": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Handoff Accept",
+    "operationId": "handoff_accept_v1_cases__case_id__handoff_accept_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Handoff Accept V1 Cases  Case Id  Handoff Accept Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/handoff/reject": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Handoff Reject",
+    "operationId": "handoff_reject_v1_cases__case_id__handoff_reject_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RejectIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Handoff Reject V1 Cases  Case Id  Handoff Reject Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/barriers": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Report Barrier",
+    "operationId": "report_barrier_v1_cases__case_id__barriers_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/BarrierIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Report Barrier V1 Cases  Case Id  Barriers Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/barriers/{barrier_id}/confirm": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Confirm Barrier",
+    "operationId": "confirm_barrier_v1_cases__case_id__barriers__barrier_id__confirm_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "barrier_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Barrier Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ConfirmBarrierIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Confirm Barrier V1 Cases  Case Id  Barriers  Barrier Id  Confirm Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/barriers/{barrier_id}/resolve": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Resolve Barrier",
+    "operationId": "resolve_barrier_v1_cases__case_id__barriers__barrier_id__resolve_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "barrier_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Barrier Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/NoteIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Resolve Barrier V1 Cases  Case Id  Barriers  Barrier Id  Resolve Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/distress/{distress_id}/resolve": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Resolve Distress",
+    "operationId": "resolve_distress_v1_cases__case_id__distress__distress_id__resolve_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "distress_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Distress Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/NoteIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Resolve Distress V1 Cases  Case Id  Distress  Distress Id  Resolve Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/contact-attempts": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Contact",
+    "operationId": "contact_v1_cases__case_id__contact_attempts_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ContactIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Contact V1 Cases  Case Id  Contact Attempts Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/consults": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Consult",
+    "operationId": "consult_v1_cases__case_id__consults_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ConsultIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Consult V1 Cases  Case Id  Consults Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/consults/{consult_id}/answer": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Answer",
+    "operationId": "answer_v1_cases__case_id__consults__consult_id__answer_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "consult_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Consult Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AnswerIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Answer V1 Cases  Case Id  Consults  Consult Id  Answer Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/patient-messages": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Message Patient",
+    "description": "A person sends a plain-language message to the patient's Sahatna inbox (optionally an approved AI\ndraft). Refused with IFHAS_MESSAGE_POLICY if it would disclose a result or give advice.",
+    "operationId": "message_patient_v1_cases__case_id__patient_messages_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PatientMessageIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Message Patient V1 Cases  Case Id  Patient Messages Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/close": {
+   "post": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Close",
+    "operationId": "close_v1_cases__case_id__close_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CloseIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Close V1 Cases  Case Id  Close Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/referral-options": {
+   "get": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Referral Options",
+    "operationId": "referral_options_v1_cases__case_id__referral_options_get",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Referral Options V1 Cases  Case Id  Referral Options Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/cases/{case_id}/audit": {
+   "get": {
+    "tags": [
+     "cases"
+    ],
+    "summary": "Audit",
+    "operationId": "audit_v1_cases__case_id__audit_get",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Audit V1 Cases  Case Id  Audit Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/me": {
+   "get": {
+    "tags": [
+     "patient"
+    ],
+    "summary": "Whoami",
+    "operationId": "whoami_v1_me_get",
+    "parameters": [
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Whoami V1 Me Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/me/work": {
+   "get": {
+    "tags": [
+     "patient"
+    ],
+    "summary": "My Work",
+    "description": "Everything waiting on this person, grouped by why. One indexed query on case_assignments.",
+    "operationId": "my_work_v1_me_work_get",
+    "parameters": [
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response My Work V1 Me Work Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/me/cases": {
+   "get": {
+    "tags": [
+     "patient"
+    ],
+    "summary": "My Cases",
+    "operationId": "my_cases_v1_me_cases_get",
+    "parameters": [
+     {
+      "name": "lang",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Lang"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response My Cases V1 Me Cases Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/me/cases/{case_id}/consent": {
+   "post": {
+    "tags": [
+     "patient"
+    ],
+    "summary": "My Consent",
+    "operationId": "my_consent_v1_me_cases__case_id__consent_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response My Consent V1 Me Cases  Case Id  Consent Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/me/cases/{case_id}/prep-check": {
+   "get": {
+    "tags": [
+     "patient"
+    ],
+    "summary": "Prep Check",
+    "description": "Teach-back questions in the patient's language. Correct answers are never sent to the client.",
+    "operationId": "prep_check_v1_me_cases__case_id__prep_check_get",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "lang",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Lang"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Prep Check V1 Me Cases  Case Id  Prep Check Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "patient"
+    ],
+    "summary": "Prep Check Answer",
+    "description": "A wrong or missing answer opens a barrier (PREP_UNCLEAR, or the question's own code) so a navigator\ngoes through it with the patient. The patient is never told they 'failed'.",
+    "operationId": "prep_check_answer_v1_me_cases__case_id__prep_check_post",
+    "parameters": [
+     {
+      "name": "case_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Id"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PrepAnswersIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Prep Check Answer V1 Me Cases  Case Id  Prep Check Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/program/metrics": {
+   "get": {
+    "tags": [
+     "program"
+    ],
+    "summary": "Metrics",
+    "operationId": "metrics_v1_program_metrics_get",
+    "parameters": [
+     {
+      "name": "pathway",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Pathway"
+      }
+     },
+     {
+      "name": "org",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "maxLength": 64
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Org"
+      }
+     },
+     {
+      "name": "language",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "pattern": "^(en|ar)$"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Language"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Metrics V1 Program Metrics Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/program/usage": {
+   "get": {
+    "tags": [
+     "program"
+    ],
+    "summary": "Usage",
+    "description": "Active cases per provider and pathway in a calendar month: the unit of the per-active-case\npricing hypothesis. Programme coordinator only.",
+    "operationId": "usage_v1_program_usage_get",
+    "parameters": [
+     {
+      "name": "month",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+       "title": "Month"
+      }
+     },
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Usage V1 Program Usage Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/system/tick": {
+   "post": {
+    "tags": [
+     "system"
+    ],
+    "summary": "System Tick",
+    "operationId": "system_tick_v1_system_tick_post",
+    "parameters": [
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "anyOf": [
+         {
+          "$ref": "#/components/schemas/TickIn"
+         },
+         {
+          "type": "null"
+         }
+        ],
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response System Tick V1 System Tick Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/directory/people": {
+   "get": {
+    "tags": [
+     "system"
+    ],
+    "summary": "People",
+    "operationId": "people_v1_directory_people_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response People V1 Directory People Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/admin/reset-demo": {
+   "post": {
+    "tags": [
+     "system"
+    ],
+    "summary": "Reset Demo",
+    "operationId": "reset_demo_v1_admin_reset_demo_post",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response Reset Demo V1 Admin Reset Demo Post"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/integration/outbox": {
+   "get": {
+    "tags": [
+     "integration"
+    ],
+    "summary": "Pull Outbox",
+    "description": "Delivery workers (Sahatna push, EMR inbox, SMS gateway) pull pending messages in id order.",
+    "operationId": "pull_outbox_v1_integration_outbox_get",
+    "parameters": [
+     {
+      "name": "after_id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "default": 0,
+       "title": "After Id"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 1000,
+       "minimum": 1,
+       "default": 100,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "pattern": "^(pending|delivered)$",
+       "default": "pending",
+       "title": "Status"
+      }
+     },
+     {
+      "name": "x-integration-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Integration-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Pull Outbox V1 Integration Outbox Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/integration/outbox/ack": {
+   "post": {
+    "tags": [
+     "integration"
+    ],
+    "summary": "Ack Outbox",
+    "operationId": "ack_outbox_v1_integration_outbox_ack_post",
+    "parameters": [
+     {
+      "name": "x-integration-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Integration-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AckIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Ack Outbox V1 Integration Outbox Ack Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/integration/delivery-failures": {
+   "post": {
+    "tags": [
+     "integration"
+    ],
+    "summary": "Delivery Failure",
+    "description": "The notifier reports a message that no channel delivered. For a patient message this creates a\nnavigator call task on the case; repeated reports for the same message are ignored.",
+    "operationId": "delivery_failure_v1_integration_delivery_failures_post",
+    "parameters": [
+     {
+      "name": "x-integration-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Integration-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DeliveryFailureIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Delivery Failure V1 Integration Delivery Failures Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/demo/scenarios": {
+   "get": {
+    "tags": [
+     "demo"
+    ],
+    "summary": "Demo Scenarios",
+    "operationId": "demo_scenarios_v1_demo_scenarios_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response Demo Scenarios V1 Demo Scenarios Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/demo/scenarios/{scenario}": {
+   "post": {
+    "tags": [
+     "demo"
+    ],
+    "summary": "Demo Run",
+    "operationId": "demo_run_v1_demo_scenarios__scenario__post",
+    "parameters": [
+     {
+      "name": "scenario",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Scenario"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "anyOf": [
+         {
+          "type": "object",
+          "additionalProperties": true
+         },
+         {
+          "type": "null"
+         }
+        ],
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Demo Run V1 Demo Scenarios  Scenario  Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/v1/policy/patient-message-check": {
+   "post": {
+    "tags": [
+     "policy"
+    ],
+    "summary": "Patient Message Check",
+    "description": "The same deterministic check the engine runs before sending. The AI agent calls it on every draft.",
+    "operationId": "patient_message_check_v1_policy_patient_message_check_post",
+    "parameters": [
+     {
+      "name": "x-demo-user",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Demo-User"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TextIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Patient Message Check V1 Policy Patient Message Check Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "AckIn": {
+    "properties": {
+     "ids": {
+      "items": {
+       "type": "integer"
+      },
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "title": "Ids"
+     }
+    },
+    "type": "object",
+    "required": [
+     "ids"
+    ],
+    "title": "AckIn"
+   },
+   "AdminStatus": {
+    "type": "string",
+    "enum": [
+     "NONE",
+     "SENT",
+     "ACCEPTED",
+     "SCHEDULED",
+     "COMPLETED",
+     "CANCELLED"
+    ],
+    "title": "AdminStatus",
+    "description": "What the referral system (Malaffi REF) reports. Never advances a verified stage by itself."
+   },
+   "AnswerIn": {
+    "properties": {
+     "answer": {
+      "type": "string",
+      "maxLength": 4000,
+      "title": "Answer"
+     }
+    },
+    "type": "object",
+    "required": [
+     "answer"
+    ],
+    "title": "AnswerIn"
+   },
+   "BarrierCode": {
+    "type": "string",
+    "enum": [
+     "FEAR",
+     "PREP_UNCLEAR",
+     "NO_ESCORT",
+     "TRANSPORT",
+     "COST_OR_INSURANCE",
+     "TIME_OR_WORK",
+     "LANGUAGE",
+     "WANTS_CALLBACK",
+     "DONE_ELSEWHERE",
+     "OTHER"
+    ],
+    "title": "BarrierCode"
+   },
+   "BarrierIn": {
+    "properties": {
+     "codes": {
+      "items": {
+       "$ref": "#/components/schemas/BarrierCode"
+      },
+      "type": "array",
+      "title": "Codes"
+     },
+     "text": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 2000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Text"
+     }
+    },
+    "type": "object",
+    "title": "BarrierIn"
+   },
+   "CloseIn": {
+    "properties": {
+     "outcome": {
+      "$ref": "#/components/schemas/Outcome"
+     },
+     "evidence_ref": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Evidence Ref"
+     },
+     "reason": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 2000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "outcome"
+    ],
+    "title": "CloseIn"
+   },
+   "ConfirmBarrierIn": {
+    "properties": {
+     "code": {
+      "$ref": "#/components/schemas/BarrierCode"
+     }
+    },
+    "type": "object",
+    "required": [
+     "code"
+    ],
+    "title": "ConfirmBarrierIn"
+   },
+   "ConsultIn": {
+    "properties": {
+     "to": {
+      "type": "string",
+      "title": "To"
+     },
+     "question": {
+      "type": "string",
+      "maxLength": 4000,
+      "title": "Question"
+     }
+    },
+    "type": "object",
+    "required": [
+     "to",
+     "question"
+    ],
+    "title": "ConsultIn"
+   },
+   "ContactIn": {
+    "properties": {
+     "channel": {
+      "type": "string",
+      "pattern": "^(phone|sms|sahatna|whatsapp|in_person|email)$",
+      "title": "Channel"
+     },
+     "result": {
+      "type": "string",
+      "pattern": "^(reached|no_answer|wrong_number|left_message|declined)$",
+      "title": "Result"
+     }
+    },
+    "type": "object",
+    "required": [
+     "channel",
+     "result"
+    ],
+    "title": "ContactIn"
+   },
+   "DeliveryFailureIn": {
+    "properties": {
+     "outbox_id": {
+      "type": "integer",
+      "minimum": 1.0,
+      "title": "Outbox Id"
+     },
+     "channels": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "maxItems": 10,
+      "minItems": 1,
+      "title": "Channels"
+     }
+    },
+    "type": "object",
+    "required": [
+     "outbox_id",
+     "channels"
+    ],
+    "title": "DeliveryFailureIn"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "HandoffIn": {
+    "properties": {
+     "to": {
+      "type": "string",
+      "title": "To"
+     },
+     "reason": {
+      "type": "string",
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "to",
+     "reason"
+    ],
+    "title": "HandoffIn"
+   },
+   "NoteIn": {
+    "properties": {
+     "note": {
+      "type": "string",
+      "maxLength": 2000,
+      "title": "Note"
+     }
+    },
+    "type": "object",
+    "required": [
+     "note"
+    ],
+    "title": "NoteIn"
+   },
+   "Outcome": {
+    "type": "string",
+    "enum": [
+     "COMPLETED_WITH_REPORT",
+     "COMPLETED_ELSEWHERE",
+     "PLAN_CHANGED",
+     "INFORMED_REFUSAL",
+     "UNREACHABLE"
+    ],
+    "title": "Outcome"
+   },
+   "PatientMessageIn": {
+    "properties": {
+     "text": {
+      "type": "string",
+      "maxLength": 600,
+      "minLength": 1,
+      "title": "Text"
+     },
+     "language": {
+      "type": "string",
+      "pattern": "^(en|ar)$",
+      "title": "Language",
+      "default": "en"
+     },
+     "ai_draft_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 64,
+        "pattern": "^[A-Za-z0-9_-]+$"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ai Draft Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text"
+    ],
+    "title": "PatientMessageIn"
+   },
+   "PrepAnswersIn": {
+    "properties": {
+     "answers": {
+      "additionalProperties": {
+       "type": "string"
+      },
+      "type": "object",
+      "maxProperties": 20,
+      "title": "Answers"
+     }
+    },
+    "type": "object",
+    "required": [
+     "answers"
+    ],
+    "title": "PrepAnswersIn"
+   },
+   "ReferralStatusMessage": {
+    "properties": {
+     "message_id": {
+      "type": "string",
+      "title": "Message Id"
+     },
+     "referral_id": {
+      "type": "string",
+      "title": "Referral Id"
+     },
+     "patient_id": {
+      "type": "string",
+      "title": "Patient Id"
+     },
+     "status": {
+      "$ref": "#/components/schemas/AdminStatus"
+     },
+     "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Occurred At"
+     },
+     "service": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Service"
+     }
+    },
+    "type": "object",
+    "required": [
+     "message_id",
+     "referral_id",
+     "patient_id",
+     "status",
+     "occurred_at"
+    ],
+    "title": "ReferralStatusMessage",
+    "description": "Simplified Malaffi REF status message (field names are an assumption until the spec is confirmed)."
+   },
+   "RejectIn": {
+    "properties": {
+     "reason_code": {
+      "type": "string",
+      "title": "Reason Code"
+     }
+    },
+    "type": "object",
+    "required": [
+     "reason_code"
+    ],
+    "title": "RejectIn"
+   },
+   "TextIn": {
+    "properties": {
+     "text": {
+      "type": "string",
+      "maxLength": 4000,
+      "title": "Text"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text"
+    ],
+    "title": "TextIn"
+   },
+   "TickIn": {
+    "properties": {
+     "now": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Now"
+     },
+     "limit": {
+      "type": "integer",
+      "maximum": 5000.0,
+      "minimum": 1.0,
+      "title": "Limit",
+      "default": 500
+     }
+    },
+    "type": "object",
+    "title": "TickIn"
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   }
+  }
+ }
+}

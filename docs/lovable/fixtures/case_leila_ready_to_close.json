@@ -1,0 +1,692 @@
+{
+  "id": "case_727d262a6ef1",
+  "status": "open",
+  "patient": {
+    "id": "p-leila",
+    "name": "Leila M. (61)",
+    "language": "en",
+    "insurance_network": "Enhanced",
+    "birth_year": 1965
+  },
+  "pathway": {
+    "id": "fit-positive-colonoscopy",
+    "name": "Positive FIT to colonoscopy",
+    "version": 1
+  },
+  "priority": {
+    "value": "high",
+    "provenance": "computed",
+    "rule": "pathway fit-positive-colonoscopy v1"
+  },
+  "owner": {
+    "id": "dr-salma",
+    "name": "Dr. Salma (family physician)",
+    "role": "family_physician"
+  },
+  "pending_handoff": null,
+  "progress": {
+    "verified": {
+      "stage": "OUTCOME_COMMUNICATED",
+      "step": 9,
+      "of": 9
+    },
+    "reported": {
+      "admin_status": "COMPLETED",
+      "implied_stage": "OUTCOME_COMMUNICATED",
+      "step": 9,
+      "of": 9
+    },
+    "gap": false
+  },
+  "stages": [
+    {
+      "id": "PATIENT_INVITED",
+      "label": "Patient invited to discuss result",
+      "note": null,
+      "reached": true,
+      "reached_at": "2026-10-20T23:15:37.419142Z",
+      "evidence_ref": "Communication/com-inv-p-leila",
+      "provenance": "fact"
+    },
+    {
+      "id": "RESULT_DISCUSSED",
+      "label": "Result discussed in person",
+      "note": "IFHAS 4.9.2.3 - abnormal findings discussed with the participant present",
+      "reached": true,
+      "reached_at": "2026-10-23T23:15:37.419142Z",
+      "evidence_ref": "Encounter/enc-p-leila",
+      "provenance": "fact"
+    },
+    {
+      "id": "REFERRED",
+      "label": "Referred to GI service",
+      "note": null,
+      "reached": true,
+      "reached_at": "2026-10-24T23:15:37.419142Z",
+      "evidence_ref": "ServiceRequest/sr-p-leila",
+      "provenance": "fact"
+    },
+    {
+      "id": "REFERRAL_ACCEPTED",
+      "label": "Referral accepted by GI service",
+      "note": null,
+      "reached": true,
+      "reached_at": "2026-10-26T23:15:37.419142Z",
+      "evidence_ref": "Task/task-p-leila",
+      "provenance": "fact"
+    },
+    {
+      "id": "BOOKED",
+      "label": "Colonoscopy booked",
+      "note": null,
+      "reached": true,
+      "reached_at": "2026-10-28T23:15:37.419142Z",
+      "evidence_ref": "Appointment/apt-p-leila",
+      "provenance": "fact"
+    },
+    {
+      "id": "ATTENDED",
+      "label": "Attended GI appointment",
+      "note": null,
+      "reached": true,
+      "reached_at": "2026-11-04T23:15:37.419142Z",
+      "evidence_ref": "Appointment/apt-p-leila",
+      "provenance": "fact"
+    },
+    {
+      "id": "PROCEDURE_DONE",
+      "label": "Colonoscopy performed",
+      "note": null,
+      "reached": true,
+      "reached_at": "2026-11-04T23:15:37.419142Z",
+      "evidence_ref": "Procedure/proc-p-leila",
+      "provenance": "fact"
+    },
+    {
+      "id": "REPORT_RECEIVED",
+      "label": "Colonoscopy or pathology report received",
+      "note": null,
+      "reached": true,
+      "reached_at": "2026-11-07T23:15:37.419142Z",
+      "evidence_ref": "DiagnosticReport/dr-p-leila",
+      "provenance": "fact"
+    },
+    {
+      "id": "OUTCOME_COMMUNICATED",
+      "label": "Outcome communicated to patient and referrer",
+      "note": null,
+      "reached": true,
+      "reached_at": "2026-11-09T23:15:37.419142Z",
+      "evidence_ref": "Communication/com-out-p-leila",
+      "provenance": "fact"
+    }
+  ],
+  "appointment_at": "2026-11-04T23:15:37.419142Z",
+  "appointment_missed": null,
+  "stalls": [],
+  "barriers": [],
+  "distress": [],
+  "consults": [],
+  "contact_attempts": 0,
+  "warnings": [],
+  "consent_at": null,
+  "outcome": null,
+  "days_since_progress": 7.0,
+  "timeline": [
+    {
+      "seq": 1,
+      "type": "CASE_OPENED",
+      "at": "2026-10-19T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "case_id": "case_727d262a6ef1",
+        "owner_id": "dr-salma",
+        "priority": "high",
+        "pathway_id": "fit-positive-colonoscopy",
+        "patient_id": "p-leila",
+        "trigger_ref": "Observation/obs-fit-p-leila",
+        "pathway_version": 1
+      }
+    },
+    {
+      "seq": 2,
+      "type": "STAGE_REACHED",
+      "at": "2026-10-20T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "Communication/com-inv-p-leila",
+        "stage": "PATIENT_INVITED",
+        "signal": "PATIENT_INVITED"
+      }
+    },
+    {
+      "seq": 3,
+      "type": "STAGE_REACHED",
+      "at": "2026-10-23T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "Encounter/enc-p-leila",
+        "stage": "RESULT_DISCUSSED",
+        "signal": "RESULT_DISCUSSED"
+      }
+    },
+    {
+      "seq": 4,
+      "type": "STAGE_REACHED",
+      "at": "2026-10-24T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "ServiceRequest/sr-p-leila",
+        "stage": "REFERRED",
+        "signal": "REFERRAL_SENT"
+      }
+    },
+    {
+      "seq": 5,
+      "type": "ADMIN_STATUS_CHANGED",
+      "at": "2026-10-24T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "ServiceRequest/sr-p-leila",
+        "status": "SENT"
+      }
+    },
+    {
+      "seq": 6,
+      "type": "STAGE_REACHED",
+      "at": "2026-10-26T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "Task/task-p-leila",
+        "stage": "REFERRAL_ACCEPTED",
+        "signal": "REFERRAL_ACCEPTED"
+      }
+    },
+    {
+      "seq": 7,
+      "type": "ADMIN_STATUS_CHANGED",
+      "at": "2026-10-26T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "ServiceRequest/sr-p-leila",
+        "status": "ACCEPTED"
+      }
+    },
+    {
+      "seq": 8,
+      "type": "STAGE_REACHED",
+      "at": "2026-10-28T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "Appointment/apt-p-leila",
+        "stage": "BOOKED",
+        "signal": "APPOINTMENT_BOOKED",
+        "appointment_at": "2026-11-04T23:15:37.419142+00:00"
+      }
+    },
+    {
+      "seq": 9,
+      "type": "ADMIN_STATUS_CHANGED",
+      "at": "2026-10-28T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "ServiceRequest/sr-p-leila",
+        "status": "SCHEDULED"
+      }
+    },
+    {
+      "seq": 10,
+      "type": "STAGE_REACHED",
+      "at": "2026-11-04T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "Appointment/apt-p-leila",
+        "stage": "ATTENDED",
+        "signal": "APPOINTMENT_ATTENDED"
+      }
+    },
+    {
+      "seq": 11,
+      "type": "STAGE_REACHED",
+      "at": "2026-11-04T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "Procedure/proc-p-leila",
+        "stage": "PROCEDURE_DONE",
+        "signal": "PROCEDURE_COMPLETED"
+      }
+    },
+    {
+      "seq": 12,
+      "type": "STAGE_REACHED",
+      "at": "2026-11-07T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "DiagnosticReport/dr-p-leila",
+        "stage": "REPORT_RECEIVED",
+        "signal": "REPORT_FINAL"
+      }
+    },
+    {
+      "seq": 13,
+      "type": "ADMIN_STATUS_CHANGED",
+      "at": "2026-11-07T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "ServiceRequest/sr-p-leila",
+        "status": "COMPLETED"
+      }
+    },
+    {
+      "seq": 14,
+      "type": "STAGE_REACHED",
+      "at": "2026-11-09T23:15:37.419142Z",
+      "actor": "malaffi-sim",
+      "provenance": "fact",
+      "payload": {
+        "ref": "Communication/com-out-p-leila",
+        "stage": "OUTCOME_COMMUNICATED",
+        "signal": "OUTCOME_COMMUNICATED"
+      }
+    }
+  ],
+  "version": 14,
+  "next_step": {
+    "reason": "READY_TO_CLOSE",
+    "who": "owner",
+    "text": "All required evidence is in. Review and close the case.",
+    "provenance": "computed",
+    "person": {
+      "id": "dr-salma",
+      "name": "Dr. Salma (family physician)"
+    }
+  },
+  "actions": {
+    "offer_handoff": {
+      "allowed": true
+    },
+    "accept_handoff": {
+      "allowed": false,
+      "code": "R2_NOT_HANDOFF_TARGET",
+      "message": "Only the person the case was offered to can accept it."
+    },
+    "reject_handoff": {
+      "allowed": false,
+      "code": "R2_NOT_HANDOFF_TARGET",
+      "message": "Only the person the case was offered to can reject it."
+    },
+    "log_contact": {
+      "allowed": true
+    },
+    "request_consult": {
+      "allowed": true
+    },
+    "message_patient": {
+      "allowed": true
+    },
+    "close": [
+      {
+        "outcome": "COMPLETED_WITH_REPORT",
+        "requires": [],
+        "allowed": true
+      },
+      {
+        "outcome": "COMPLETED_ELSEWHERE",
+        "requires": [
+          "evidence_ref"
+        ],
+        "allowed": true
+      },
+      {
+        "outcome": "PLAN_CHANGED",
+        "requires": [
+          "reason"
+        ],
+        "allowed": true
+      },
+      {
+        "outcome": "INFORMED_REFUSAL",
+        "requires": [
+          "evidence_ref",
+          "reason"
+        ],
+        "allowed": true
+      },
+      {
+        "outcome": "UNREACHABLE",
+        "requires": [],
+        "allowed": false,
+        "code": "R3_CONTACT_ATTEMPTS",
+        "message": "UNREACHABLE needs at least 3 contact attempts and one escalation."
+      }
+    ],
+    "barriers": {},
+    "distress": {},
+    "consults": {}
+  },
+  "notifications": [
+    {
+      "id": 17,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 1,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:37.858984Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "Your doctor would like to see you to talk about your recent screening result."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    },
+    {
+      "id": 19,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 2,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:37.901460Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "Please book a visit with your family doctor to talk about your screening result."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    },
+    {
+      "id": 27,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 3,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:38.133361Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "Your doctor is arranging a follow-up test (colonoscopy) for you."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    },
+    {
+      "id": 30,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 4,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:38.289621Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "Your referral has been sent. The clinic will contact you to book."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    },
+    {
+      "id": 34,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 6,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:38.463987Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "The clinic has accepted your referral. Booking is next."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    },
+    {
+      "id": 37,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 8,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:38.557573Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "Your colonoscopy is booked. Tell us if anything could stop you from going."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    },
+    {
+      "id": 53,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 10,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:38.856270Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "Thank you for attending. Your care team will follow up."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    },
+    {
+      "id": 54,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 11,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:38.868436Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "Your test is done. Your doctor will share the results with you."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    },
+    {
+      "id": 64,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 12,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:39.062352Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "Your results are with your doctor, who will contact you."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    },
+    {
+      "id": 70,
+      "case_id": "case_727d262a6ef1",
+      "event_seq": 14,
+      "channel": "sahatna",
+      "recipient": "p-leila",
+      "recipient_role": "patient",
+      "template": "patient_update",
+      "urgent": false,
+      "status": "pending",
+      "created_at": "2026-11-16T23:15:39.199556Z",
+      "delivered_at": null,
+      "payload": {
+        "about": [
+          {
+            "reference": "urn:tasleem:case:case_727d262a6ef1"
+          }
+        ],
+        "status": "in-progress",
+        "payload": [
+          {
+            "contentString": "Your follow-up is complete. Thank you."
+          }
+        ],
+        "subject": {
+          "reference": "Patient/p-leila"
+        },
+        "language": "en",
+        "resourceType": "Communication"
+      }
+    }
+  ]
+}

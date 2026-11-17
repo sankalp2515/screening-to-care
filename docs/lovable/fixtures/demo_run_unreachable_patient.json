@@ -1,0 +1,207 @@
+{
+  "patient_id": "p-demo-unreach-2b219b",
+  "case_id": "case_7c54860d4ee6",
+  "feed": [
+    {
+      "at": "2026-11-16T23:15:04.307057+00:00",
+      "source": "Malaffi (FHIR)",
+      "message": "Observation",
+      "status": "applied"
+    }
+  ],
+  "story": "A positive FIT opens a case and the patient is invited in Sahatna. This patient has no app and no working mobile number. When the notifier runs, both channels fail and the case gets a navigator task: 'Patient not reached by message. Call the patient.'",
+  "case": {
+    "id": "case_7c54860d4ee6",
+    "status": "open",
+    "patient": {
+      "id": "p-demo-unreach-2b219b",
+      "name": "Tariq (demo, 55)",
+      "language": "en",
+      "insurance_network": "Thiqa",
+      "birth_year": 1971
+    },
+    "pathway": {
+      "id": "fit-positive-colonoscopy",
+      "name": "Positive FIT to colonoscopy",
+      "version": 1
+    },
+    "priority": {
+      "value": "high",
+      "provenance": "computed",
+      "rule": "pathway fit-positive-colonoscopy v1"
+    },
+    "owner": {
+      "id": "dr-fatima",
+      "name": "Dr. Fatima (family physician)",
+      "role": "family_physician"
+    },
+    "pending_handoff": null,
+    "progress": {
+      "verified": {
+        "stage": null,
+        "step": 0,
+        "of": 9
+      },
+      "reported": {
+        "admin_status": "NONE",
+        "implied_stage": null,
+        "step": 0,
+        "of": 9
+      },
+      "gap": false
+    },
+    "stages": [
+      {
+        "id": "PATIENT_INVITED",
+        "label": "Patient invited to discuss result",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "RESULT_DISCUSSED",
+        "label": "Result discussed in person",
+        "note": "IFHAS 4.9.2.3 - abnormal findings discussed with the participant present",
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "REFERRED",
+        "label": "Referred to GI service",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "REFERRAL_ACCEPTED",
+        "label": "Referral accepted by GI service",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "BOOKED",
+        "label": "Colonoscopy booked",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "ATTENDED",
+        "label": "Attended GI appointment",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "PROCEDURE_DONE",
+        "label": "Colonoscopy performed",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "REPORT_RECEIVED",
+        "label": "Colonoscopy or pathology report received",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "OUTCOME_COMMUNICATED",
+        "label": "Outcome communicated to patient and referrer",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      }
+    ],
+    "appointment_at": null,
+    "appointment_missed": null,
+    "stalls": [],
+    "barriers": [],
+    "distress": [],
+    "consults": [],
+    "contact_attempts": 0,
+    "warnings": [],
+    "consent_at": null,
+    "outcome": null,
+    "days_since_progress": 0.0,
+    "timeline": [
+      {
+        "seq": 1,
+        "type": "CASE_OPENED",
+        "at": "2026-11-16T23:15:04.307057Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "case_id": "case_7c54860d4ee6",
+          "owner_id": "dr-fatima",
+          "priority": "high",
+          "pathway_id": "fit-positive-colonoscopy",
+          "patient_id": "p-demo-unreach-2b219b",
+          "trigger_ref": "Observation/obs-fit-p-demo-unreach-2b219b",
+          "pathway_version": 1
+        }
+      }
+    ],
+    "version": 1,
+    "next_step": {
+      "reason": "WAITING",
+      "who": "system",
+      "text": "On track. Waiting for: Patient invited to discuss result.",
+      "provenance": "computed"
+    },
+    "actions": null,
+    "notifications": [
+      {
+        "id": 92,
+        "case_id": "case_7c54860d4ee6",
+        "event_seq": 1,
+        "channel": "sahatna",
+        "recipient": "p-demo-unreach-2b219b",
+        "recipient_role": "patient",
+        "template": "patient_update",
+        "urgent": false,
+        "status": "pending",
+        "created_at": "2026-11-16T23:15:04.317323Z",
+        "delivered_at": null,
+        "payload": {
+          "about": [
+            {
+              "reference": "urn:tasleem:case:case_7c54860d4ee6"
+            }
+          ],
+          "status": "in-progress",
+          "payload": [
+            {
+              "contentString": "Your doctor would like to see you to talk about your recent screening result."
+            }
+          ],
+          "subject": {
+            "reference": "Patient/p-demo-unreach-2b219b"
+          },
+          "language": "en",
+          "resourceType": "Communication"
+        }
+      }
+    ]
+  }
+}

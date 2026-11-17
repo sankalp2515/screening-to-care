@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1090" viewBox="0 0 1500 1090" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475467"/>
+    </marker>
+    <style>
+      .t { font-size: 15px; font-weight: 600; fill: #101828; }
+      .s { font-size: 12.5px; fill: #344054; }
+      .m { font-size: 11.5px; fill: #667085; }
+      .h { font-size: 12px; font-weight: 700; fill: #667085; letter-spacing: 1.2px; }
+      .ext { fill: #fff8eb; stroke: #e0a43a; stroke-width: 1.4; }
+      .edge { fill: #ffffff; stroke: #98a2b3; stroke-width: 1.4; stroke-dasharray: 6 4; }
+      .core { fill: #ffffff; stroke: #1f6f8b; stroke-width: 1.4; }
+      .eng { fill: #e6f2f6; stroke: #1f6f8b; stroke-width: 2; }
+      .data { fill: #f2f4f7; stroke: #667085; stroke-width: 1.4; }
+      .user { fill: #eef4ff; stroke: #4e6bd6; stroke-width: 1.4; }
+      .dash { stroke-dasharray: 6 4; }
+      .ln { stroke: #475467; stroke-width: 1.6; fill: none; }
+      .lbl { font-size: 11.5px; fill: #475467; font-style: italic; }
+    </style>
+  </defs>
+  <rect width="1500" height="1090" fill="#fcfcfd"/>
+
+  <text x="30" y="46" font-size="27" font-weight="700" fill="#101828">Tasleem · system architecture</text>
+  <text x="30" y="72" class="s">Verified screening-to-care follow-through beside Malaffi and Sahatna. Solid border = built in the MVP · dashed border = production design, not yet built.</text>
+
+  <!-- column headers -->
+  <text x="30" y="232" class="h">SOURCES (OUTSIDE TASLEEM)</text>
+  <text x="320" y="232" class="h">INTEGRATION EDGE</text>
+  <text x="1120" y="232" class="h">DATA · AZURE UAE NORTH</text>
+  <text x="580" y="98" class="h">PEOPLE AND APPS</text>
+
+  <!-- people row -->
+  <rect x="580" y="108" width="165" height="82" rx="10" class="user"/>
+  <text x="594" y="132" class="t">Clinician web app</text>
+  <text x="594" y="152" class="s">worklist, stalled first</text>
+  <text x="594" y="170" class="s">case view, actions</text>
+
+  <rect x="761" y="108" width="165" height="82" rx="10" class="user"/>
+  <text x="775" y="132" class="t">Care navigator</text>
+  <text x="775" y="152" class="s">barriers, playbooks</text>
+  <text x="775" y="170" class="s">contact attempts</text>
+
+  <rect x="942" y="108" width="165" height="82" rx="10" class="user"/>
+  <text x="956" y="132" class="t">Patient companion</text>
+  <text x="956" y="152" class="s">mobile, Arabic / English</text>
+  <text x="956" y="170" class="s">Sahatna-embeddable</text>
+
+  <rect x="1123" y="108" width="165" height="82" rx="10" class="user"/>
+  <text x="1137" y="132" class="t">Program view</text>
+  <text x="1137" y="152" class="s">ADPHC: funnel, stalls,</text>
+  <text x="1137" y="170" class="s">false-done count</text>
+
+  <rect x="1304" y="108" width="166" height="82" rx="10" class="user"/>
+  <text x="1318" y="132" class="t">Escalation targets</text>
+  <text x="1318" y="152" class="s">named people only: owner</text>
+  <text x="1318" y="170" class="s">→ clinic lead → coordinator</text>
+
+  <path d="M830,190 V238" class="ln" marker-end="url(#arr)" marker-start="url(#arr)"/>
+  <text x="840" y="220" class="lbl">HTTPS · staff OIDC (demo: guest login) · patient token</text>
+
+  <!-- sources -->
+  <rect x="30" y="250" width="250" height="125" rx="10" class="ext"/>
+  <text x="44" y="274" class="t">Malaffi (Abu Dhabi HIE)</text>
+  <text x="44" y="295" class="s">FHIR R4 resources</text>
+  <text x="44" y="314" class="m">Observation · DiagnosticReport</text>
+  <text x="44" y="332" class="m">Appointment · Procedure · Task</text>
+  <text x="44" y="350" class="m">Communication · Encounter</text>
+
+  <rect x="30" y="390" width="250" height="100" rx="10" class="ext"/>
+  <text x="44" y="414" class="t">Malaffi Referral API</text>
+  <text x="44" y="435" class="s">HL7 REF status messages</text>
+  <text x="44" y="453" class="m">DoH Circular 210/2026</text>
+  <text x="44" y="471" class="m">SENT → ACCEPTED → … → COMPLETED</text>
+
+  <rect x="30" y="505" width="250" height="95" rx="10" class="ext"/>
+  <text x="44" y="529" class="t">Sahatna / companion</text>
+  <text x="44" y="550" class="s">patient replies in EN / AR</text>
+  <text x="44" y="568" class="m">"I can't make it", consent,</text>
+  <text x="44" y="586" class="m">call me back</text>
+
+  <rect x="30" y="615" width="250" height="80" rx="10" class="ext"/>
+  <text x="44" y="639" class="t">Directory feed</text>
+  <text x="44" y="660" class="s">practitioners, family physician,</text>
+  <text x="44" y="678" class="s">insurance network</text>
+
+  <rect x="30" y="722" width="512" height="214" rx="10" class="core"/>
+  <text x="44" y="747" class="t">Workflow and outbound layer</text>
+  <text x="44" y="770" class="s">Transactional outbox, written in the same commit as the events</text>
+  <text x="44" y="790" class="s">→ Sahatna: FHIR Communication, plain language, no result values</text>
+  <text x="44" y="810" class="s">→ EMR / Malaffi worklist: FHIR Task to a named person</text>
+  <text x="44" y="830" class="s">Delivery workers pull /v1/integration/outbox, then acknowledge</text>
+  <text x="44" y="853" class="s">case_assignments: each person's inbox in one indexed query</text>
+  <text x="44" y="873" class="s">Org-scoped access: a clinic sees its own patients (404 otherwise)</text>
+  <text x="44" y="893" class="s">Action hints: the UI dry-runs the real engine before each click</text>
+  <text x="44" y="917" class="m">Sahatna, EMR and SMS delivery workers: production integration</text>
+  <path d="M580,770 H544" class="ln" marker-end="url(#arr)"/>
+
+  <path d="M280,312 H300 M280,440 H300 M280,552 H300 M280,655 H300 M300,312 V655" class="ln"/>
+  <path d="M300,350 H318" class="ln" marker-end="url(#arr)"/>
+
+  <!-- edge -->
+  <rect x="320" y="250" width="220" height="200" rx="10" class="edge"/>
+  <text x="334" y="274" class="t">API gateway</text>
+  <text x="334" y="292" class="m">Azure API Management</text>
+  <text x="334" y="316" class="s">TLS 1.2+, rate limits</text>
+  <text x="334" y="336" class="s">OIDC for staff</text>
+  <text x="334" y="364" class="s">Built in the API today:</text>
+  <text x="334" y="384" class="m">integration key for feeds</text>
+  <text x="334" y="402" class="m">1 MB body limit → 413</text>
+  <text x="334" y="420" class="m">request id on every call</text>
+
+  <rect x="320" y="470" width="220" height="130" rx="10" class="edge"/>
+  <text x="334" y="494" class="t">Queue (Service Bus)</text>
+  <text x="334" y="516" class="s">absorbs bursts, backfills</text>
+  <text x="334" y="536" class="s">at-least-once delivery</text>
+  <text x="334" y="556" class="m">safe because ingest is</text>
+  <text x="334" y="574" class="m">idempotent</text>
+
+  <path d="M430,450 V468" class="ln" marker-end="url(#arr)"/>
+  <path d="M540,335 H598" class="ln" marker-end="url(#arr)"/>
+  <path d="M540,535 H560 V365 H598" class="ln dash" marker-end="url(#arr)"/>
+
+  <!-- core container -->
+  <rect x="580" y="240" width="500" height="560" rx="14" fill="#f7fbfc" stroke="#1f6f8b" stroke-width="2"/>
+  <text x="600" y="266" font-size="13" font-weight="700" fill="#1f6f8b">TASLEEM API · STATELESS REPLICAS (PYTHON, FASTAPI)</text>
+
+  <rect x="600" y="280" width="460" height="110" rx="10" class="core"/>
+  <text x="614" y="303" class="t">Ingest adapters</text>
+  <text x="614" y="324" class="s">FHIR R4 parser → normalized signals; field-level 422 errors</text>
+  <text x="614" y="343" class="s">REF adapter: admin status never advances a verified stage</text>
+  <text x="614" y="362" class="s">Idempotent on (source, message_id); retries on races</text>
+  <text x="614" y="381" class="s">Late-trigger replay for out-of-order delivery</text>
+
+  <path d="M830,390 V403" class="ln" marker-end="url(#arr)"/>
+  <rect x="600" y="405" width="460" height="85" rx="10" class="core"/>
+  <text x="614" y="428" class="t">Application services</text>
+  <text x="614" y="449" class="s">load → decide → append events + projection in one transaction</text>
+  <text x="614" y="468" class="s">optimistic version lock per case · cache invalidation</text>
+
+  <path d="M830,490 V503" class="ln" marker-end="url(#arr)"/>
+  <rect x="600" y="505" width="460" height="150" rx="10" class="eng"/>
+  <text x="614" y="529" class="t">Domain engine · pure code, no I/O, deterministic</text>
+  <text x="614" y="551" class="s">Pathways as versioned YAML: FIT+ → colonoscopy, HbA1c, blood pressure</text>
+  <text x="614" y="570" class="s">8 stall checks, including "completed but no report"</text>
+  <text x="614" y="589" class="s">Escalation ladder to named humans, re-escalates</text>
+  <text x="614" y="608" class="s">Closure only with outcome + evidence or signed decision</text>
+  <text x="614" y="627" class="s">Barrier → playbook · distress → clinician now</text>
+  <text x="614" y="645" class="m">No database, network or AI inside: every rule is unit-testable</text>
+
+  <path d="M830,655 V668" class="ln" marker-end="url(#arr)"/>
+  <rect x="600" y="670" width="460" height="112" rx="10" class="core"/>
+  <text x="614" y="693" class="t">Read models</text>
+  <text x="614" y="714" class="s">Worklist (risk-ordered, paged) · case detail: verified vs reported</text>
+  <text x="614" y="733" class="s">Timeline labelled Fact / Computed / AI suggestion / Human</text>
+  <text x="614" y="752" class="s">Patient view: plain language, no result values, RTL</text>
+  <text x="614" y="771" class="s">Program metrics: funnel, stalls, barriers, false-done</text>
+
+  <!-- below core -->
+  <rect x="580" y="822" width="240" height="112" rx="10" class="core"/>
+  <text x="594" y="846" class="t">Scheduler workers</text>
+  <text x="594" y="867" class="s">only cases with next_check_at due</text>
+  <text x="594" y="886" class="s">SKIP LOCKED batches, drains backlog</text>
+  <text x="594" y="905" class="s">missed deadline → named person</text>
+  <text x="594" y="923" class="m">any number of workers</text>
+  <path d="M700,822 V802" class="ln" marker-end="url(#arr)"/>
+
+  <rect x="840" y="822" width="240" height="112" rx="10" class="core"/>
+  <text x="854" y="846" class="t">AI helpers · suggest only</text>
+  <text x="854" y="867" class="s">keyword barrier + distress (built)</text>
+  <text x="854" y="886" class="s">LLM classifier, drafting: off by</text>
+  <text x="854" y="905" class="s">default, behind a flag</text>
+  <text x="854" y="923" class="m">a human confirms every suggestion</text>
+  <path d="M960,822 V802" class="ln" marker-end="url(#arr)"/>
+
+  <!-- data -->
+  <rect x="1120" y="250" width="350" height="280" rx="10" class="data"/>
+  <text x="1134" y="274" class="t">PostgreSQL (SQLite for local demo)</text>
+  <text x="1134" y="298" class="s">cases: projection, owner, stage, version</text>
+  <text x="1134" y="317" class="m">indexes: worklist order, due checks, one open</text>
+  <text x="1134" y="334" class="m">case per patient and pathway</text>
+  <text x="1134" y="358" class="s">case_events: append-only, hash-chained</text>
+  <text x="1134" y="375" class="m">tamper check reports the first broken link</text>
+  <text x="1134" y="399" class="s">inbound_messages: raw payload + signals</text>
+  <text x="1134" y="416" class="m">unique (source, message_id) for idempotency</text>
+  <text x="1134" y="440" class="s">organizations, practitioners, patients</text>
+  <text x="1134" y="464" class="s">5 s statement timeout · pooled, pre-ping</text>
+  <text x="1134" y="488" class="m">pseudonymous ids; Emirates ID stays in Malaffi</text>
+  <text x="1134" y="512" class="m">production: Alembic migrations, monthly partitions</text>
+
+  <rect x="1120" y="550" width="350" height="125" rx="10" class="data"/>
+  <text x="1134" y="574" class="t">Redis cache</text>
+  <text x="1134" y="596" class="s">program metrics, at most 15 s stale, single flight</text>
+  <text x="1134" y="615" class="s">directory lookups, 300 s</text>
+  <text x="1134" y="639" class="s">clinical case state is never cached</text>
+  <text x="1134" y="658" class="m">in-process cache when Redis is not configured</text>
+
+  <rect x="1120" y="695" width="350" height="105" rx="10" class="data dash"/>
+  <text x="1134" y="719" class="t">Observability</text>
+  <text x="1134" y="740" class="s">JSON logs with request id, no PII</text>
+  <text x="1134" y="759" class="s">/healthz liveness · /readyz checks database</text>
+  <text x="1134" y="778" class="m">OpenTelemetry traces and metrics (production)</text>
+
+  <path d="M1060,447 H1118" class="ln" marker-end="url(#arr)"/>
+  <text x="1084" y="439" class="lbl" font-size="10.5">write</text>
+  <path d="M1060,726 H1090 V612 H1118" class="ln" marker-end="url(#arr)"/>
+  <text x="1094" y="604" class="lbl" font-size="10.5">read</text>
+
+  <!-- safety band -->
+  <rect x="30" y="960" width="1440" height="105" rx="12" fill="#101828"/>
+  <text x="50" y="988" font-size="13" font-weight="700" fill="#ffffff" letter-spacing="1">SAFETY RULES · ENFORCED IN THE DOMAIN ENGINE · EACH ONE TESTED, INCLUDING 2,000 RANDOMIZED COMMAND SEQUENCES</text>
+  <g font-size="12.5" fill="#e4e7ec">
+    <text x="50" y="1018"><tspan font-weight="700" fill="#7dd3fc">R1</tspan> one named owner, always</text>
+    <text x="290" y="1018"><tspan font-weight="700" fill="#7dd3fc">R2</tspan> two-step handoff: sender owns until accepted</text>
+    <text x="680" y="1018"><tspan font-weight="700" fill="#7dd3fc">R3</tspan> close only with evidence or a signed decision</text>
+    <text x="50" y="1046"><tspan font-weight="700" fill="#7dd3fc">R4</tspan> every missed deadline escalates to a named human</text>
+    <text x="480" y="1046"><tspan font-weight="700" fill="#7dd3fc">R5</tspan> AI never decides: suggestions only, a human confirms</text>
+    <text x="940" y="1046"><tspan font-weight="700" fill="#7dd3fc">R6</tspan> every state change is a hash-chained, tamper-evident event</text>
+    <text x="1080" y="1018" fill="#98a2b3">synthetic data only</text>
+  </g>
+</svg>

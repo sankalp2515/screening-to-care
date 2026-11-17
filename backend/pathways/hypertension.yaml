@@ -1,0 +1,64 @@
+# Pathway C (configuration only): screening blood pressure in the hypertension range -> confirmation -> plan.
+# ADPHC named hypertension first among the findings to prioritise (V3). No new code: this file is the whole
+# change, which is how Tasleem scales to more screening findings. Thresholds and deadlines are PLACEHOLDERS
+# for the programme's clinical lead to set.
+id: hypertension-screening
+version: 1
+name: Raised screening blood pressure to confirmed plan
+priority: medium
+referral_service: null
+
+trigger:
+  signal: LAB_RESULT
+  codes: ["8480-6"]                       # LOINC systolic blood pressure
+  value_gte: 140                          # mmHg; placeholder screening threshold
+
+stages:
+  - {id: PATIENT_INVITED, label: Patient invited for a blood pressure review, signals: [PATIENT_INVITED], sla_days: 5}
+  - {id: RESULT_DISCUSSED, label: Reviewed with family physician, signals: [RESULT_DISCUSSED], sla_days: 14}
+  - {id: CONFIRMED, label: Confirmatory reading or home monitoring resulted, signals: [LAB_RESULT, REPORT_FINAL], codes: ["8480-6", "55284-4"], sla_days: 21}
+  - {id: CARE_PLAN_AGREED, label: Plan agreed (lifestyle or treatment), signals: [CARE_PLAN_ACTIVE], sla_days: 14}
+  - {id: OUTCOME_COMMUNICATED, label: Plan shared with patient, signals: [OUTCOME_COMMUNICATED], sla_days: 7}
+
+checks:
+  report_stage: CONFIRMED
+  communicated_stage: OUTCOME_COMMUNICATED
+  report_not_communicated_days: 14
+  handoff_accept_days: 2
+  consult_answer_days: 3
+  reescalate_after_days: 5
+
+escalation_ladder: [owner, clinic_lead, program_coordinator]
+
+playbooks:
+  FEAR: {assignee_role: navigator, action: "Explain what a raised reading means and what the review involves.", due_days: 2}
+  TIME_OR_WORK: {assignee_role: navigator, action: "Offer an evening slot or a home blood pressure monitor loan.", due_days: 3}
+  COST_OR_INSURANCE: {assignee_role: coordinator, action: "Check coverage for home monitoring and review.", due_days: 3}
+  LANGUAGE: {assignee_role: navigator, action: "Book an interpreter.", due_days: 2}
+  WANTS_CALLBACK: {assignee_role: clinician, action: "Owner calls the patient back.", due_days: 2}
+  DONE_ELSEWHERE: {assignee_role: clinician, action: "Request readings from the other provider.", due_days: 3}
+  OTHER: {assignee_role: navigator, action: "Call the patient to understand the barrier.", due_days: 2}
+
+closure:
+  completion_stages: [CARE_PLAN_AGREED, OUTCOME_COMMUNICATED]
+  min_contact_attempts_for_unreachable: 3
+
+patient_messages:
+  OPENED:
+    en: "Your doctor would like to check your blood pressure again."
+    ar: "يرغب طبيبك في إعادة قياس ضغط الدم لديك."
+  PATIENT_INVITED:
+    en: "Please book a short blood pressure review with your family doctor."
+    ar: "يرجى حجز مراجعة قصيرة لضغط الدم مع طبيب الأسرة."
+  RESULT_DISCUSSED:
+    en: "Your doctor has asked for a few more readings to be sure."
+    ar: "طلب طبيبك بعض القراءات الإضافية للتأكد."
+  CONFIRMED:
+    en: "Your doctor will agree a plan with you."
+    ar: "سيتفق طبيبك معك على خطة."
+  CARE_PLAN_AGREED:
+    en: "Your plan is ready."
+    ar: "خطتك جاهزة."
+  OUTCOME_COMMUNICATED:
+    en: "Your follow-up is complete. Thank you."
+    ar: "اكتملت متابعتك. شكراً لك."

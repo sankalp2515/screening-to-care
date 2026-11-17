@@ -1,0 +1,122 @@
+{
+  "case_id": "case_152db087059c",
+  "sense": [
+    {
+      "id": "opened",
+      "text": "Case opened on 2026-10-17 on the pathway 'Positive FIT to colonoscopy'. Owner: Dr. Fatima (family physician).",
+      "cites": [
+        1
+      ]
+    },
+    {
+      "id": "verified",
+      "text": "Furthest verified step: Attended GI appointment (step 6 of 9).",
+      "cites": [
+        10
+      ]
+    },
+    {
+      "id": "gap",
+      "text": "Malaffi referral status says COMPLETED, which is further than the clinical evidence shows.",
+      "cites": [
+        11
+      ]
+    },
+    {
+      "id": "stall:CLOSED_WITHOUT_EVIDENCE",
+      "text": "Stalled: Marked completed without a report. Escalation level 3, currently with Sara (program coordinator).",
+      "cites": [
+        12
+      ]
+    }
+  ],
+  "decide": {
+    "next_step": {
+      "reason": "CLOSED_WITHOUT_EVIDENCE",
+      "who": "owner",
+      "text": "Malaffi says completed but no colonoscopy report exists. Ask the GI centre for the report or rebook.",
+      "provenance": "computed",
+      "person": {
+        "id": "dr-fatima",
+        "name": "Dr. Fatima (family physician)"
+      }
+    },
+    "note": "Chosen by case-core's fixed rules. The agent cannot change it."
+  },
+  "act": {
+    "brief": {
+      "provenance": "computed",
+      "source": "extractive",
+      "model": "rules",
+      "rejected_llm_output": null,
+      "sentences": [
+        {
+          "text": "Case opened on 2026-10-17 on the pathway 'Positive FIT to colonoscopy'. Owner: Dr. Fatima (family physician).",
+          "cites": [
+            1
+          ]
+        },
+        {
+          "text": "Furthest verified step: Attended GI appointment (step 6 of 9).",
+          "cites": [
+            10
+          ]
+        },
+        {
+          "text": "Malaffi referral status says COMPLETED, which is further than the clinical evidence shows.",
+          "cites": [
+            11
+          ]
+        },
+        {
+          "text": "Stalled: Marked completed without a report. Escalation level 3, currently with Sara (program coordinator).",
+          "cites": [
+            12
+          ]
+        }
+      ],
+      "next_step": {
+        "reason": "CLOSED_WITHOUT_EVIDENCE",
+        "who": "owner",
+        "text": "Malaffi says completed but no colonoscopy report exists. Ask the GI centre for the report or rebook.",
+        "provenance": "computed",
+        "person": {
+          "id": "dr-fatima",
+          "name": "Dr. Fatima (family physician)"
+        }
+      },
+      "draft_id": "drf_97518f683e584956"
+    },
+    "patient_message": {
+      "draft": {
+        "text": "Your care team is following up on your next step. Please open Sahatna or call your clinic if anything could stop you from attending.",
+        "language": "en",
+        "template": "GENERIC"
+      },
+      "why": "No barrier on file; general follow-up message.",
+      "provenance": "template",
+      "source": "template",
+      "model": "approved-library",
+      "rejected_llm_output": null,
+      "draft_id": "drf_493e80d14a5c4f5f",
+      "requires_approval": true,
+      "send_with": {
+        "method": "POST",
+        "path": "/v1/cases/case_152db087059c/patient-messages",
+        "body": {
+          "text": "Your care team is following up on your next step. Please open Sahatna or call your clinic if anything could stop you from attending.",
+          "language": "en",
+          "ai_draft_id": "drf_493e80d14a5c4f5f"
+        }
+      }
+    }
+  },
+  "hand_off": {
+    "to": {
+      "id": "dr-fatima",
+      "name": "Dr. Fatima (family physician)"
+    },
+    "note": "Nothing is sent or changed until this person acts in Tasleem."
+  },
+  "llm": "offline-templates"
+}

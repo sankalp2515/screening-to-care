@@ -1,0 +1,39 @@
+{
+  "items": [
+    {
+      "id": "false-done",
+      "title": "Malaffi says completed, colonoscopy never happened",
+      "why": "The headline failure Tasleem exists to catch."
+    },
+    {
+      "id": "report-arrives",
+      "title": "GI centre sends the report (needs case_id)",
+      "why": "Resolves a false-done case on evidence."
+    },
+    {
+      "id": "new-positive-fit",
+      "title": "New positive FIT from the lab",
+      "why": "Shows a case opening with a named owner and a Sahatna invitation."
+    },
+    {
+      "id": "missed-colonoscopy",
+      "title": "Patient misses the colonoscopy and replies",
+      "why": "Barrier capture, AI suggestion, human confirmation, navigator task."
+    },
+    {
+      "id": "distress-message",
+      "title": "Patient reports bleeding and fear",
+      "why": "Distress reaches a clinician the same minute."
+    },
+    {
+      "id": "raised-blood-pressure",
+      "title": "Raised screening blood pressure",
+      "why": "A second disease on configuration only."
+    },
+    {
+      "id": "unreachable-patient",
+      "title": "Patient cannot be reached by app or SMS",
+      "why": "Channel fallback ends in a human call task (run the notifier)."
+    }
+  ]
+}

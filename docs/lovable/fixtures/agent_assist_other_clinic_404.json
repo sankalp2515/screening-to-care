@@ -1,0 +1,10 @@
+{
+  "detail": {
+    "code": "NOT_FOUND",
+    "message": "case 'case_152db087059c' not found",
+    "details": {
+      "what": "case",
+      "id": "case_152db087059c"
+    }
+  }
+}

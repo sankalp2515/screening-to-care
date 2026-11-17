@@ -1,0 +1,116 @@
+# Local production-like stack. Synthetic demo data only; every key below is a local placeholder.
+#   case-core API :8000   notifier :8010   agent :8020   HL7 connector :8030
+# Built once (by `migrate`), reused by every service so they all run the same code.
+x-image: &image
+  image: tasleem-backend:local
+  pull_policy: never
+
+x-core-env: &core-env
+  TASLEEM_DATABASE_URL: postgresql+psycopg://tasleem:tasleem-local-only@db:5432/tasleem
+  TASLEEM_REDIS_URL: redis://redis:6379/0
+  TASLEEM_DEMO_MODE: "true"
+  TASLEEM_AUTO_CREATE_SCHEMA: "false"
+  # One key per calling service, each limited to its own scope (connector: ingest; notifier: outbox).
+  TASLEEM_INTEGRATION_KEYS: '{"connector": "local-connector-key", "notifier": "local-notifier-key"}'
+  TASLEEM_RATE_LIMIT_PER_SECOND: "50"
+  TASLEEM_RATE_LIMIT_BURST: "200"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tasleem
+      POSTGRES_PASSWORD: tasleem-local-only
+      POSTGRES_DB: tasleem
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tasleem"]
+      interval: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./deploy/postgres-init.sql:/docker-entrypoint-initdb.d/10-service-databases.sql:ro
+
+  redis:
+    image: redis:7-alpine
+
+  migrate:
+    <<: *image
+    build: ./backend
+    command: ["python", "-m", "tasleem.migrate"]
+    environment: *core-env
+    depends_on:
+      db: {condition: service_healthy}
+    restart: "no"
+
+  api:
+    <<: *image
+    environment:
+      <<: *core-env
+      TASLEEM_SEED_ON_START: "true"
+      TASLEEM_SCHEDULER_INTERVAL_SECONDS: "0"   # the scheduler service runs deadlines
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_started}
+    ports: ["8000:8000"]
+    healthcheck: &health
+      test: ["CMD", "python", "-c", "import os,urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:'+os.environ.get('PORT','8000')+'/healthz').status==200 else 1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  scheduler:
+    <<: *image
+    command: ["python", "-m", "tasleem.workers.scheduler", "--interval", "300"]
+    environment: *core-env
+    depends_on:
+      api: {condition: service_healthy}
+
+  notifier:
+    <<: *image
+    command: ["uvicorn", "tasleem_notifier.app:app", "--host", "0.0.0.0", "--port", "8010"]
+    environment:
+      PORT: "8010"
+      NOTIFIER_DATABASE_URL: postgresql+psycopg://tasleem:tasleem-local-only@db:5432/notifier
+      NOTIFIER_CORE_URL: http://api:8000
+      NOTIFIER_CORE_INTEGRATION_KEY: local-notifier-key
+      NOTIFIER_POLL_SECONDS: "15"
+      NOTIFIER_DEMO_MODE: "true"
+      NOTIFIER_OPS_KEY: local-ops-key
+    depends_on:
+      api: {condition: service_healthy}
+    ports: ["8010:8010"]
+    healthcheck: *health
+
+  agent:
+    <<: *image
+    command: ["uvicorn", "tasleem_agent.app:app", "--host", "0.0.0.0", "--port", "8020"]
+    environment:
+      PORT: "8020"
+      AGENT_DATABASE_URL: postgresql+psycopg://tasleem:tasleem-local-only@db:5432/agent
+      AGENT_CORE_URL: http://api:8000
+      # offline|claude|groq|gemini|nvidia|openrouter|openai_compat. Keys come from backend/.env below.
+      AGENT_LLM_PROVIDER: ${AGENT_LLM_PROVIDER:-offline}
+      AGENT_LLM_MODEL: ${AGENT_LLM_MODEL:-}
+    env_file:
+      - path: backend/.env   # git- and docker-ignored; optional
+        required: false
+    depends_on:
+      api: {condition: service_healthy}
+    ports: ["8020:8020"]
+    healthcheck: *health
+
+  connector:
+    <<: *image
+    command: ["uvicorn", "tasleem_connector.app:app", "--host", "0.0.0.0", "--port", "8030"]
+    environment:
+      PORT: "8030"
+      CONNECTOR_CORE_URL: http://api:8000
+      CONNECTOR_CORE_INTEGRATION_KEY: local-connector-key
+      CONNECTOR_DEMO_MODE: "true"
+    depends_on:
+      api: {condition: service_healthy}
+    ports: ["8030:8030"]
+    healthcheck: *health
+
+volumes:
+  pgdata:

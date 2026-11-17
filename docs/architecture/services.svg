@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="1200" height="760" font-family="Inter, Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475467"/>
+    </marker>
+    <style>
+      .t { font-size: 15px; font-weight: 600; fill: #101828; }
+      .s { font-size: 12.5px; fill: #344054; }
+      .h { font-size: 13px; font-weight: 700; fill: #475467; letter-spacing: .06em; }
+      .l { stroke: #475467; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+      .ld { stroke: #475467; stroke-width: 1.4; fill: none; stroke-dasharray: 5 4; marker-end: url(#a); }
+      .e { font-size: 11.5px; fill: #475467; }
+    </style>
+  </defs>
+  <rect width="1200" height="760" fill="#ffffff"/>
+  <text x="40" y="44" font-size="24" font-weight="700" fill="#0F5C6E">Tasleem: services and channels</text>
+  <text x="40" y="68" class="s">One safety core writes clinical state (rules R1–R6, audit). Satellites reach it only over HTTP. Synthetic data only.</text>
+
+  <!-- Sources -->
+  <text x="40" y="112" class="h">SOURCES</text>
+  <rect x="40" y="124" width="220" height="70" rx="10" fill="#F2F4F7" stroke="#D0D5DD"/>
+  <text x="56" y="152" class="t">Labs and GI centres</text>
+  <text x="56" y="174" class="s">HL7 v2 ORU results, SIU bookings</text>
+  <rect x="40" y="210" width="220" height="70" rx="10" fill="#F2F4F7" stroke="#D0D5DD"/>
+  <text x="56" y="238" class="t">Malaffi</text>
+  <text x="56" y="260" class="s">HL7 REF (Circular 210), FHIR R4</text>
+
+  <!-- Connector -->
+  <rect x="320" y="150" width="210" height="104" rx="12" fill="#EEF4FF" stroke="#6172F3" stroke-width="1.5"/>
+  <text x="336" y="178" class="t">HL7 connector :8030</text>
+  <text x="336" y="200" class="s">parse, map to FHIR, ACK</text>
+  <text x="336" y="220" class="s">idempotent on MSH-10</text>
+  <text x="336" y="240" class="s">untrusted input stays here</text>
+
+  <!-- Core -->
+  <rect x="590" y="110" width="290" height="250" rx="14" fill="#E6F2F4" stroke="#0F5C6E" stroke-width="2.2"/>
+  <text x="608" y="140" class="t" fill="#0F5C6E">case-core API :8000</text>
+  <text x="608" y="162" class="s">the only writer of clinical state</text>
+  <text x="608" y="190" class="s">• rules: owner, handoff, evidence-based</text>
+  <text x="620" y="208" class="s">closure, escalation, no AI decisions</text>
+  <text x="608" y="230" class="s">• hash-chained audit log</text>
+  <text x="608" y="252" class="s">• personal inboxes, clinic scoping (404)</text>
+  <text x="608" y="274" class="s">• patient-message policy (IFHAS)</text>
+  <text x="608" y="296" class="s">• outbox, written in the same transaction</text>
+  <rect x="608" y="312" width="254" height="34" rx="8" fill="#ffffff" stroke="#0F5C6E"/>
+  <text x="622" y="334" class="s">scheduler worker: deadlines, escalations</text>
+
+  <!-- Databases -->
+  <rect x="590" y="390" width="140" height="56" rx="10" fill="#FFFFFF" stroke="#98A2B3"/>
+  <text x="604" y="414" class="t">Postgres</text>
+  <text x="604" y="434" class="s">db: tasleem</text>
+  <rect x="742" y="390" width="138" height="56" rx="10" fill="#FFFFFF" stroke="#98A2B3"/>
+  <text x="756" y="414" class="t">Redis</text>
+  <text x="756" y="434" class="s">cache only</text>
+
+  <!-- Agent -->
+  <rect x="320" y="420" width="210" height="130" rx="12" fill="#F4F3FF" stroke="#7A5AF8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="336" y="448" class="t">AI agent :8020</text>
+  <text x="336" y="470" class="s">suggestions only</text>
+  <text x="336" y="490" class="s">cited case brief</text>
+  <text x="336" y="510" class="s">policy-checked patient draft</text>
+  <text x="336" y="530" class="s">no write access; db: agent</text>
+
+  <!-- Notifier -->
+  <rect x="940" y="110" width="220" height="150" rx="12" fill="#FEF6EE" stroke="#B7791F" stroke-width="1.5"/>
+  <text x="956" y="138" class="t">notifier :8010</text>
+  <text x="956" y="160" class="s">a channel per kind of person</text>
+  <text x="956" y="180" class="s">quiet hours, retries, fallback</text>
+  <text x="956" y="200" class="s">signed receipts</text>
+  <text x="956" y="220" class="s">unreached → navigator task</text>
+  <text x="956" y="240" class="s">db: notifier</text>
+
+  <!-- People / channels -->
+  <text x="940" y="300" class="h">WHO IS REACHED HOW</text>
+  <rect x="940" y="312" width="220" height="52" rx="10" fill="#F2F4F7" stroke="#D0D5DD"/>
+  <text x="954" y="334" class="t">Patient</text>
+  <text x="954" y="353" class="s">Sahatna → SMS nudge → call</text>
+  <rect x="940" y="372" width="220" height="52" rx="10" fill="#F2F4F7" stroke="#D0D5DD"/>
+  <text x="954" y="394" class="t">Physicians, GI, clinic lead</text>
+  <text x="954" y="413" class="s">EMR task; SMS page if urgent</text>
+  <rect x="940" y="432" width="220" height="52" rx="10" fill="#F2F4F7" stroke="#D0D5DD"/>
+  <text x="954" y="454" class="t">Navigator</text>
+  <text x="954" y="473" class="s">Tasleem worklist</text>
+  <rect x="940" y="492" width="220" height="52" rx="10" fill="#F2F4F7" stroke="#D0D5DD"/>
+  <text x="954" y="514" class="t">Programme coordinator</text>
+  <text x="954" y="533" class="s">daily digest, programme view</text>
+
+  <!-- UI -->
+  <rect x="590" y="500" width="290" height="70" rx="12" fill="#FFFFFF" stroke="#0F5C6E" stroke-dasharray="4 3"/>
+  <text x="640" y="528" class="t">Tasleem web app (Lovable)</text>
+  <text x="640" y="550" class="s">My work, case view, programme, patient</text>
+
+  <!-- Arrows -->
+  <path class="l" d="M260,159 H320"/>
+  <path class="l" d="M260,245 C290,245 290,220 320,220"/>
+  <path class="l" d="M530,200 H590"/>
+  <text x="533" y="190" class="e">FHIR/REF</text>
+  <path class="ld" d="M260,262 C420,300 470,320 590,320"/>
+  <text x="380" y="292" class="e">FHIR direct</text>
+  <path class="l" d="M940,185 H880"/>
+  <text x="886" y="176" class="e">pull, ack</text>
+  <path class="l" d="M880,215 H940"/>
+  <text x="883" y="232" class="e" font-size="10.5">unreached</text>
+  <path class="l" d="M1050,260 V312"/>
+  <path class="l" d="M680,360 V390"/>
+  <path class="l" d="M790,360 V390"/>
+  <path class="l" d="M530,470 C570,470 560,300 590,300"/>
+  <text x="392" y="404" class="e">reads as the caller</text>
+  <path class="l" d="M600,500 C565,470 565,390 600,362"/>
+  <path class="l" d="M590,535 C560,535 560,520 530,520"/>
+
+  <!-- Footer -->
+  <rect x="40" y="610" width="1120" height="110" rx="12" fill="#F9FAFB" stroke="#EAECF0"/>
+  <text x="60" y="640" class="t">Verified on 17 Nov 2026</text>
+  <text x="60" y="664" class="s">177 automated tests · 32 of 32 end-to-end checks on Docker with PostgreSQL 16 and Redis · 64 of 67 labelled hard cases · dependencies audited clean</text>
+  <text x="60" y="688" class="s">Benchmark on synthetic cohorts: 98.5% of stalled journeys reach a named person vs 70.1% with status-only monitoring; 0 vs 125 falsely counted as done.</text>
+  <text x="60" y="708" class="s">Every cross-service write is idempotent. A database per service. Service boundaries are checked by a test.</text>
+</svg>

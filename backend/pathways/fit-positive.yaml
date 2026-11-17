@@ -1,0 +1,125 @@
+# Pathway A (built deep): positive faecal immunochemical test (FIT) -> colonoscopy -> report -> outcome.
+# Clinician-approved configuration. Deadlines are PLACEHOLDERS for the prototype and must be set by the
+# screening program's clinical lead before any pilot. Codes must be checked against Malaffi code sets.
+id: fit-positive-colonoscopy
+version: 1
+name: Positive FIT to colonoscopy
+priority: high
+referral_service: colonoscopy
+
+trigger:
+  signal: LAB_RESULT
+  codes: ["29771-3", "57905-2"]          # LOINC FIT (verify against Malaffi lab catalogue)
+  positive_interpretations: ["POS", "A", "H", "AA"]
+
+stages:
+  - {id: PATIENT_INVITED, label: Patient invited to discuss result, signals: [PATIENT_INVITED], sla_days: 3}
+  - {id: RESULT_DISCUSSED, label: Result discussed in person, signals: [RESULT_DISCUSSED], sla_days: 7,
+     note: "IFHAS 4.9.2.3 - abnormal findings discussed with the participant present"}
+  - {id: REFERRED, label: Referred to GI service, signals: [REFERRAL_SENT], sla_days: 3}
+  - {id: REFERRAL_ACCEPTED, label: Referral accepted by GI service, signals: [REFERRAL_ACCEPTED], sla_days: 5}
+  - {id: BOOKED, label: Colonoscopy booked, signals: [APPOINTMENT_BOOKED], sla_days: 7}
+  - {id: ATTENDED, label: Attended GI appointment, signals: [APPOINTMENT_ATTENDED]}
+  - {id: PROCEDURE_DONE, label: Colonoscopy performed, signals: [PROCEDURE_COMPLETED], codes: ["73761001"]}
+  - {id: REPORT_RECEIVED, label: Colonoscopy or pathology report received, signals: [REPORT_FINAL],
+     codes: ["18746-8", "11526-1"], sla_days: 10}
+  - {id: OUTCOME_COMMUNICATED, label: Outcome communicated to patient and referrer, signals: [OUTCOME_COMMUNICATED]}
+
+# What a "Malaffi referral status only" view would believe.
+admin_status_map:
+  SENT: REFERRED
+  ACCEPTED: REFERRAL_ACCEPTED
+  SCHEDULED: BOOKED
+  COMPLETED: OUTCOME_COMMUNICATED
+
+checks:
+  booked_stage: BOOKED
+  attended_stage: ATTENDED
+  attended_grace_hours: 24
+  procedure_stage: PROCEDURE_DONE
+  consult_no_procedure_days: 21
+  evidence_stage: REPORT_RECEIVED
+  admin_completed_grace_days: 3
+  report_stage: REPORT_RECEIVED
+  communicated_stage: OUTCOME_COMMUNICATED
+  report_not_communicated_days: 7
+  handoff_accept_days: 2
+  consult_answer_days: 2
+  reescalate_after_days: 3
+
+escalation_ladder: [owner, clinic_lead, program_coordinator]
+
+playbooks:
+  FEAR: {assignee_role: navigator, action: "Call to explain colonoscopy and sedation in the patient's language; offer a clinician call-back.", due_days: 1}
+  PREP_UNCLEAR: {assignee_role: navigator, action: "Walk through bowel preparation step by step; repeat the teach-back check.", due_days: 1}
+  NO_ESCORT: {assignee_role: navigator, action: "Arrange an escort option or a slot when family can attend; confirm sedation-discharge rules.", due_days: 2}
+  TRANSPORT: {assignee_role: navigator, action: "Offer a closer in-network centre or transport support.", due_days: 2}
+  COST_OR_INSURANCE: {assignee_role: coordinator, action: "Check coverage and route to an in-network centre; resolve pre-authorisation.", due_days: 2}
+  TIME_OR_WORK: {assignee_role: navigator, action: "Offer evening or weekend slots; provide a sick-leave note on request.", due_days: 2}
+  LANGUAGE: {assignee_role: navigator, action: "Book an interpreter and send instructions in the preferred language.", due_days: 1}
+  WANTS_CALLBACK: {assignee_role: clinician, action: "Owner calls the patient back.", due_days: 1}
+  DONE_ELSEWHERE: {assignee_role: clinician, action: "Request the report from the other provider; close as COMPLETED_ELSEWHERE only with evidence.", due_days: 3}
+  OTHER: {assignee_role: navigator, action: "Call the patient to understand the barrier.", due_days: 1}
+
+closure:
+  completion_stages: [REPORT_RECEIVED, OUTCOME_COMMUNICATED]
+  min_contact_attempts_for_unreachable: 3
+
+patient_messages:
+  OPENED:
+    en: "Your doctor would like to see you to talk about your recent screening result."
+    ar: "يرغب طبيبك في مقابلتك للتحدث عن نتيجة الفحص الأخيرة."
+  PATIENT_INVITED:
+    en: "Please book a visit with your family doctor to talk about your screening result."
+    ar: "يرجى حجز موعد مع طبيب الأسرة للتحدث عن نتيجة الفحص."
+  RESULT_DISCUSSED:
+    en: "Your doctor is arranging a follow-up test (colonoscopy) for you."
+    ar: "يقوم طبيبك بترتيب فحص متابعة (تنظير القولون) لك."
+  REFERRED:
+    en: "Your referral has been sent. The clinic will contact you to book."
+    ar: "تم إرسال التحويل. ستتواصل معك العيادة لحجز الموعد."
+  REFERRAL_ACCEPTED:
+    en: "The clinic has accepted your referral. Booking is next."
+    ar: "قبلت العيادة التحويل. الخطوة التالية هي الحجز."
+  BOOKED:
+    en: "Your colonoscopy is booked. Tell us if anything could stop you from going."
+    ar: "تم حجز موعد تنظير القولون. أخبرنا إذا كان هناك ما قد يمنعك من الحضور."
+  ATTENDED:
+    en: "Thank you for attending. Your care team will follow up."
+    ar: "شكراً لحضورك. سيتابع معك فريق الرعاية."
+  PROCEDURE_DONE:
+    en: "Your test is done. Your doctor will share the results with you."
+    ar: "تم إجراء الفحص. سيشاركك طبيبك النتائج."
+  REPORT_RECEIVED:
+    en: "Your results are with your doctor, who will contact you."
+    ar: "نتائجك لدى طبيبك وسيتواصل معك."
+  OUTCOME_COMMUNICATED:
+    en: "Your follow-up is complete. Thank you."
+    ar: "اكتملت متابعتك. شكراً لك."
+
+# Bowel-preparation teach-back (TSL-083). PLACEHOLDER wording: the GI centre's nurse lead must approve the
+# questions and answers before a pilot. A wrong answer opens a barrier for the navigator; it never advises.
+prep_check:
+  - id: diet
+    text: {en: "When do you start the clear-liquid diet?", ar: "متى تبدأ النظام الغذائي من السوائل الصافية؟"}
+    options:
+      - {id: day_before, text: {en: "The day before the test", ar: "في اليوم السابق للفحص"}}
+      - {id: same_morning, text: {en: "On the morning of the test", ar: "في صباح يوم الفحص"}}
+      - {id: not_needed, text: {en: "I don't need to", ar: "لا أحتاج إلى ذلك"}}
+    correct: day_before
+  - id: home
+    text: {en: "How will you get home after the test?", ar: "كيف ستعود إلى المنزل بعد الفحص؟"}
+    options:
+      - {id: adult, text: {en: "An adult will take me home", ar: "سيرافقني شخص بالغ إلى المنزل"}}
+      - {id: drive, text: {en: "I will drive myself", ar: "سأقود السيارة بنفسي"}}
+      - {id: taxi_alone, text: {en: "I will take a taxi alone", ar: "سأستقل سيارة أجرة وحدي"}}
+    correct: adult
+    barrier_on_wrong: NO_ESCORT
+  - id: unfinished
+    text: {en: "What do you do if you could not finish the preparation?",
+           ar: "ماذا تفعل إذا لم تتمكن من إكمال التحضير؟"}
+    options:
+      - {id: call, text: {en: "Call the clinic before the test", ar: "أتصل بالعيادة قبل الفحص"}}
+      - {id: come_anyway, text: {en: "Come anyway and not mention it", ar: "أحضر على أي حال دون أن أذكر ذلك"}}
+      - {id: skip, text: {en: "Skip the test", ar: "ألغي الفحص"}}
+    correct: call

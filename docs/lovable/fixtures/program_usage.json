@@ -1,0 +1,29 @@
+{
+  "month": "2026-11",
+  "active_cases": 13,
+  "by_org": [
+    {
+      "org_id": "org-ghaf",
+      "pathways": {
+        "hba1c-diabetes-range": 1,
+        "fit-positive-colonoscopy": 7
+      },
+      "active_cases": 8
+    },
+    {
+      "org_id": "org-program",
+      "pathways": {
+        "fit-positive-colonoscopy": 1
+      },
+      "active_cases": 1
+    },
+    {
+      "org_id": "org-samar",
+      "pathways": {
+        "fit-positive-colonoscopy": 3,
+        "hypertension-screening": 1
+      },
+      "active_cases": 4
+    }
+  ]
+}

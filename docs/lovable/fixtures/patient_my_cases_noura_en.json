@@ -1,0 +1,56 @@
+{
+  "items": [
+    {
+      "case_id": "case_bccdb1a3c498",
+      "status": "open",
+      "language": "en",
+      "direction": "ltr",
+      "message": "We noticed you could not attend. Tell us what got in the way and we will help you rebook.",
+      "appointment_at": null,
+      "consent_given": false,
+      "barrier_options": [
+        {
+          "code": "FEAR",
+          "label": "I feel scared or worried"
+        },
+        {
+          "code": "PREP_UNCLEAR",
+          "label": "I don't understand the preparation"
+        },
+        {
+          "code": "NO_ESCORT",
+          "label": "No one can take me home"
+        },
+        {
+          "code": "TRANSPORT",
+          "label": "Getting there is hard"
+        },
+        {
+          "code": "COST_OR_INSURANCE",
+          "label": "Cost or insurance"
+        },
+        {
+          "code": "TIME_OR_WORK",
+          "label": "Work or no time"
+        },
+        {
+          "code": "LANGUAGE",
+          "label": "I need an interpreter"
+        },
+        {
+          "code": "WANTS_CALLBACK",
+          "label": "Please call me"
+        },
+        {
+          "code": "DONE_ELSEWHERE",
+          "label": "I had the test somewhere else"
+        },
+        {
+          "code": "OTHER",
+          "label": "Something else"
+        }
+      ],
+      "open_requests": 1
+    }
+  ]
+}

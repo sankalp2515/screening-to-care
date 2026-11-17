@@ -1,0 +1,650 @@
+{
+  "patient_id": "p-demo-4eb712",
+  "case_id": "case_1727a0c555f5",
+  "feed": [
+    {
+      "at": "2026-10-23T23:15:39.947658+00:00",
+      "source": "Malaffi (FHIR)",
+      "message": "Observation",
+      "status": "applied"
+    },
+    {
+      "at": "2026-10-24T23:15:39.947658+00:00",
+      "source": "Malaffi (FHIR)",
+      "message": "Communication",
+      "status": "applied"
+    },
+    {
+      "at": "2026-10-27T23:15:39.947658+00:00",
+      "source": "Malaffi (FHIR)",
+      "message": "Encounter",
+      "status": "applied"
+    },
+    {
+      "at": "2026-10-28T23:15:39.947658+00:00",
+      "source": "Malaffi (FHIR)",
+      "message": "ServiceRequest",
+      "status": "applied"
+    },
+    {
+      "at": "2026-10-28T23:15:39.947658+00:00",
+      "source": "Malaffi (HL7 REF)",
+      "message": "REF SENT"
+    },
+    {
+      "at": "2026-10-30T23:15:39.947658+00:00",
+      "source": "Malaffi (FHIR)",
+      "message": "Task",
+      "status": "applied"
+    },
+    {
+      "at": "2026-10-30T23:15:39.947658+00:00",
+      "source": "Malaffi (HL7 REF)",
+      "message": "REF ACCEPTED"
+    },
+    {
+      "at": "2026-11-01T23:15:39.947658+00:00",
+      "source": "Malaffi (FHIR)",
+      "message": "Appointment",
+      "status": "applied"
+    },
+    {
+      "at": "2026-11-01T23:15:39.947658+00:00",
+      "source": "Malaffi (HL7 REF)",
+      "message": "REF SCHEDULED"
+    },
+    {
+      "at": "2026-11-08T23:15:39.947658+00:00",
+      "source": "Malaffi (FHIR)",
+      "message": "Appointment",
+      "status": "applied"
+    },
+    {
+      "at": "2026-11-12T23:15:39.947658+00:00",
+      "source": "Malaffi (HL7 REF)",
+      "message": "REF COMPLETED"
+    }
+  ],
+  "story": "Malaffi marked the referral COMPLETED 4 days ago. No colonoscopy or report was ever sent. Tasleem flags 'Marked completed without a report' and escalates to the family physician.",
+  "case": {
+    "id": "case_1727a0c555f5",
+    "status": "open",
+    "patient": {
+      "id": "p-demo-4eb712",
+      "name": "Huda (demo, 55)",
+      "language": "ar",
+      "insurance_network": "Thiqa",
+      "birth_year": 1971
+    },
+    "pathway": {
+      "id": "fit-positive-colonoscopy",
+      "name": "Positive FIT to colonoscopy",
+      "version": 1
+    },
+    "priority": {
+      "value": "high",
+      "provenance": "computed",
+      "rule": "pathway fit-positive-colonoscopy v1"
+    },
+    "owner": {
+      "id": "dr-fatima",
+      "name": "Dr. Fatima (family physician)",
+      "role": "family_physician"
+    },
+    "pending_handoff": null,
+    "progress": {
+      "verified": {
+        "stage": "ATTENDED",
+        "step": 6,
+        "of": 9
+      },
+      "reported": {
+        "admin_status": "COMPLETED",
+        "implied_stage": "OUTCOME_COMMUNICATED",
+        "step": 9,
+        "of": 9
+      },
+      "gap": true
+    },
+    "stages": [
+      {
+        "id": "PATIENT_INVITED",
+        "label": "Patient invited to discuss result",
+        "note": null,
+        "reached": true,
+        "reached_at": "2026-10-24T23:15:39.947658Z",
+        "evidence_ref": "Communication/com-inv-p-demo-4eb712",
+        "provenance": "fact"
+      },
+      {
+        "id": "RESULT_DISCUSSED",
+        "label": "Result discussed in person",
+        "note": "IFHAS 4.9.2.3 - abnormal findings discussed with the participant present",
+        "reached": true,
+        "reached_at": "2026-10-27T23:15:39.947658Z",
+        "evidence_ref": "Encounter/enc-p-demo-4eb712",
+        "provenance": "fact"
+      },
+      {
+        "id": "REFERRED",
+        "label": "Referred to GI service",
+        "note": null,
+        "reached": true,
+        "reached_at": "2026-10-28T23:15:39.947658Z",
+        "evidence_ref": "ServiceRequest/sr-p-demo-4eb712",
+        "provenance": "fact"
+      },
+      {
+        "id": "REFERRAL_ACCEPTED",
+        "label": "Referral accepted by GI service",
+        "note": null,
+        "reached": true,
+        "reached_at": "2026-10-30T23:15:39.947658Z",
+        "evidence_ref": "Task/task-p-demo-4eb712",
+        "provenance": "fact"
+      },
+      {
+        "id": "BOOKED",
+        "label": "Colonoscopy booked",
+        "note": null,
+        "reached": true,
+        "reached_at": "2026-11-01T23:15:39.947658Z",
+        "evidence_ref": "Appointment/apt-p-demo-4eb712",
+        "provenance": "fact"
+      },
+      {
+        "id": "ATTENDED",
+        "label": "Attended GI appointment",
+        "note": null,
+        "reached": true,
+        "reached_at": "2026-11-08T23:15:39.947658Z",
+        "evidence_ref": "Appointment/apt-p-demo-4eb712",
+        "provenance": "fact"
+      },
+      {
+        "id": "PROCEDURE_DONE",
+        "label": "Colonoscopy performed",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "REPORT_RECEIVED",
+        "label": "Colonoscopy or pathology report received",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      },
+      {
+        "id": "OUTCOME_COMMUNICATED",
+        "label": "Outcome communicated to patient and referrer",
+        "note": null,
+        "reached": false,
+        "reached_at": null,
+        "evidence_ref": null,
+        "provenance": null
+      }
+    ],
+    "appointment_at": "2026-11-08T23:15:39.947658Z",
+    "appointment_missed": null,
+    "stalls": [
+      {
+        "reason": "CLOSED_WITHOUT_EVIDENCE",
+        "stage": "REPORT_RECEIVED",
+        "detail": "referral marked completed, but no report has been received",
+        "flagged_at": "2026-11-16T23:15:39.947658Z",
+        "level": 1,
+        "last_escalated_at": "2026-11-16T23:15:39.947658Z",
+        "escalated_to": {
+          "id": "dr-fatima",
+          "name": "Dr. Fatima (family physician)",
+          "role": "family_physician"
+        },
+        "label": "Marked completed without a report",
+        "provenance": "computed"
+      }
+    ],
+    "barriers": [],
+    "distress": [],
+    "consults": [],
+    "contact_attempts": 0,
+    "warnings": [],
+    "consent_at": null,
+    "outcome": null,
+    "days_since_progress": 8.0,
+    "timeline": [
+      {
+        "seq": 1,
+        "type": "CASE_OPENED",
+        "at": "2026-10-23T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "case_id": "case_1727a0c555f5",
+          "owner_id": "dr-fatima",
+          "priority": "high",
+          "pathway_id": "fit-positive-colonoscopy",
+          "patient_id": "p-demo-4eb712",
+          "trigger_ref": "Observation/obs-fit-p-demo-4eb712",
+          "pathway_version": 1
+        }
+      },
+      {
+        "seq": 2,
+        "type": "STAGE_REACHED",
+        "at": "2026-10-24T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "Communication/com-inv-p-demo-4eb712",
+          "stage": "PATIENT_INVITED",
+          "signal": "PATIENT_INVITED"
+        }
+      },
+      {
+        "seq": 3,
+        "type": "STAGE_REACHED",
+        "at": "2026-10-27T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "Encounter/enc-p-demo-4eb712",
+          "stage": "RESULT_DISCUSSED",
+          "signal": "RESULT_DISCUSSED"
+        }
+      },
+      {
+        "seq": 4,
+        "type": "STAGE_REACHED",
+        "at": "2026-10-28T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "ServiceRequest/sr-p-demo-4eb712",
+          "stage": "REFERRED",
+          "signal": "REFERRAL_SENT"
+        }
+      },
+      {
+        "seq": 5,
+        "type": "ADMIN_STATUS_CHANGED",
+        "at": "2026-10-28T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "ServiceRequest/sr-p-demo-4eb712",
+          "status": "SENT"
+        }
+      },
+      {
+        "seq": 6,
+        "type": "STAGE_REACHED",
+        "at": "2026-10-30T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "Task/task-p-demo-4eb712",
+          "stage": "REFERRAL_ACCEPTED",
+          "signal": "REFERRAL_ACCEPTED"
+        }
+      },
+      {
+        "seq": 7,
+        "type": "ADMIN_STATUS_CHANGED",
+        "at": "2026-10-30T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "ServiceRequest/sr-p-demo-4eb712",
+          "status": "ACCEPTED"
+        }
+      },
+      {
+        "seq": 8,
+        "type": "STAGE_REACHED",
+        "at": "2026-11-01T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "Appointment/apt-p-demo-4eb712",
+          "stage": "BOOKED",
+          "signal": "APPOINTMENT_BOOKED",
+          "appointment_at": "2026-11-08T23:15:39.947658+00:00"
+        }
+      },
+      {
+        "seq": 9,
+        "type": "ADMIN_STATUS_CHANGED",
+        "at": "2026-11-01T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "ServiceRequest/sr-p-demo-4eb712",
+          "status": "SCHEDULED"
+        }
+      },
+      {
+        "seq": 10,
+        "type": "STAGE_REACHED",
+        "at": "2026-11-08T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "Appointment/apt-p-demo-4eb712",
+          "stage": "ATTENDED",
+          "signal": "APPOINTMENT_ATTENDED"
+        }
+      },
+      {
+        "seq": 11,
+        "type": "ADMIN_STATUS_CHANGED",
+        "at": "2026-11-12T23:15:39.947658Z",
+        "actor": "malaffi-sim",
+        "provenance": "fact",
+        "payload": {
+          "ref": "ServiceRequest/sr-p-demo-4eb712",
+          "status": "COMPLETED"
+        }
+      },
+      {
+        "seq": 12,
+        "type": "STALL_FLAGGED",
+        "at": "2026-11-16T23:15:39.947658Z",
+        "actor": "system",
+        "provenance": "computed",
+        "payload": {
+          "stage": "REPORT_RECEIVED",
+          "detail": "referral marked completed, but no report has been received",
+          "reason": "CLOSED_WITHOUT_EVIDENCE",
+          "escalated_to": "dr-fatima"
+        }
+      },
+      {
+        "seq": 13,
+        "type": "ESCALATED",
+        "at": "2026-11-16T23:15:39.947658Z",
+        "actor": "system",
+        "provenance": "computed",
+        "payload": {
+          "level": 1,
+          "to_id": "dr-fatima",
+          "reason": "CLOSED_WITHOUT_EVIDENCE"
+        }
+      }
+    ],
+    "version": 13,
+    "next_step": {
+      "reason": "CLOSED_WITHOUT_EVIDENCE",
+      "who": "owner",
+      "text": "Malaffi says completed but no colonoscopy report exists. Ask the GI centre for the report or rebook.",
+      "provenance": "computed",
+      "person": {
+        "id": "dr-fatima",
+        "name": "Dr. Fatima (family physician)"
+      }
+    },
+    "actions": null,
+    "notifications": [
+      {
+        "id": 91,
+        "case_id": "case_1727a0c555f5",
+        "event_seq": 1,
+        "channel": "sahatna",
+        "recipient": "p-demo-4eb712",
+        "recipient_role": "patient",
+        "template": "patient_update",
+        "urgent": false,
+        "status": "pending",
+        "created_at": "2026-11-16T23:15:39.960301Z",
+        "delivered_at": null,
+        "payload": {
+          "about": [
+            {
+              "reference": "urn:tasleem:case:case_1727a0c555f5"
+            }
+          ],
+          "status": "in-progress",
+          "payload": [
+            {
+              "contentString": "يرغب طبيبك في مقابلتك للتحدث عن نتيجة الفحص الأخيرة."
+            }
+          ],
+          "subject": {
+            "reference": "Patient/p-demo-4eb712"
+          },
+          "language": "ar",
+          "resourceType": "Communication"
+        }
+      },
+      {
+        "id": 92,
+        "case_id": "case_1727a0c555f5",
+        "event_seq": 2,
+        "channel": "sahatna",
+        "recipient": "p-demo-4eb712",
+        "recipient_role": "patient",
+        "template": "patient_update",
+        "urgent": false,
+        "status": "pending",
+        "created_at": "2026-11-16T23:15:39.977838Z",
+        "delivered_at": null,
+        "payload": {
+          "about": [
+            {
+              "reference": "urn:tasleem:case:case_1727a0c555f5"
+            }
+          ],
+          "status": "in-progress",
+          "payload": [
+            {
+              "contentString": "يرجى حجز موعد مع طبيب الأسرة للتحدث عن نتيجة الفحص."
+            }
+          ],
+          "subject": {
+            "reference": "Patient/p-demo-4eb712"
+          },
+          "language": "ar",
+          "resourceType": "Communication"
+        }
+      },
+      {
+        "id": 93,
+        "case_id": "case_1727a0c555f5",
+        "event_seq": 3,
+        "channel": "sahatna",
+        "recipient": "p-demo-4eb712",
+        "recipient_role": "patient",
+        "template": "patient_update",
+        "urgent": false,
+        "status": "pending",
+        "created_at": "2026-11-16T23:15:40.044937Z",
+        "delivered_at": null,
+        "payload": {
+          "about": [
+            {
+              "reference": "urn:tasleem:case:case_1727a0c555f5"
+            }
+          ],
+          "status": "in-progress",
+          "payload": [
+            {
+              "contentString": "يقوم طبيبك بترتيب فحص متابعة (تنظير القولون) لك."
+            }
+          ],
+          "subject": {
+            "reference": "Patient/p-demo-4eb712"
+          },
+          "language": "ar",
+          "resourceType": "Communication"
+        }
+      },
+      {
+        "id": 94,
+        "case_id": "case_1727a0c555f5",
+        "event_seq": 4,
+        "channel": "sahatna",
+        "recipient": "p-demo-4eb712",
+        "recipient_role": "patient",
+        "template": "patient_update",
+        "urgent": false,
+        "status": "pending",
+        "created_at": "2026-11-16T23:15:40.058435Z",
+        "delivered_at": null,
+        "payload": {
+          "about": [
+            {
+              "reference": "urn:tasleem:case:case_1727a0c555f5"
+            }
+          ],
+          "status": "in-progress",
+          "payload": [
+            {
+              "contentString": "تم إرسال التحويل. ستتواصل معك العيادة لحجز الموعد."
+            }
+          ],
+          "subject": {
+            "reference": "Patient/p-demo-4eb712"
+          },
+          "language": "ar",
+          "resourceType": "Communication"
+        }
+      },
+      {
+        "id": 95,
+        "case_id": "case_1727a0c555f5",
+        "event_seq": 6,
+        "channel": "sahatna",
+        "recipient": "p-demo-4eb712",
+        "recipient_role": "patient",
+        "template": "patient_update",
+        "urgent": false,
+        "status": "pending",
+        "created_at": "2026-11-16T23:15:40.219805Z",
+        "delivered_at": null,
+        "payload": {
+          "about": [
+            {
+              "reference": "urn:tasleem:case:case_1727a0c555f5"
+            }
+          ],
+          "status": "in-progress",
+          "payload": [
+            {
+              "contentString": "قبلت العيادة التحويل. الخطوة التالية هي الحجز."
+            }
+          ],
+          "subject": {
+            "reference": "Patient/p-demo-4eb712"
+          },
+          "language": "ar",
+          "resourceType": "Communication"
+        }
+      },
+      {
+        "id": 96,
+        "case_id": "case_1727a0c555f5",
+        "event_seq": 8,
+        "channel": "sahatna",
+        "recipient": "p-demo-4eb712",
+        "recipient_role": "patient",
+        "template": "patient_update",
+        "urgent": false,
+        "status": "pending",
+        "created_at": "2026-11-16T23:15:40.255181Z",
+        "delivered_at": null,
+        "payload": {
+          "about": [
+            {
+              "reference": "urn:tasleem:case:case_1727a0c555f5"
+            }
+          ],
+          "status": "in-progress",
+          "payload": [
+            {
+              "contentString": "تم حجز موعد تنظير القولون. أخبرنا إذا كان هناك ما قد يمنعك من الحضور."
+            }
+          ],
+          "subject": {
+            "reference": "Patient/p-demo-4eb712"
+          },
+          "language": "ar",
+          "resourceType": "Communication"
+        }
+      },
+      {
+        "id": 97,
+        "case_id": "case_1727a0c555f5",
+        "event_seq": 10,
+        "channel": "sahatna",
+        "recipient": "p-demo-4eb712",
+        "recipient_role": "patient",
+        "template": "patient_update",
+        "urgent": false,
+        "status": "pending",
+        "created_at": "2026-11-16T23:15:40.289162Z",
+        "delivered_at": null,
+        "payload": {
+          "about": [
+            {
+              "reference": "urn:tasleem:case:case_1727a0c555f5"
+            }
+          ],
+          "status": "in-progress",
+          "payload": [
+            {
+              "contentString": "شكراً لحضورك. سيتابع معك فريق الرعاية."
+            }
+          ],
+          "subject": {
+            "reference": "Patient/p-demo-4eb712"
+          },
+          "language": "ar",
+          "resourceType": "Communication"
+        }
+      },
+      {
+        "id": 98,
+        "case_id": "case_1727a0c555f5",
+        "event_seq": 13,
+        "channel": "emr_inbox",
+        "recipient": "dr-fatima",
+        "recipient_role": "family_physician",
+        "template": "stall_escalation",
+        "urgent": false,
+        "status": "pending",
+        "created_at": "2026-11-16T23:15:40.331273Z",
+        "delivered_at": null,
+        "payload": {
+          "for": {
+            "reference": "Patient/p-demo-4eb712"
+          },
+          "code": {
+            "text": "Marked completed without a report (level 1)",
+            "coding": [
+              {
+                "code": "stall",
+                "system": "urn:tasleem:task"
+              }
+            ]
+          },
+          "focus": {
+            "reference": "urn:tasleem:case:case_1727a0c555f5"
+          },
+          "owner": {
+            "reference": "Practitioner/dr-fatima"
+          },
+          "intent": "order",
+          "status": "requested",
+          "priority": "routine",
+          "authoredOn": "2026-11-16T23:15:39.947658+00:00",
+          "description": "Malaffi says completed but no colonoscopy report exists. Ask the GI centre for the report or rebook.",
+          "resourceType": "Task"
+        }
+      }
+    ]
+  }
+}

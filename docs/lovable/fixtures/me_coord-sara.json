@@ -1,0 +1,8 @@
+{
+  "id": "coord-sara",
+  "name": "Sara (program coordinator)",
+  "role": "program_coordinator",
+  "actor_type": "coordinator",
+  "org_id": "org-program",
+  "sees_all_cases": true
+}

@@ -1,0 +1,449 @@
+{
+  "person": "dr-salma",
+  "needs_action": 4,
+  "sections": [
+    {
+      "kind": "distress",
+      "label": "Patient messages that need a clinician",
+      "count": 1,
+      "items": [
+        {
+          "id": "case_614c0ad7160c",
+          "patient": {
+            "id": "p-sunita",
+            "name": "Sunita P. (53)",
+            "language": "en"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-salma",
+            "name": "Dr. Salma (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "SCHEDULED",
+              "implied_stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [],
+          "escalation_level": 0,
+          "days_since_progress": 11.0,
+          "open_barriers": 1,
+          "distress_open": 1,
+          "outcome": null,
+          "why": {
+            "kind": "distress",
+            "refs": [
+              "dis_94a5008c0b3e"
+            ],
+            "since": "2026-11-15T23:15:37.419142Z"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "escalated",
+      "label": "Stalled cases you own or that were escalated to you",
+      "count": 2,
+      "items": [
+        {
+          "id": "case_54538287d7c2",
+          "patient": {
+            "id": "p-grace",
+            "name": "Grace O. (49)",
+            "language": "en"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-salma",
+            "name": "Dr. Salma (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "REPORT_RECEIVED",
+              "step": 8,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "COMPLETED",
+              "implied_stage": "OUTCOME_COMMUNICATED",
+              "step": 9,
+              "of": 9
+            },
+            "gap": true
+          },
+          "stalls": [
+            {
+              "reason": "REPORT_NOT_COMMUNICATED",
+              "label": "Report not communicated",
+              "level": 3
+            }
+          ],
+          "escalation_level": 3,
+          "days_since_progress": 26.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "escalated",
+            "refs": [
+              "REPORT_NOT_COMMUNICATED"
+            ],
+            "since": "2026-10-29T06:00:00Z"
+          }
+        },
+        {
+          "id": "case_f3fff69f28d6",
+          "patient": {
+            "id": "p-khalfan",
+            "name": "Khalfan B. (51)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "hypertension-screening",
+            "name": "Raised screening blood pressure to confirmed plan"
+          },
+          "status": "open",
+          "priority": "medium",
+          "owner": {
+            "id": "dr-salma",
+            "name": "Dr. Salma (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "PATIENT_INVITED",
+              "step": 1,
+              "of": 5
+            },
+            "reported": {
+              "admin_status": "NONE",
+              "implied_stage": null,
+              "step": 0,
+              "of": 5
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "STEP_OVERDUE",
+              "label": "Next step overdue",
+              "level": 2
+            }
+          ],
+          "escalation_level": 2,
+          "days_since_progress": 23.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "escalated",
+            "refs": [
+              "STEP_OVERDUE"
+            ],
+            "since": "2026-11-08T06:00:00Z"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "handoff",
+      "label": "Cases offered to you",
+      "count": 1,
+      "items": [
+        {
+          "id": "case_21a99d58776a",
+          "patient": {
+            "id": "p-fatma",
+            "name": "Fatma N. (70)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-fatima",
+            "name": "Dr. Fatima (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "PATIENT_INVITED",
+              "step": 1,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "NONE",
+              "implied_stage": null,
+              "step": 0,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "STEP_OVERDUE",
+              "label": "Next step overdue",
+              "level": 1
+            },
+            {
+              "reason": "HANDOFF_NOT_ACCEPTED",
+              "label": "Handoff not accepted",
+              "level": 2
+            }
+          ],
+          "escalation_level": 2,
+          "days_since_progress": 9.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "handoff",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-11-10T23:15:37.419142Z"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "consult",
+      "label": "E-consult questions for you",
+      "count": 0,
+      "items": []
+    },
+    {
+      "kind": "task",
+      "label": "Barrier tasks assigned to you",
+      "count": 0,
+      "items": []
+    },
+    {
+      "kind": "owner",
+      "label": "All open cases you own",
+      "count": 4,
+      "items": [
+        {
+          "id": "case_54538287d7c2",
+          "patient": {
+            "id": "p-grace",
+            "name": "Grace O. (49)",
+            "language": "en"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-salma",
+            "name": "Dr. Salma (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "REPORT_RECEIVED",
+              "step": 8,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "COMPLETED",
+              "implied_stage": "OUTCOME_COMMUNICATED",
+              "step": 9,
+              "of": 9
+            },
+            "gap": true
+          },
+          "stalls": [
+            {
+              "reason": "REPORT_NOT_COMMUNICATED",
+              "label": "Report not communicated",
+              "level": 3
+            }
+          ],
+          "escalation_level": 3,
+          "days_since_progress": 26.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-10-02T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_f3fff69f28d6",
+          "patient": {
+            "id": "p-khalfan",
+            "name": "Khalfan B. (51)",
+            "language": "ar"
+          },
+          "pathway": {
+            "id": "hypertension-screening",
+            "name": "Raised screening blood pressure to confirmed plan"
+          },
+          "status": "open",
+          "priority": "medium",
+          "owner": {
+            "id": "dr-salma",
+            "name": "Dr. Salma (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "PATIENT_INVITED",
+              "step": 1,
+              "of": 5
+            },
+            "reported": {
+              "admin_status": "NONE",
+              "implied_stage": null,
+              "step": 0,
+              "of": 5
+            },
+            "gap": false
+          },
+          "stalls": [
+            {
+              "reason": "STEP_OVERDUE",
+              "label": "Next step overdue",
+              "level": 2
+            }
+          ],
+          "escalation_level": 2,
+          "days_since_progress": 23.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-10-22T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_614c0ad7160c",
+          "patient": {
+            "id": "p-sunita",
+            "name": "Sunita P. (53)",
+            "language": "en"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-salma",
+            "name": "Dr. Salma (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "SCHEDULED",
+              "implied_stage": "BOOKED",
+              "step": 5,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [],
+          "escalation_level": 0,
+          "days_since_progress": 11.0,
+          "open_barriers": 1,
+          "distress_open": 1,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-10-27T23:15:37.419142Z"
+          }
+        },
+        {
+          "id": "case_727d262a6ef1",
+          "patient": {
+            "id": "p-leila",
+            "name": "Leila M. (61)",
+            "language": "en"
+          },
+          "pathway": {
+            "id": "fit-positive-colonoscopy",
+            "name": "Positive FIT to colonoscopy"
+          },
+          "status": "open",
+          "priority": "high",
+          "owner": {
+            "id": "dr-salma",
+            "name": "Dr. Salma (family physician)",
+            "role": "family_physician"
+          },
+          "progress": {
+            "verified": {
+              "stage": "OUTCOME_COMMUNICATED",
+              "step": 9,
+              "of": 9
+            },
+            "reported": {
+              "admin_status": "COMPLETED",
+              "implied_stage": "OUTCOME_COMMUNICATED",
+              "step": 9,
+              "of": 9
+            },
+            "gap": false
+          },
+          "stalls": [],
+          "escalation_level": 0,
+          "days_since_progress": 7.0,
+          "open_barriers": 0,
+          "distress_open": 0,
+          "outcome": null,
+          "why": {
+            "kind": "owner",
+            "refs": [
+              "-"
+            ],
+            "since": "2026-10-19T23:15:37.419142Z"
+          }
+        }
+      ]
+    }
+  ]
+}

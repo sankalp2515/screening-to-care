@@ -1,0 +1,62 @@
+# Pathway B (configuration only): HbA1c in the diabetes range -> confirmation -> care plan.
+# Proves the engine is not single-disease: no new code, only this file. Deadlines are placeholders.
+id: hba1c-diabetes-range
+version: 1
+name: HbA1c in diabetes range to confirmed care plan
+priority: medium
+referral_service: null
+
+trigger:
+  signal: LAB_RESULT
+  codes: ["4548-4"]                       # LOINC Hemoglobin A1c/Hemoglobin.total in Blood
+  value_gte: 6.5                          # percent; diagnostic threshold per ADA
+
+stages:
+  - {id: PATIENT_INVITED, label: Patient invited to discuss result, signals: [PATIENT_INVITED], sla_days: 3}
+  - {id: RESULT_DISCUSSED, label: Result discussed with family physician, signals: [RESULT_DISCUSSED], sla_days: 7}
+  - {id: CONFIRMED, label: Confirmatory test resulted, signals: [REPORT_FINAL, LAB_RESULT], codes: ["4548-4", "1558-6"], sla_days: 14}
+  - {id: CARE_PLAN_AGREED, label: Care plan agreed, signals: [CARE_PLAN_ACTIVE], sla_days: 14}
+  - {id: OUTCOME_COMMUNICATED, label: Plan shared with patient, signals: [OUTCOME_COMMUNICATED], sla_days: 7}
+
+checks:
+  report_stage: CONFIRMED
+  communicated_stage: OUTCOME_COMMUNICATED
+  report_not_communicated_days: 14
+  handoff_accept_days: 2
+  consult_answer_days: 3
+  reescalate_after_days: 5
+
+escalation_ladder: [owner, clinic_lead, program_coordinator]
+
+playbooks:
+  FEAR: {assignee_role: navigator, action: "Explain what the result means for next steps; offer a clinician call-back.", due_days: 2}
+  TIME_OR_WORK: {assignee_role: navigator, action: "Offer evening or weekend slots.", due_days: 3}
+  COST_OR_INSURANCE: {assignee_role: coordinator, action: "Check coverage for confirmatory testing.", due_days: 3}
+  LANGUAGE: {assignee_role: navigator, action: "Book an interpreter.", due_days: 2}
+  WANTS_CALLBACK: {assignee_role: clinician, action: "Owner calls the patient back.", due_days: 2}
+  DONE_ELSEWHERE: {assignee_role: clinician, action: "Request results from the other provider.", due_days: 3}
+  OTHER: {assignee_role: navigator, action: "Call the patient to understand the barrier.", due_days: 2}
+
+closure:
+  completion_stages: [CARE_PLAN_AGREED, OUTCOME_COMMUNICATED]
+  min_contact_attempts_for_unreachable: 3
+
+patient_messages:
+  OPENED:
+    en: "Your doctor would like to see you to talk about your recent blood test."
+    ar: "يرغب طبيبك في مقابلتك للتحدث عن تحليل الدم الأخير."
+  PATIENT_INVITED:
+    en: "Please book a visit with your family doctor to talk about your blood test."
+    ar: "يرجى حجز موعد مع طبيب الأسرة للتحدث عن تحليل الدم."
+  RESULT_DISCUSSED:
+    en: "Your doctor has asked for one more test to confirm."
+    ar: "طلب طبيبك فحصاً إضافياً للتأكيد."
+  CONFIRMED:
+    en: "Your doctor will agree a care plan with you."
+    ar: "سيتفق طبيبك معك على خطة رعاية."
+  CARE_PLAN_AGREED:
+    en: "Your care plan is ready."
+    ar: "خطة رعايتك جاهزة."
+  OUTCOME_COMMUNICATED:
+    en: "Your follow-up is complete. Thank you."
+    ar: "اكتملت متابعتك. شكراً لك."

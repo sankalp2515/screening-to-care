@@ -1,0 +1,23 @@
+{
+  "draft": {
+    "text": "نتفهم أن الفحص قد يسبب القلق. سيتصل بك أحد أعضاء فريق الرعاية ليشرح لك ما يحدث في يوم الفحص ويجيب عن أسئلتك.",
+    "language": "ar",
+    "template": "FEAR"
+  },
+  "why": "Latest open barrier: FEAR.",
+  "provenance": "template",
+  "source": "template",
+  "model": "approved-library",
+  "rejected_llm_output": null,
+  "draft_id": "drf_fe657b71494c4f5d",
+  "requires_approval": true,
+  "send_with": {
+    "method": "POST",
+    "path": "/v1/cases/case_2fa028843f40/patient-messages",
+    "body": {
+      "text": "نتفهم أن الفحص قد يسبب القلق. سيتصل بك أحد أعضاء فريق الرعاية ليشرح لك ما يحدث في يوم الفحص ويجيب عن أسئلتك.",
+      "language": "ar",
+      "ai_draft_id": "drf_fe657b71494c4f5d"
+    }
+  }
+}
