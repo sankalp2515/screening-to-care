@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sheet and biro design system</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&amp;family=Libre+Franklin:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap">
+<style>
+:root{--ease-out:cubic-bezier(0.23,1,0.32,1)}
+body{margin:0;background:#F6F4EE}
+.ds{font-family:'Libre Franklin',system-ui,sans-serif;color:#14171F;-webkit-font-smoothing:antialiased;width:1440px;height:1700px;box-sizing:border-box;padding:56px 64px;background:#F6F4EE;display:flex;flex-direction:column;gap:40px}
+.serif{font-family:'Source Serif 4',Georgia,serif}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+.ov{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#545862;margin:0 0 14px;display:flex;align-items:center;gap:10px}
+.ov:before{content:'';width:24px;height:1px;background:#14171F}
+.sheet{background:#fff;border:1px solid #E7E2D7;border-radius:4px;padding:24px}
+.grid{display:grid;gap:24px}
+.sw{display:flex;flex-direction:column;gap:8px}
+.sw i{display:block;height:56px;border-radius:2px;border:1px solid #E7E2D7}
+.sw b{font-size:13px;font-weight:600}.sw span{font-size:12px;color:#6B6F78}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border-radius:4px;font:inherit;font-weight:600;font-size:14px;border:1px solid #D5CFC2;background:#fff;color:#14171F;cursor:pointer;transition:transform 160ms var(--ease-out),background-color 150ms ease}
+.btn:active{transform:scale(0.97)}
+.btn-p{background:#1A4BE0;border-color:#1A4BE0;color:#fff}
+.btn-q{border-color:transparent;background:transparent;color:#3A3E47;text-decoration:underline;text-underline-offset:3px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 8px;border-radius:2px;line-height:16px}
+.seg{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px}
+.seg i{display:block;height:14px;border-radius:2px;background:#F1EDE5}
+.seg i.rep{background:repeating-linear-gradient(135deg,#A29D91 0 3px,#D5CFC2 3px 7px)}
+.seg i.ver{background:#1E7A4C}
+.seg i.gap{background:#FEF4EC;box-shadow:inset 0 0 0 1.5px #B54708}
+.src{border-radius:4px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.5}
+@media (prefers-reduced-motion:reduce){.btn:active{transform:none}}
+</style>
+</helmet>
+<div class="ds">
+
+<header style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; border-bottom: 1px solid #14171F; padding-bottom: 24px">
+<div>
+<p class="ov">Tasleem design system</p>
+<h1 class="serif" style="margin: 0; font-size: 56px; line-height: 1.05; font-weight: 600; letter-spacing: -0.02em">Sheet and <em style="font-weight: 500">biro</em></h1>
+<p style="margin: 12px 0 0; font-size: 17px; color: #545862; max-width: 640px">A well-kept paper record, written in blue biro: calm, exact and signed by a person. Full rules live in DESIGN.md at the repository root.</p>
+</div>
+<div style="width: 420px">
+<div style="display: grid; grid-template-columns: 6fr 3fr 1fr; height: 44px; border: 1px solid #D5CFC2; border-radius: 2px; overflow: hidden">
+<span style="background: #F6F4EE"></span><span style="background: #14171F"></span><span style="background: #1A4BE0"></span>
+</div>
+<div style="display: grid; grid-template-columns: 6fr 3fr 1fr; margin-top: 8px; font-size: 12px; color: #545862"><span>60% paper</span><span>30% ink</span><span>10% biro</span></div>
+</div>
+</header>
+
+<section>
+<p class="ov">Colour tokens</p>
+<div class="grid" style="grid-template-columns: repeat(9, 1fr)">
+<div class="sw"><i style="background: #F6F4EE"></i><b>paper</b><span class="mono">#F6F4EE</span></div>
+<div class="sw"><i style="background: #FFFFFF"></i><b>sheet</b><span class="mono">#FFFFFF</span></div>
+<div class="sw"><i style="background: #E7E2D7"></i><b>rule</b><span class="mono">#E7E2D7</span></div>
+<div class="sw"><i style="background: #14171F"></i><b>ink</b><span class="mono">#14171F</span></div>
+<div class="sw"><i style="background: #1A4BE0"></i><b>biro</b><span class="mono">#1A4BE0</span></div>
+<div class="sw"><i style="background: #1E7A4C"></i><b>done</b><span class="mono">#1E7A4C</span></div>
+<div class="sw"><i style="background: #B54708"></i><b>attn</b><span class="mono">#B54708</span></div>
+<div class="sw"><i style="background: #B42318"></i><b>stop</b><span class="mono">#B42318</span></div>
+<div class="sw"><i style="background: #FDF2F8; border: 1.5px dashed #C11574"></i><b>ai</b><span class="mono">#C11574</span></div>
+</div>
+<p style="margin: 14px 0 0; font-size: 14px; color: #545862">Biro marks only what you can click or what is selected. Status colours always come with a word and an icon. No violet, no shadows.</p>
+</section>
+
+<section class="grid" style="grid-template-columns: 1.3fr 1fr">
+<div class="sheet" style="display: flex; flex-direction: column; gap: 18px">
+<p class="ov" style="margin: 0">Type</p>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-bottom: 1px solid #E7E2D7; padding-bottom: 14px"><span class="serif" style="font-size: 44px; font-weight: 600; letter-spacing: -0.02em">Care <em style="font-weight: 500">actually</em> happened</span><span class="mono" style="font-size: 12px; color: #6B6F78">Display · Source Serif 4</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-bottom: 1px solid #E7E2D7; padding-bottom: 14px"><span class="serif" style="font-size: 32px; font-weight: 600">My work, Dr. Fatima</span><span class="mono" style="font-size: 12px; color: #6B6F78">H1 32 · serif 600</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-bottom: 1px solid #E7E2D7; padding-bottom: 14px"><span style="font-size: 16px; font-weight: 600">Positive FIT to colonoscopy</span><span class="mono" style="font-size: 12px; color: #6B6F78">H3 16 · Libre Franklin 600</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-bottom: 1px solid #E7E2D7; padding-bottom: 14px"><span style="font-size: 15px; line-height: 1.5; max-width: 420px">Malaffi says completed. Clinical evidence stops at attended.</span><span class="mono" style="font-size: 12px; color: #6B6F78">Body 15 · 400</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-bottom: 1px solid #E7E2D7; padding-bottom: 14px"><span class="mono" style="font-size: 13px">ServiceRequest/sr-p-rajesh · 16 d</span><span class="mono" style="font-size: 12px; color: #6B6F78">IDs, numbers · Plex Mono</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px" dir="rtl"><span lang="ar" style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 20px; font-weight: 600">خطوتك التالية</span><span class="mono" dir="ltr" style="font-size: 12px; color: #6B6F78">Arabic · IBM Plex Sans Arabic</span></div>
+</div>
+
+<div class="sheet" style="display: flex; flex-direction: column; gap: 20px">
+<p class="ov" style="margin: 0">Buttons: three variants</p>
+<div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap"><button type="button" class="btn btn-p">Accept handoff</button><button type="button" class="btn">Add a note</button><button type="button" class="btn btn-q">Cancel</button></div>
+<p style="margin: 0; font-size: 13px; color: #545862">One primary per screen. Press: scale 0.97, 160ms, strong ease-out.</p>
+<p class="ov" style="margin: 8px 0 0">Status tags</p>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<span class="tag" style="background: #ECF6F0; color: #1E7A4C">✓ Verified</span>
+<span class="tag" style="background: #FEF4EC; color: #93370D">Reported, not verified</span>
+<span class="tag" style="background: #FEF3F2; color: #B42318">Overdue 3 days</span>
+<span class="tag" style="background: #F1EDE5; color: #3A3E47">Waiting on patient</span>
+<span class="tag" style="box-shadow: inset 0 0 0 1px #B42318; color: #B42318">Escalated</span>
+</div>
+<p class="ov" style="margin: 8px 0 0">Signature line (R3)</p>
+<div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 15px; font-weight: 600">Dr. Fatima, family physician</span><i style="display: block; width: 160px; height: 2px; background: #1A4BE0; border-radius: 1px"></i><span class="mono" style="font-size: 12px; color: #6B6F78">Signed decision · written to the audit log</span></div>
+</div>
+</section>
+
+<section class="sheet">
+<p class="ov">The journey bar: reported against verified</p>
+<div style="display: grid; grid-template-columns: 220px 1fr; gap: 14px 24px; align-items: center">
+<span style="font-size: 14px; color: #545862">Reported by referral status</span><div class="seg"><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i></div>
+<span style="font-size: 14px; color: #545862">Verified by clinical evidence</span><div class="seg"><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="gap"></i><i class="gap"></i><i class="gap"></i></div>
+<span></span><div style="display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; font-size: 11px; color: #6B6F78"><span>Invited</span><span>Result</span><span>Referred</span><span>Booked</span><span>Attended</span><span>Procedure</span><span>Report</span><span>Reviewed</span><span>Closed</span></div>
+</div>
+</section>
+
+<section>
+<p class="ov">Where every piece of content comes from</p>
+<div class="grid" style="grid-template-columns: repeat(4, 1fr)">
+<div class="src" style="background: #fff; border: 1px solid #E7E2D7"><span class="tag" style="align-self: flex-start; background: #F1EDE5; color: #14171F">FACT</span><span>Attended on 3 Nov.</span><span class="mono" style="font-size: 12px; color: #6B6F78">Encounter/enc-p-rajesh</span></div>
+<div class="src" style="background: #fff; border: 1px solid #D5CFC2"><span class="tag" style="align-self: flex-start; box-shadow: inset 0 0 0 1px #A29D91; color: #3A3E47">RULE</span><span style="color: #3A3E47">Cannot close without a procedure report.</span><span class="mono" style="font-size: 12px; color: #6B6F78">R3_EVIDENCE_REQUIRED</span></div>
+<div class="src" style="background: #FDF2F8; border: 1.5px dashed #C11574"><span class="tag" style="align-self: flex-start; background: #fff; color: #A3125F">AI DRAFT</span><span>Suggested barrier: fear of sedation.</span><span style="font-size: 12px; color: #A3125F">A person must confirm this</span></div>
+<div class="src" style="background: #fff; border: 1px solid #E7E2D7"><span class="tag" style="align-self: flex-start; background: #EEF1FC; color: #1238B0">HUMAN</span><span>Confirmed barrier: fear and no escort.</span><span style="font-size: 12px; color: #6B6F78">Aisha, navigator</span></div>
+</div>
+</section>
+
+<section class="grid" style="grid-template-columns: repeat(3, 1fr)">
+<div class="sheet"><p class="ov">Space and radius</p><p style="margin: 0; font-size: 14px; line-height: 1.7; color: #3A3E47">4px base: 4 · 8 · 12 · 16 · 24 · 32 · 56 · 80 · 120.<br>App radius 4px, tags 2px. Patient cards 10px, buttons 8px.<br>No drop shadows: paper → sheet → hairline.</p></div>
+<div class="sheet"><p class="ov">Motion</p><p style="margin: 0; font-size: 14px; line-height: 1.7; color: #3A3E47"><span class="mono" style="font-size: 12px">cubic-bezier(0.23, 1, 0.32, 1)</span><br>Press 160ms · selection 150ms · reveal 200ms · drawer 240ms.<br>Never on alerts, timers, keyboard actions. Reduced motion keeps colour only.</p></div>
+<div class="sheet"><p class="ov">Patient companion</p><p style="margin: 0; font-size: 14px; line-height: 1.7; color: #3A3E47">The next step first, one big button.<br>One question at a time. Big plain choices.<br>"Call me" always one tap away. Never results by message.</p></div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

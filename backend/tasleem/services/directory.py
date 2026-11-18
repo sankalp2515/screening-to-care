@@ -82,6 +82,27 @@ class Directory:
         self.cache.set(key, row.id, DIR_TTL)
         return row.id
 
+    def fallback_clinician_id(self) -> str:
+        """A clinician for a case whose owner is not one and whose patient has no family physician (found by the
+        real-world-fit run: a distress message from such a patient went to the non-clinical coordinator, who
+        cannot resolve it). Order: the coordinator's lead if a clinician, then clinic leads, then family
+        physicians, by id. The coordinator only if the directory has no clinician at all."""
+        key = "dir:fallback-clinician"
+        hit = self.cache.get(key)
+        if hit:
+            return hit
+        coord = self.person(self.coordinator_id())
+        lead = self.person(coord.lead_id) if coord and coord.lead_id else None
+        pick = lead.id if lead and lead.role in CLINICIAN_ROLES else None
+        for role in ("clinic_lead", "family_physician"):
+            if pick:
+                break
+            pick = self.s.execute(select(PractitionerRow.id).where(PractitionerRow.role == role)
+                                  .order_by(PractitionerRow.id)).scalars().first()
+        pick = pick or self.coordinator_id()
+        self.cache.set(key, pick, DIR_TTL)
+        return pick
+
     # ---- patients ------------------------------------------------------------------------------
     def patient(self, pid: str) -> PatientInfo | None:
         row = self.s.get(PatientRow, pid)
@@ -129,7 +150,7 @@ class Directory:
             pat = self.patient(state.patient_id)
             if pat and pat.family_physician_id:
                 return pat.family_physician_id
-            return self.coordinator_id()
+            return self.fallback_clinician_id()
         return self.coordinator_id()
 
     def person_for_role(self, state: CaseState, role: str) -> str:

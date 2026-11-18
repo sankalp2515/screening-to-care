@@ -70,8 +70,11 @@ def run_reminders(c: Cohort) -> ArmResult:
 
 
 # ---- Arm B ----------------------------------------------------------------------------------------
-def run_status_only(c: Cohort) -> ArmResult:
-    r = ArmResult("B: Malaffi status only")
+def run_status_only(c: Cohort, no_referral_days: int = 14, stale_days: int = 30,
+                    name: str = "B: Malaffi status only", repeat: bool = False) -> ArmResult:
+    """`repeat` re-alerts every threshold period while nothing changes (a stricter monitor). The headline
+    benchmark uses the single-alert form; the real-world-fit run tries both."""
+    r = ArmResult(name)
     per: dict[str, list] = defaultdict(list)
     seen: set[str] = set()
     for d in c.deliveries:
@@ -100,8 +103,8 @@ def run_status_only(c: Cohort) -> ArmResult:
                 i += 1
             if fit_at is None or status == AdminStatus.COMPLETED:
                 continue
-            if status is None and day - fit_at > timedelta(days=14):
-                key = ("NO_REFERRAL",)
+            if status is None and day - fit_at > timedelta(days=no_referral_days):
+                key = ("NO_REFERRAL", (day - fit_at).days // no_referral_days if repeat else 0)
                 if key not in alerted:
                     alerted.add(key)
                     r.alerts[pid].append(Alert(day, "NO_REFERRAL", owner))
@@ -110,8 +113,8 @@ def run_status_only(c: Cohort) -> ArmResult:
                 if key not in alerted:
                     alerted.add(key)
                     r.alerts[pid].append(Alert(day, "REFERRAL_CANCELLED", owner))
-            elif status is not None and status_at is not None and day - status_at > timedelta(days=30):
-                key = ("STALE", status, status_at)
+            elif status is not None and status_at is not None and day - status_at > timedelta(days=stale_days):
+                key = ("STALE", status, status_at, (day - status_at).days // stale_days if repeat else 0)
                 if key not in alerted:
                     alerted.add(key)
                     r.alerts[pid].append(Alert(day, f"STATUS_{status.value}_STALE", owner))

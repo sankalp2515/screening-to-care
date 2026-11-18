@@ -1,5 +1,5 @@
 # Local production-like stack. Synthetic demo data only; every key below is a local placeholder.
-#   case-core API :8000   notifier :8010   agent :8020   HL7 connector :8030
+#   web app :8080 (open this)   case-core API :8000   notifier :8010   agent :8020   HL7 connector :8030
 # Built once (by `migrate`), reused by every service so they all run the same code.
 x-image: &image
   image: tasleem-backend:local
@@ -111,6 +111,23 @@ services:
       api: {condition: service_healthy}
     ports: ["8030:8030"]
     healthcheck: *health
+
+  # Web app: staff console and patient companion, plus a same-origin gateway (/api/core, /api/agent,
+  # /api/notifier, /api/connector) so the browser talks to one origin. Built in live mode; pass
+  # --build-arg VITE_DEMO_MODE=true for the standalone synthetic replay.
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: tasleem-frontend:local
+    depends_on:
+      api: {condition: service_healthy}
+    ports: ["8080:8080"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
 
 volumes:
   pgdata:

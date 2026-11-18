@@ -30,10 +30,11 @@ Entry for the Future Health Digital Innovation Challenge 2026 · Population Heal
 
 ## Run it
 
-Everything, on Docker (API, scheduler, notifier, agent, connector, PostgreSQL, Redis):
+Everything, on Docker (web app, API, scheduler, notifier, agent, connector, PostgreSQL, Redis):
 ```bash
 docker compose up -d --build --wait
 ```
+Then open http://localhost:8080. The web container serves the app and passes `/api/core`, `/api/agent`, `/api/notifier` and `/api/connector` to the services, so the browser talks to one origin.
 ```bash
 cd backend && python -m tasleem.smoke --stack
 ```

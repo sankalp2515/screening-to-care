@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Live simulator</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&amp;family=Libre+Franklin:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap">
+<style>
+:root{--ease-out:cubic-bezier(0.23,1,0.32,1)}
+h1,h2{font-family:'Source Serif 4',Georgia,serif;font-weight:600;letter-spacing:-0.012em}
+[lang=ar] h1,[lang=ar] h2{font-family:'IBM Plex Sans Arabic',sans-serif;letter-spacing:0}
+button,.btn,.pbtn,.opt,.bchip,.out,[role=button]{transition:transform 160ms var(--ease-out),background-color 150ms ease,border-color 150ms ease,color 150ms ease}
+button:active,.btn:active,.pbtn:active,.bchip:active{transform:scale(0.97)}
+.opt:active,.out:active{transform:scale(0.98)}
+:focus-visible{outline:2px solid #1A4BE0;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){button:active,.btn:active,.pbtn:active,.opt:active,.bchip:active,.out:active{transform:none}}
+
+body{margin:0;background:#FAF8F3}
+a{color:#1A4BE0}a:hover{color:#1238B0}
+.tl{font-family:'Libre Franklin',system-ui,sans-serif;color:#14171F;-webkit-font-smoothing:antialiased}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+.card{background:#fff;border:1px solid #E7E2D7;border-radius:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 14px;border-radius:4px;font-weight:600;font-size:14px;text-decoration:none;border:1px solid #D5CFC2;background:#fff;color:#3A3E47;cursor:pointer;font-family:inherit;box-sizing:border-box}
+.btn-p{background:#1A4BE0;border-color:#1A4BE0;color:#fff}.btn-p:hover{color:#fff;background:#1238B0}
+.sc{padding:16px;display:flex;flex-direction:column;gap:10px}
+.sc h3{margin:0;font-size:15px;font-weight:650;line-height:1.35}
+.sc p{margin:0;font-size:13px;line-height:1.5;color:#545862;flex:1}
+.ev{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 14px;border-bottom:1px solid #F1EDE5;font-size:13px}
+.src{font-size:12px;font-weight:600;padding:2px 8px;border-radius:3px;white-space:nowrap}
+.s-fhir{background:#F3F1EB;color:#3A3E47}
+.s-ref{background:#FDF2F8;color:#A3125F}
+.ok{font-size:11px;font-weight:600;color:#1E7A4C;background:#ECFDF3;border-radius:999px;padding:1px 8px}
+.seg{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:3px}
+.seg i{display:block;height:8px;border-radius:2px;background:#E7E2D7}
+.seg i.rep{background:repeating-linear-gradient(135deg,#A29D91 0 2px,#D5CFC2 2px 5px)}
+.seg i.ver{background:#1E7A4C}
+.seg i.gap{background:#FDEFE3;box-shadow:inset 0 0 0 1px #F2B48A}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;line-height:18px;white-space:nowrap}
+.l1{background:#FEF4EC;color:#7A2E0E;box-shadow:inset 0 0 0 1px #F2B48A}
+pre{margin:0}
+</style>
+</helmet>
+<div class="tl" style="width: 100%; min-height: 100vh; background: #FAF8F3">
+<header style="min-height: 60px; background: #fff; border-bottom: 1px solid #E7E2D7; padding: 10px 28px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<a href="MyWork.dc.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #14171F"><svg width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true"><circle cx="14" cy="14" r="12.5" stroke="#14171F" stroke-width="2.5"></circle><path d="M8.5 14.5l3.8 3.8 7.2-8" stroke="#14171F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg><b style="font-size: 16px">Tasleem</b></a>
+<span style="color: #D5CFC2">/</span><span style="font-size: 14px; font-weight: 600">Live simulator</span>
+<div style="flex: 1"></div>
+<span style="font-size: 12px; color: #6B6F78">Synthetic data</span>
+</header>
+
+<main style="max-width: 1320px; margin: 0 auto; padding: 24px 28px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-size: 28px; letter-spacing: -0.02em">Send real-world events and watch Tasleem react.</h1>
+<p style="margin: 0; font-size: 15px; color: #545862">Each scenario sends the same messages Malaffi, a lab or Sahatna would send.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 12px">
+<div class="card sc" style="border: 1.5px solid #1A4BE0; box-shadow: 0 0 0 3px rgba(26,75,224,.1)"><h3>Malaffi says completed, colonoscopy never happened</h3><p>The headline failure Tasleem exists to catch.</p><span style="display: flex; gap: 8px; align-items: center"><button type="button" class="btn btn-p">Send to Tasleem</button><span class="ok">Ran just now</span></span></div>
+<div class="card sc"><h3>GI centre sends the report</h3><p>Resolves a false-done case on evidence.</p><button type="button" class="btn">Send to Tasleem</button></div>
+<div class="card sc"><h3>New positive FIT from the lab</h3><p>Shows a case opening with a named owner and a Sahatna invitation.</p><button type="button" class="btn">Send to Tasleem</button></div>
+<div class="card sc"><h3>Patient misses the colonoscopy and replies</h3><p>Barrier capture, AI suggestion, human confirmation, navigator task.</p><button type="button" class="btn">Send to Tasleem</button></div>
+<div class="card sc"><h3>Patient reports bleeding and fear</h3><p>Distress reaches a clinician the same minute.</p><button type="button" class="btn">Send to Tasleem</button></div>
+<div class="card sc"><h3>Raised screening blood pressure</h3><p>A second disease on configuration only.</p><button type="button" class="btn">Send to Tasleem</button></div>
+<div class="card sc"><h3>Patient cannot be reached by app or SMS</h3><p>Channel fallback ends in a human call task (run the notifier).</p><button type="button" class="btn">Send to Tasleem</button></div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 16px; align-items: start">
+<section class="card" style="overflow: hidden">
+<div style="padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid #E7E2D7"><h2 style="margin: 0; font-size: 15px; font-weight: 650">Incoming messages</h2><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #1E7A4C"><span style="width: 7px; height: 7px; border-radius: 50%; background: #1E7A4C"></span>11 received</span></div>
+<div role="log" aria-label="Incoming messages">
+<div class="ev"><span class="src s-fhir">Malaffi (FHIR)</span><span class="mono">Observation</span><span style="display: flex; gap: 8px; align-items: center"><span style="font-size: 12px; color: #6B6F78">24 Oct</span><span class="ok">applied</span></span></div>
+<div class="ev"><span class="src s-fhir">Malaffi (FHIR)</span><span class="mono">Communication</span><span style="display: flex; gap: 8px; align-items: center"><span style="font-size: 12px; color: #6B6F78">25 Oct</span><span class="ok">applied</span></span></div>
+<div class="ev"><span class="src s-fhir">Malaffi (FHIR)</span><span class="mono">Encounter</span><span style="display: flex; gap: 8px; align-items: center"><span style="font-size: 12px; color: #6B6F78">28 Oct</span><span class="ok">applied</span></span></div>
+<div class="ev"><span class="src s-fhir">Malaffi (FHIR)</span><span class="mono">ServiceRequest</span><span style="display: flex; gap: 8px; align-items: center"><span style="font-size: 12px; color: #6B6F78">29 Oct</span><span class="ok">applied</span></span></div>
+<div class="ev"><span class="src s-ref">Malaffi (HL7 REF)</span><span class="mono">REF SENT</span><span style="font-size: 12px; color: #6B6F78">29 Oct</span></div>
+<div class="ev"><span class="src s-fhir">Malaffi (FHIR)</span><span class="mono">Task</span><span style="display: flex; gap: 8px; align-items: center"><span style="font-size: 12px; color: #6B6F78">31 Oct</span><span class="ok">applied</span></span></div>
+<div class="ev"><span class="src s-ref">Malaffi (HL7 REF)</span><span class="mono">REF ACCEPTED</span><span style="font-size: 12px; color: #6B6F78">31 Oct</span></div>
+<div class="ev"><span class="src s-fhir">Malaffi (FHIR)</span><span class="mono">Appointment</span><span style="display: flex; gap: 8px; align-items: center"><span style="font-size: 12px; color: #6B6F78">2 Nov</span><span class="ok">applied</span></span></div>
+<div class="ev"><span class="src s-ref">Malaffi (HL7 REF)</span><span class="mono">REF SCHEDULED</span><span style="font-size: 12px; color: #6B6F78">2 Nov</span></div>
+<div class="ev"><span class="src s-fhir">Malaffi (FHIR)</span><span class="mono">Appointment</span><span style="display: flex; gap: 8px; align-items: center"><span style="font-size: 12px; color: #6B6F78">9 Nov</span><span class="ok">applied</span></span></div>
+<div class="ev" style="background: #FFFAF6; border-bottom: 0"><span class="src s-ref">Malaffi (HL7 REF)</span><span class="mono" style="font-weight: 600">REF COMPLETED</span><span style="font-size: 12px; color: #6B6F78">13 Nov</span></div>
+</div>
+</section>
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+<section style="padding: 16px 18px; border-radius: 4px; background: #14171F; color: #fff; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #B4C5FA">What happened</span>
+<p style="margin: 0; font-size: 15px; line-height: 1.55">Malaffi marked the referral COMPLETED 4 days ago. No colonoscopy or report was ever sent. Tasleem flags 'Marked completed without a report' and escalates to the family physician.</p>
+</section>
+<section class="card" style="padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><span style="font-size: 15px; font-weight: 650">Amal (demo, 55) <span style="font-size: 11px; font-weight: 600; color: #3A3E47; background: #F1EDE5; border-radius: 2px; padding: 1px 6px">AR</span></span><span class="chip l1">Marked completed without a report</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px"><span class="seg"><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i></span><span class="seg"><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="gap"></i><i class="gap"></i><i class="gap"></i></span></div>
+<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #3A3E47">Next step: Malaffi says completed but no colonoscopy report exists. Ask the GI centre for the report or rebook.</p>
+<span style="font-size: 13px; color: #545862">Owner: <b style="color: #14171F">Dr. Fatima</b></span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><a href="CaseView.dc.html" class="btn btn-p">Open case</a><a href="MyWork.dc.html" class="btn">See it in Dr. Fatima's My work</a></div>
+</section>
+<section class="card" style="padding: 16px 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 14px; font-weight: 600">Run the notifier now</span><span style="font-size: 12px; color: #6B6F78">Routine patient messages wait for 08:00 Gulf time (quiet hours)</span></div>
+<button type="button" class="btn">Run now</button>
+</section>
+</div>
+</div>
+
+<section class="card" style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 650">HL7 from the lab</h2>
+<label for="hl7" style="font-size: 13px; color: #545862">ORU^R01 message (a positive FIT)</label>
+<textarea id="hl7" class="mono" rows="5" style="font-size: 12.5px; line-height: 1.6; padding: 12px; border: 1px solid #D5CFC2; border-radius: 4px; background: #0E1015; color: #E2DDD1; resize: vertical">MSH|^~\&amp;|LAB|SKMC|MALAFFI|DOH|20261117090000||ORU^R01|LAB-DEMO-0002|P|2.5.1
+PID|1||p-demo-42acd3
+OBX|1|ST|29771-3^FIT^LN||Positive|||A|||F|||20261117090000</textarea>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="btn btn-p">Send</button><button type="button" class="btn">Send a broken message</button></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 650">Acknowledgements</h2>
+<div style="border: 1px solid #ABEFC6; background: #F6FEF9; border-radius: 4px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 600; color: #1E7A4C">Accepted</span>
+<pre class="mono" style="font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-all; color: #3A3E47">MSH|^~\&amp;|TASLEEM|TASLEEM|LAB|SKMC|20261117172220+0400||ACK^R01^ACK|ACKLAB-DEMO-0002|P|2.5.1
+<b style="color: #1E7A4C; background: #DCFAE6; border-radius: 2px; padding: 0 3px">MSA|AA</b>|LAB-DEMO-0002|accepted 1 item(s)</pre>
+</div>
+<div style="border: 1px solid #FDA29B; background: #FFFBFA; border-radius: 4px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 600; color: #B42318">Rejected: "not an hl7 message"</span>
+<pre class="mono" style="font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-all; color: #3A3E47"><b style="color: #B42318; background: #FEE4E2; border-radius: 2px; padding: 0 3px">MSA|AR</b>||unparseable: message must start with an MSH segment</pre>
+</div>
+</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

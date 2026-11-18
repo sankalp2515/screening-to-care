@@ -20,7 +20,7 @@ An AI assistant drafts briefs and patient messages; a person always decides and 
 - patients (a mobile companion designed to live inside the national Sahatna app).
 
 # 1. Tech and structure
-- **Stack:** React, Vite, TypeScript, Tailwind, shadcn/ui, React Router, TanStack Query, Recharts, lucide-react. No Supabase, no Lovable Cloud, no database, no auth provider: the backend already exists elsewhere.
+- **Stack:** use this project's default stack and its router (TypeScript, Tailwind, shadcn/ui), plus TanStack Query, Recharts and lucide-react. Everything runs in the browser: no server functions, no Supabase, no Lovable Cloud, no database, no auth provider. The backend already exists elsewhere. Environment variables are read with `import.meta.env`.
 - **Routes:**
   - `/` landing page;
   - `/how-it-works` (optional anchor on the landing page instead: your choice; keep it one scroll if you can);

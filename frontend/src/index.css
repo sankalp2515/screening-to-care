@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+/* Sheet and biro tokens (DESIGN.md section 2). 60% paper, 30% ink, 10% biro. */
+:root {
+  --paper: #F6F4EE;
+  --sheet: #FFFFFF;
+  --sheet-2: #FAF8F3;
+  --rule: #E7E2D7;
+  --rule-strong: #D5CFC2;
+  --ink: #14171F;
+  --ink-2: #3A3E47;
+  --muted: #6B6F78;
+  --biro: #1A4BE0;
+  --biro-ink: #1238B0;
+  --biro-wash: #EEF1FC;
+  --done: #1E7A4C;
+  --done-wash: #ECF6F0;
+  --attn: #B54708;
+  --attn-wash: #FEF4EC;
+  --stop: #B42318;
+  --stop-wash: #FEF3F2;
+  --ai: #C11574;
+  --ai-wash: #FDF2F8;
+  --hatch: repeating-linear-gradient(135deg, #A29D91 0 3px, #D5CFC2 3px 7px);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-sheet-2: var(--sheet-2);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-biro: var(--biro);
+  --color-biro-ink: var(--biro-ink);
+  --color-biro-wash: var(--biro-wash);
+  --color-done: var(--done);
+  --color-done-wash: var(--done-wash);
+  --color-attn: var(--attn);
+  --color-attn-wash: var(--attn-wash);
+  --color-stop: var(--stop);
+  --color-stop-wash: var(--stop-wash);
+  --color-ai: var(--ai);
+  --color-ai-wash: var(--ai-wash);
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-sans: "Libre Franklin", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-arabic: "IBM Plex Sans Arabic", "Libre Franklin", sans-serif;
+  --radius-sm: 2px;
+  --radius: 4px;
+  --radius-md: 4px;
+}
+
+@layer base {
+html, body { background: var(--paper); color: var(--ink); }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 22px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+[lang="ar"], [dir="rtl"] { font-family: var(--font-arabic); }
+h1, h2, .serif { font-family: var(--font-serif); letter-spacing: -0.01em; }
+.mono, code, kbd { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tnum { font-variant-numeric: tabular-nums; }
+
+:focus-visible { outline: 2px solid var(--biro); outline-offset: 2px; }
+::selection { background: var(--biro-wash); }
+}
+
+/* Press feedback (DESIGN.md 8.2). Exact properties only, never transition: all. */
+.press {
+  transition: transform 160ms var(--ease-out), background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.press:active:not(:disabled) { transform: scale(0.97); }
+.press-wide {
+  transition: transform 160ms var(--ease-out), background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.press-wide:active:not(:disabled) { transform: scale(0.98); }
+
+/* Revealed requirement (close dialog fields, confirmations). */
+.reveal {
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+  @starting-style { opacity: 0; transform: translateY(4px); }
+}
+
+/* Dialog entrance. */
+.dlg {
+  transition: opacity 200ms var(--ease-out), scale 200ms var(--ease-out);
+  @starting-style { opacity: 0; scale: 0.97; }
+}
+.scrim {
+  transition: opacity 200ms var(--ease-out);
+  @starting-style { opacity: 0; }
+}
+
+/* Toasts. */
+.toast {
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+  @starting-style { opacity: 0; transform: translateY(8px); }
+}
+
+/* Website hero entrance, once on load (marketing exemption, 400ms, 60ms stagger). */
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.enter { animation: enter 400ms var(--ease-out) both; }
+.enter-1 { animation-delay: 60ms; }
+.enter-2 { animation-delay: 120ms; }
+.enter-3 { animation-delay: 180ms; }
+
+.hatch { background: var(--hatch); }
+.skeleton { background: var(--sheet-2); border-radius: 4px; }
+
+/* Biro underline under the wordmark and signature line. */
+.biro-underline { background-image: linear-gradient(var(--biro), var(--biro)); background-size: 100% 2px; background-repeat: no-repeat; background-position: 0 100%; padding-bottom: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .press:active, .press-wide:active { transform: none; }
+  .enter { animation: enter-fade 200ms ease both; }
+  @keyframes enter-fade { from { opacity: 0; } to { opacity: 1; } }
+  .reveal, .toast { @starting-style { transform: none; } }
+  .dlg { @starting-style { scale: 1; } }
+}
+@media (hover: hover) and (pointer: fine) {
+  .row-hover:hover { background: var(--sheet-2); }
+}
+
+/* Landing page micro-interactions (hover-capable pointers only; reduced motion keeps colour changes only). */
+.faq[open] .faq-mark { transform: rotate(45deg); }
+.faq-mark { display: inline-block; transition: transform 200ms var(--ease-out); }
+.faq summary::-webkit-details-marker { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .lift { transition: transform 200ms var(--ease-out), border-color 150ms ease, box-shadow 200ms var(--ease-out); }
+  .lift:hover { transform: translateY(-2px); border-color: var(--rule-strong); box-shadow: 0 6px 0 -2px var(--rule); }
+  .link-draw { background-image: linear-gradient(currentColor, currentColor); background-size: 0 1px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size 200ms var(--ease-out), color 150ms ease; }
+  .link-draw:hover { background-size: 100% 1px; }
+  .cta-arrow { transition: transform 200ms var(--ease-out); }
+  a:hover > .cta-arrow { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lift:hover, a:hover > .cta-arrow { transform: none; }
+  .faq-mark { transition: none; }
+}

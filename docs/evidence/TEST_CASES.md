@@ -142,3 +142,54 @@ Limits of this set: the barrier and distress lexicons were written by the team; 
 | V35 | Eval run with a wrong model id | host answers 404 | stops after 1 call, no result file; found when a real Groq run with an outdated default model failed 15 of 15 | pass | bench/llm_barriers.py |
 | V36 | LLM barrier classifier vs keywords (live, Groq free tier, `openai/gpt-oss-120b`) | 15 labelled synthetic messages, EN and AR | LLM no worse than keywords | LLM 14/15, keywords 13/15, 0 failed calls; 1 false barrier; sample too small to claim better ([LLM_BARRIER_EVAL.md](LLM_BARRIER_EVAL.md)) | pass | bench/llm_barriers.py |
 | H28 | Patient reports on another patient's case | — | changed from 403 to 404 (no existence leak) | pass | case-core |
+
+## Frontend (demo replayer and safety in the UI)
+
+Automated in `frontend/src/test/demo.test.ts`. Run: `cd frontend && npm test`. Last run: **18 Nov 2026, 23 passed, 0 failed** (Vitest, Node 22, the recorded synthetic bundle `docs/lovable/demo/demo-bundle.json`). Typecheck clean, production build passes. Checked by hand in the browser at 1440 px and 375 px the same day (rows F19–F22).
+
+| # | Case | Input | Expected | Actual | Component |
+|---|---|---|---|---|---|
+| F1 | Message policy matches the server | recorded "policy check blocks a result" text | same `{ok, violations}` as the recorded server answer | pass | lib/demo.ts messagePolicy (port of domain/messaging.py) |
+| F2 | Result word, Arabic result word, advice, link, empty | "Your result is positive"; "الفحص إيجابي"; "nothing to worry"; www link; blank | RESULT_DISCLOSURE; RESULT_DISCLOSURE; CLINICAL_ADVICE; LINK; EMPTY | pass | messagePolicy |
+| F3 | Values vs logistics | "150/95"; "at 9:30 on 21 Nov" | RESULT_VALUE; allowed | pass | messagePolicy |
+| F4 | R3 close without evidence | Rajesh, COMPLETED_WITH_REPORT, dr-fatima | 409 `R3_EVIDENCE_REQUIRED` | pass | demo close handler (reads server `actions.close`) |
+| F5 | R3 allowed outcome, evidence missing | COMPLETED_ELSEWHERE, no evidence_ref | 422, not closed | pass | demo close handler |
+| F6 | R3 unreachable too early | UNREACHABLE with too few contact attempts | 409 `R3_CONTACT_ATTEMPTS` | pass | demo close handler |
+| F7 | R3 distress needs a clinician | resolve as coord-sara, then dr-salma | 409 `R3_SIGNATURE_REQUIRED`, then 200 and resolved | pass | recorded commands |
+| F8 | Result in a patient message where a send was recorded | "Your result is positive" to Noura | 409 `IFHAS_MESSAGE_POLICY`; policy runs before any recorded reply | pass | demo patient-messages handler |
+| F9 | Case outside the clinic | dr-lina opens Rajesh | 404 | pass | demo GET case |
+| F10 | R1 in every list | all staff case lists | every open row has an owner | pass | bundle check |
+| F11 | Stalled filter | coord-sara `?stalled=true` | only rows with stalls | pass | demo GET cases |
+| F12 | Simulator order and evidence | report-arrives before false-done; then false-done; then report-arrives | 409; new row first in Dr. Fatima's list with CLOSED_WITHOUT_EVIDENCE; stall cleared | pass | runScenario |
+| F13 | Channel fallback | run notifier before and after unreachable-patient | pulled 0; then 1, next step PATIENT_NOT_REACHED, trail exhausted | pass | runNotifier |
+| F14 | HL7 | recorded ORU^R01; "not an hl7 message" | `MSA|AA`; `MSA|AR` | pass | connector replay |
+| F15 | Prep check never says "wrong" | one wrong answer; all right | follow-up call message, no "wrong"; all_correct | pass | prep-check handler (answer key from pathways) |
+| F16 | Patient isolation and status text | Noura reads Rajesh's prep check; every patient status message | 404; no result values or links | pass | demo GET prep-check; bundle check |
+| F17 | Demo honesty | unrecorded handoff POST | 501 `DEMO_NOT_RECORDED`, shown as a neutral note | pass | demoRequest fallback |
+| F18 | Reset | run false-done, then reset | lists and session back to recorded start | pass | resetDemo |
+| F19 | Browser: R3 in the close dialog | Rajesh, choose COMPLETED_WITH_REPORT, try anyway | option shows rule code; server refusal shown in the dialog; Close button stays disabled | pass (manual, 1440 px) | CaseActions CloseDialog |
+| F20 | Browser: AI suggestion confirmed by a person | Noura as nav-aisha, Confirm | HUMAN tag, task text, due in 1 day | pass (manual) | CaseView BarrierCard |
+| F21 | Browser: composer blocks a result | append "your result is positive" to the draft | red violation shown; Send disabled (also while the check is pending) | pass (manual) | Composer |
+| F22 | Browser: patient companion at 375 px | Noura (AR, RTL) barrier flow; Rajesh (EN) prep check, one wrong answer | one big button first; 5 choices + "other reasons"; instant reply; no horizontal scroll; one question at a time; reply asks for a call | pass (manual) | pages/Patient.tsx |
+
+Finding from F16: the backend status template "Your results are with your doctor, who will contact you." would itself fail the backend message policy (`your results are`). It carries no value, but the wording should be reviewed by a clinician before a pilot.
+
+## Real-world fit (published failure mix, 18 Nov)
+
+Run: `python -m tasleem.bench.reality` ([REAL_WORLD_FIT.md](REAL_WORLD_FIT.md)). Tests in `backend/tests/test_bench_reality.py` and `frontend/src/test/demo.test.ts`.
+
+| # | Case | Input | Expected | Actual | Component |
+|---|---|---|---|---|---|
+| RW1 | Calibrated mix matches the literature | `CALIBRATED` weights | 1,000 per mix; 423 never get a colonoscopy (Martin 2017: 42.3%) | pass | bench/reality.py |
+| RW2 | Weights override is safe | unknown scenario name; design weights passed explicitly | ValueError; identical cohort to the default | pass | bench/cohort.py |
+| RW3 | A tighter status monitor is still blind to false done | 300 patients, 3 d / 7 d thresholds, repeating alerts | more alerts than the generous monitor; every FALSE_DONE still counted done | pass | bench/arms.py |
+| RW4 | Tasleem invariants hold on the realistic mix | 80 patients | 0 false done, 0 open cases without an owner, 0% false alerts | pass | engine + scheduler |
+| RW5 | **Distress from a patient with no family physician reaches a clinician** | 4 distress patients, none with a family physician | first DISTRESS alert goes to a named clinician (`dr-…`), within 24 h | **failed before the fix** (went to the programme coordinator, who cannot resolve it); pass after | services/directory.py `fallback_clinician_id` |
+| RW6 | Full run, 3 seeds × 2,000 | published mix | never-colonoscopy flagged 100% vs 92.0% status only; median 1.9 vs 16.5 days; distress to a clinician in 24 h 10/11, 19/24, 15/18 (every miss is the deliberate no-cue message) | pass | whole pipeline |
+| F23 | Tour finds case ids in live mode | `caseIdForPatient("p-rajesh")` | Rajesh's case id; unknown patient gives null | pass | lib/api.ts |
+| F24 | Landing numbers are traceable | every value in `landing-facts.ts` | none blank; real-world values appear in REAL_WORLD_FIT.md | pass | lib/landing-facts.ts |
+| F25 | Container gateway, live mode | `docker run` the web image on the stack network; GET `/api/core/v1/me`, `/api/{agent,notifier,connector}/healthz`, `/app/work` | 200 from every service through one origin; SPA route served | pass (manual) | frontend/Dockerfile, deploy/nginx.conf |
+
+Finding from RW5: before the fix, 1 of 11 distress messages in seed 2026 went to a non-clinician. The design-mix benchmark never produced a patient with both no family physician and a distress message, so the gap only showed on a larger, realistic run.
+
+Known flaky test (not changed): `test_workflow.py::test_outbox_notifies_named_people_and_never_leaks_results_to_patients` searches the whole payload JSON for "162" and "7.2", which a random id or timestamp can contain. It failed once in about five full runs.

@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tasleem landing page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&amp;family=Libre+Franklin:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;display=swap">
+<style>
+:root{--ease-out:cubic-bezier(0.23,1,0.32,1)}
+h1,h2{font-family:'Source Serif 4',Georgia,serif;font-weight:600;letter-spacing:-0.012em}
+[lang=ar] h1,[lang=ar] h2{font-family:'IBM Plex Sans Arabic',sans-serif;letter-spacing:0}
+button,.btn,.pbtn,.opt,.bchip,.out,[role=button]{transition:transform 160ms var(--ease-out),background-color 150ms ease,border-color 150ms ease,color 150ms ease}
+button:active,.btn:active,.pbtn:active,.bchip:active{transform:scale(0.97)}
+.opt:active,.out:active{transform:scale(0.98)}
+:focus-visible{outline:2px solid #1A4BE0;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){button:active,.btn:active,.pbtn:active,.opt:active,.bchip:active,.out:active{transform:none}}
+
+body{margin:0;background:#F6F4EE}
+.enter>*{animation:rise 400ms var(--ease-out) both}.enter>*:nth-child(2){animation-delay:60ms}.enter>*:nth-child(3){animation-delay:120ms}.enter>*:nth-child(4){animation-delay:180ms}.enter>*:nth-child(5){animation-delay:240ms}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.enter>*{animation-name:fade}@keyframes fade{from{opacity:0}to{opacity:1}}}
+h1 em,h2 em{font-style:italic;font-weight:500}
+.num{font-family:'Source Serif 4',Georgia,serif;font-weight:600;letter-spacing:-0.01em}
+a{color:#1A4BE0}a:hover{color:#1238B0}
+.tl{font-family:'Libre Franklin',system-ui,sans-serif;color:#14171F;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px;box-sizing:border-box}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:4px;font-weight:600;font-size:15px;text-decoration:none;box-sizing:border-box}
+.btn-p{background:#1A4BE0;color:#fff}.btn-p:hover{background:#1238B0;color:#fff}
+.btn-g{border:1px solid #D5CFC2;color:#14171F;background:#fff}.btn-g:hover{background:#FAF8F3;color:#14171F}
+.btn-w{background:#fff;color:#1A4BE0}.btn-w:hover{background:#EEF1FC;color:#1238B0}
+.btn-o{border:1px solid rgba(255,255,255,.5);color:#fff}.btn-o:hover{background:rgba(255,255,255,.1);color:#fff}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+.seg{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px}
+.seg i{display:block;height:12px;border-radius:2px;background:#E7E2D7}
+.seg i.rep{background:repeating-linear-gradient(135deg,#A29D91 0 3px,#D5CFC2 3px 7px)}
+.seg i.ver{background:#1E7A4C}
+.seg i.gap{background:#FDEFE3;box-shadow:inset 0 0 0 1px #F2B48A}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 8px;border-radius:2px;line-height:16px}
+.l3{background:#FEF3F2;color:#B42318;box-shadow:inset 0 0 0 1px #FDA29B}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:3px;line-height:16px;white-space:nowrap}
+.b-rule{color:#3A3E47;box-shadow:inset 0 0 0 1px #B9B3A6}
+.b-fact{color:#1E7A4C;box-shadow:inset 0 0 0 1px #75C69D}
+.rule{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:500;color:#3A3E47;background:#F1EDE5;border-radius:2px;padding:2px 6px}
+.card{background:#fff;border:1px solid #E7E2D7;border-radius:4px}
+.h2{font-size:clamp(30px,3.6vw,44px);line-height:1.1;letter-spacing:-0.015em;font-weight:600;margin:0}
+.kicker{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#545862;margin:0 0 14px;display:flex;align-items:center;gap:10px}.kicker:before{content:'';width:24px;height:1px;background:#14171F}
+.lead{font-size:18px;line-height:1.6;color:#545862;margin:0}
+.navlink{color:#3A3E47;text-decoration:none;font-size:15px;font-weight:500}.navlink:hover{color:#1A4BE0}
+</style>
+</helmet>
+<div class="tl" style="width: 100%; min-height: 100vh; background: #F6F4EE">
+
+<header style="border-bottom: 1px solid #E7E2D7; background: #F6F4EE">
+<nav class="wrap" aria-label="Main" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; min-height: 72px">
+<a href="#top" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #14171F">
+<span style="display: inline-flex; flex-direction: column; gap: 1px"><span style="font-family: 'Source Serif 4', Georgia, serif; font-size: 24px; font-weight: 600; letter-spacing: -0.015em; line-height: 1">Tasleem</span><svg width="58" height="6" viewBox="0 0 58 6" fill="none" aria-hidden="true"><path d="M1 4.2C12 2.4 30 1.6 57 2.6" stroke="#1A4BE0" stroke-width="1.8" stroke-linecap="round"></path></svg></span>
+</a>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 28px">
+<a class="navlink" href="#how-it-works">How it works</a>
+<a class="navlink" href="#proof">Proof</a>
+<a class="navlink" href="#safety">Safety</a>
+<a class="navlink" href="#for-teams">For teams</a>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<a class="btn btn-g" href="https://github.com/sankalp2515/screening-to-care">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"></path></svg>
+View on GitHub</a>
+<a class="btn btn-p" href="Persona.dc.html">Try the live demo</a>
+</div>
+</nav>
+</header>
+
+<section id="top" style="padding: 88px 0 96px">
+<div class="wrap" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 64px; align-items: center">
+<div class="enter" style="display: flex; flex-direction: column; gap: 24px">
+<p class="kicker" style="margin: 0">For Abu Dhabi screening follow-up</p>
+<h1 style="margin: 0; font-size: clamp(44px, 5.6vw, 72px); line-height: 1.02; letter-spacing: -0.025em; font-weight: 600">Know whether the care <em>actually</em> happened.</h1>
+<p class="lead" style="font-size: 20px; max-width: 540px">Malaffi tells you a referral exists. Tasleem tells you whether the colonoscopy was done, why not, and who is fixing it, for every positive screening result.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; padding-top: 8px">
+<a class="btn btn-p" href="Persona.dc.html" style="min-height: 48px; padding: 0 22px; font-size: 16px">Try the live demo
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a class="btn btn-g" href="#how-it-works" style="min-height: 48px; padding: 0 22px; font-size: 16px">See how it works</a>
+</div>
+<p style="margin: 0; font-size: 13px; color: #6B6F78">No sign-up. Synthetic patients only.</p>
+</div>
+
+<div class="enter" style="position: relative">
+<div class="card" style="padding: 0; display: flex; flex-direction: column; gap: 0; border-color: #D5CFC2">
+<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 28px; border-bottom: 1px solid #E7E2D7; background: #FAF8F3; font-size: 12px; color: #6B6F78"><span style="font-weight: 600; letter-spacing: .06em; text-transform: uppercase">Case sheet</span><span class="mono">ServiceRequest/sr-p-rajesh</span></div>
+<div style="padding: 28px; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-family: 'Source Serif 4', Georgia, serif; font-size: 22px; font-weight: 600">Rajesh K. (58)</span>
+<span class="badge" style="background: #F1EDE5; color: #3A3E47">EN</span>
+</div>
+<span style="font-size: 14px; color: #545862">Positive FIT to colonoscopy</span>
+</div>
+<span class="chip l3">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 8v5M12 16.5v.5"></path><circle cx="12" cy="12" r="10"></circle></svg>
+Marked completed without a report</span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 13px; gap: 8px"><span style="color: #545862">Reported by referral status</span><span class="mono" style="font-weight: 500; color: #3A3E47">COMPLETED · 9/9</span></div>
+<div class="seg"><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i><i class="rep"></i></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 13px; gap: 8px"><span style="color: #545862">Verified by clinical evidence</span><span style="font-weight: 600; color: #1E7A4C">Attended · 6/9</span></div>
+<div class="seg"><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="ver"></i><i class="gap"></i><i class="gap"></i><i class="gap"></i></div>
+</div>
+</div>
+
+<div style="display: flex; gap: 10px; align-items: flex-start; background: #FEF4EC; border-radius: 4px; padding: 12px 14px; color: #7A2E0E; font-size: 14px; line-height: 1.5">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B54708" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"></path></svg>
+<span>Malaffi says <b class="mono" style="font-weight: 600">COMPLETED</b>. Clinical evidence stops at <b>Attended</b>. No colonoscopy report exists.</span>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; border-top: 1px solid #E7E2D7; padding-top: 18px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; color: #6B6F78">Owner</span>
+<span style="font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px"><span style="width: 24px; height: 24px; border-radius: 50%; background: #EEF1FC; color: #14171F; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">DF</span>Dr. Fatima</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; color: #6B6F78">Escalation</span>
+<span style="font-size: 14px; font-weight: 600">Escalated to Sara · level 3</span>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap">
+<span class="badge b-rule">Computed by rule</span>
+<span style="font-size: 12px; color: #6B6F78">Case cannot close until the report arrives <span class="rule">R3</span></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="padding: 96px 0; background: #FAF8F3; border-top: 1px solid #E7E2D7; border-bottom: 1px solid #E7E2D7">
+<div class="wrap" style="display: flex; flex-direction: column; gap: 40px">
+<div style="max-width: 720px">
+<p class="kicker">The problem</p>
+<h2 class="h2">A status is <em>not</em> care.</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px">
+<div class="card" style="padding: 32px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 13px; font-weight: 600; color: #6B6F78; text-transform: uppercase; letter-spacing: .06em">Today</span>
+<p style="margin: 0; font-size: 18px; line-height: 1.6; color: #3A3E47">Rajesh, 58, has a positive stool test. He is referred for a colonoscopy. Weeks later the referral shows COMPLETED. No colonoscopy was done and no report exists. Nobody notices until he is diagnosed later.</p>
+</div>
+<div class="card" style="padding: 32px; display: flex; flex-direction: column; gap: 14px; border-color: #1A4BE0; box-shadow: inset 0 0 0 1px #1A4BE0">
+<span style="font-size: 13px; font-weight: 600; color: #14171F; text-transform: uppercase; letter-spacing: .06em">With Tasleem</span>
+<p style="margin: 0; font-size: 18px; line-height: 1.6; color: #14171F">The same referral says COMPLETED, but there is no procedure and no report. Tasleem flags it, names Dr. Fatima as owner, escalates when she is busy, and will not let the case close until the report arrives.</p>
+</div>
+</div>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #545862; max-width: 860px">In published programmes, 30–55% of people with an abnormal stool test complete a colonoscopy in safety-net settings, against 70–80% in organised programmes with tracking, a named owner and navigation. <a href="https://bmjopen.bmj.com/content/16/10/e115052">BMJ Open, 2026</a></p>
+</div>
+</section>
+
+<section id="how-it-works" style="padding: 112px 0">
+<div class="wrap" style="display: flex; flex-direction: column; gap: 48px">
+<div style="max-width: 720px">
+<p class="kicker">How it works</p>
+<h2 class="h2">Four steps. One accountable loop.</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 20px">
+<div class="card" style="padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="width: 40px; height: 40px; border-radius: 4px; background: #EEF1FC; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14171F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h4l3-8 6 16 3-8h4"></path></svg></span><span class="mono" style="font-size: 12px; color: #A29D91">01</span></div>
+<h3 style="margin: 0; font-size: 19px; font-weight: 650">Sense</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #545862">Reads referral, booking and result events from Malaffi and labs (HL7 v2, FHIR R4).</p>
+</div>
+<div class="card" style="padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="width: 40px; height: 40px; border-radius: 4px; background: #EEF1FC; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14171F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path><circle cx="18" cy="16" r="3"></circle></svg></span><span class="mono" style="font-size: 12px; color: #A29D91">02</span></div>
+<h3 style="margin: 0; font-size: 19px; font-weight: 650">Decide</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #545862">Fixed, tested rules spot stalls: booked but not attended, completed without a report, referral rejected, no reply.</p>
+</div>
+<div class="card" style="padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="width: 40px; height: 40px; border-radius: 4px; background: #EEF1FC; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14171F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span><span class="mono" style="font-size: 12px; color: #A29D91">03</span></div>
+<h3 style="margin: 0; font-size: 19px; font-weight: 650">Act</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #545862">Assigns one owner, escalates on missed deadlines, and reaches each person on their own channel: Sahatna for patients, the EMR inbox for clinicians.</p>
+</div>
+<div class="card" style="padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="width: 40px; height: 40px; border-radius: 4px; background: #EEF1FC; display: inline-flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14171F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4"></path><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg></span><span class="mono" style="font-size: 12px; color: #A29D91">04</span></div>
+<h3 style="margin: 0; font-size: 19px; font-weight: 650">Hand off</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #545862">A clinician closes every case, on evidence. The AI assistant drafts; a person always decides.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="proof" style="padding: 112px 0; background: #14171F; color: #fff">
+<div class="wrap" style="display: flex; flex-direction: column; gap: 48px">
+<div style="max-width: 720px">
+<p class="kicker" style="color: #94ABF6">Proof</p>
+<h2 class="h2" style="color: #fff">Tested before it is trusted.</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 40px; align-items: start">
+<figure style="margin: 0; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 32px; display: flex; flex-direction: column; gap: 26px">
+<figcaption style="font-size: 15px; font-weight: 600; color: #fff">Stalled journeys that reached a named person</figcaption>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #D5CFC2">Reminders only</span><span class="mono" style="color: #fff">0%</span></div>
+<div style="height: 14px; border-radius: 2px; background: rgba(255,255,255,.08)"><div style="width: 0.6%; height: 14px; border-radius: 2px; background: #A29D91"></div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #D5CFC2">Malaffi status only</span><span class="mono" style="color: #fff">70.1%</span></div>
+<div style="height: 14px; border-radius: 2px; background: rgba(255,255,255,.08)"><div style="width: 70.1%; height: 14px; border-radius: 2px; background: #A29D91"></div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #fff; font-weight: 600">Tasleem</span><span class="mono" style="color: #94ABF6; font-weight: 600">98.5%</span></div>
+<div style="height: 14px; border-radius: 2px; background: rgba(255,255,255,.08)"><div style="width: 98.5%; height: 14px; border-radius: 2px; background: #7C9BFF"></div></div>
+</div>
+</figure>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 24px; display: flex; flex-direction: column; gap: 8px"><span class="num" style="font-size: 34px">0 vs 125</span><span style="font-size: 14px; line-height: 1.5; color: #D5CFC2">journeys falsely counted as done (Tasleem vs status only)</span></div>
+<div style="background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 24px; display: flex; flex-direction: column; gap: 8px"><span class="num" style="font-size: 34px">4 vs 14.4 days</span><span style="font-size: 14px; line-height: 1.5; color: #D5CFC2">median time from care stopping to an alert</span></div>
+<div style="background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 24px; display: flex; flex-direction: column; gap: 8px"><span class="num" style="font-size: 34px">198</span><span style="font-size: 14px; line-height: 1.5; color: #D5CFC2">automated tests passing</span></div>
+<div style="background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 24px; display: flex; flex-direction: column; gap: 8px"><span class="num" style="font-size: 34px">64 of 67</span><span style="font-size: 14px; line-height: 1.5; color: #D5CFC2">labelled hard cases handled</span></div>
+</div>
+</div>
+<p style="margin: 0; font-size: 14px; line-height: 1.6; color: #D5CFC2; max-width: 820px">Synthetic cohort of 1,000 patients, three seeds. This tests the software, not patient outcomes; that needs a clinical pilot. <a href="https://github.com/sankalp2515/screening-to-care/blob/main/docs/evidence/benchmark.md" style="color: #94ABF6">Read the evidence</a></p>
+</div>
+</section>
+
+<section id="safety" style="padding: 112px 0">
+<div class="wrap" style="display: flex; flex-direction: column; gap: 48px">
+<div style="max-width: 720px">
+<p class="kicker">Safety</p>
+<h2 class="h2">Clinical teams stay in charge.</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px">
+<div class="card" style="padding: 24px; display: flex; gap: 16px; align-items: flex-start"><span class="rule">R1</span><p style="margin: 0; font-size: 16px; line-height: 1.5">Every open case has one named owner.</p></div>
+<div class="card" style="padding: 24px; display: flex; gap: 16px; align-items: flex-start"><span class="rule">R2</span><p style="margin: 0; font-size: 16px; line-height: 1.5">A handoff counts only when the receiver accepts.</p></div>
+<div class="card" style="padding: 24px; display: flex; gap: 16px; align-items: flex-start"><span class="rule">R3</span><p style="margin: 0; font-size: 16px; line-height: 1.5">A case closes only on evidence or a signed clinician decision.</p></div>
+<div class="card" style="padding: 24px; display: flex; gap: 16px; align-items: flex-start"><span class="rule">R4</span><p style="margin: 0; font-size: 16px; line-height: 1.5">Every missed deadline reaches a named person.</p></div>
+<div class="card" style="padding: 24px; display: flex; gap: 16px; align-items: flex-start"><span class="rule">R5</span><p style="margin: 0; font-size: 16px; line-height: 1.5">AI suggests. It never closes a case, sets priority or advises a patient.</p></div>
+<div class="card" style="padding: 24px; display: flex; gap: 16px; align-items: flex-start"><span class="rule">R6</span><p style="margin: 0; font-size: 16px; line-height: 1.5">Every change is written to a tamper-evident audit log.</p></div>
+</div>
+<div style="display: flex; gap: 12px; align-items: center; padding: 18px 22px; border-radius: 4px; background: #FAF8F3; border: 1px solid #E7E2D7">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14171F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #3A3E47">Patient messages never contain results. Abnormal findings are discussed in person, as the IFHAS standard requires.</p>
+</div>
+</div>
+</section>
+
+<section style="padding: 80px 0; background: #FAF8F3; border-top: 1px solid #E7E2D7; border-bottom: 1px solid #E7E2D7">
+<div class="wrap" style="display: flex; flex-direction: column; gap: 24px; align-items: center; text-align: center">
+<p class="kicker" style="margin: 0">Built on what exists</p>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center">
+<span style="padding: 10px 16px; border-radius: 2px; border: 1px solid #D5CFC2; background: #fff; font-size: 14px; font-weight: 500">Malaffi referral events (Circular 210/2026)</span>
+<span style="padding: 10px 16px; border-radius: 2px; border: 1px solid #D5CFC2; background: #fff; font-size: 14px; font-weight: 500">Sahatna patient app</span>
+<span style="padding: 10px 16px; border-radius: 2px; border: 1px solid #D5CFC2; background: #fff; font-size: 14px; font-weight: 500">HL7 v2 and FHIR R4</span>
+<span style="padding: 10px 16px; border-radius: 2px; border: 1px solid #D5CFC2; background: #fff; font-size: 14px; font-weight: 500">SNOMED CT and LOINC</span>
+<span style="padding: 10px 16px; border-radius: 2px; border: 1px solid #D5CFC2; background: #fff; font-size: 14px; font-weight: 500">Arabic and English</span>
+</div>
+<p style="margin: 0; font-size: 17px; color: #545862">Tasleem is a layer beside Malaffi and Sahatna. It doesn't replace them.</p>
+</div>
+</section>
+
+<section id="for-teams" style="padding: 112px 0">
+<div class="wrap" style="display: flex; flex-direction: column; gap: 48px">
+<div style="max-width: 720px">
+<p class="kicker">For teams</p>
+<h2 class="h2">Each person sees their part of the loop.</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 10px; border-top: 2px solid #14171F; padding-top: 20px"><h3 style="margin: 0; font-size: 19px; font-weight: 650">Family physicians</h3><p style="margin: 0; font-size: 16px; line-height: 1.55; color: #545862">One list of the cases that need you, and why.</p></div>
+<div style="display: flex; flex-direction: column; gap: 10px; border-top: 2px solid #14171F; padding-top: 20px"><h3 style="margin: 0; font-size: 19px; font-weight: 650">Navigators</h3><p style="margin: 0; font-size: 16px; line-height: 1.55; color: #545862">The patient's own words, a suggested barrier and a task with a due date.</p></div>
+<div style="display: flex; flex-direction: column; gap: 10px; border-top: 2px solid #14171F; padding-top: 20px"><h3 style="margin: 0; font-size: 19px; font-weight: 650">Programme leads</h3><p style="margin: 0; font-size: 16px; line-height: 1.55; color: #545862">Verified completion, false 'done' and time to colonoscopy, by clinic and language.</p></div>
+</div>
+</div>
+</section>
+
+<section style="padding: 0 0 112px">
+<div class="wrap">
+<div style="background: #fff; color: #14171F; border: 1px solid #14171F; border-radius: 4px; padding: clamp(32px, 5vw, 64px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 40px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<h2 class="h2">Start with one loop. <em>Prove it</em> in 90 days.</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a class="btn btn-p" href="Persona.dc.html">Try the live demo</a>
+<a class="btn btn-g" href="mailto:pilot@tasleem.example?subject=Tasleem%20pilot">Talk to us about a pilot</a>
+</div>
+</div>
+<div style="display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 72px 1fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid #E7E2D7"><span class="mono" style="font-weight: 500; color: #14171F">Now</span><span style="font-size: 16px; line-height: 1.5">The positive-FIT-to-colonoscopy loop.</span></div>
+<div style="display: grid; grid-template-columns: 72px 1fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid #E7E2D7"><span class="mono" style="font-weight: 500; color: #14171F">Next</span><span style="font-size: 16px; line-height: 1.5">A 90-day pilot with one family-medicine network and one GI centre, measured on completed colonoscopies and days to procedure.</span></div>
+<div style="display: grid; grid-template-columns: 72px 1fr; gap: 16px; padding: 16px 0"><span class="mono" style="font-weight: 500; color: #14171F">Later</span><span style="font-size: 16px; line-height: 1.5">Blood pressure, diabetes and other IFHAS findings.</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<footer style="border-top: 1px solid #E7E2D7; padding: 32px 0">
+<div class="wrap" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 14px; color: #545862">
+<span>Tasleem · Future Health Digital Innovation Challenge 2026 · Challenge 05</span>
+<span style="display: flex; gap: 20px; flex-wrap: wrap"><span>Demo with synthetic data. No real patients.</span><a href="https://github.com/sankalp2515/screening-to-care">GitHub</a></span>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":5600}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

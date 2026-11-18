@@ -168,18 +168,24 @@ def _messages(pid: str, t: dict[str, datetime], upto: str) -> list[tuple[datetim
 
 
 def generate(n: int = 1000, seed: int = 2026, dup_rate: float = 0.10, late_rate: float = 0.05,
-             late_max_hours: float = 36.0, no_fp_rate: float = 0.03) -> Cohort:
+             late_max_hours: float = 36.0, no_fp_rate: float = 0.03,
+             weights: dict[str, float] | None = None) -> Cohort:
+    """`weights` overrides the design mix (scenario -> weight); missing scenarios get weight 0."""
     rng = random.Random(seed)
     horizon = BASE + timedelta(days=HORIZON_DAYS)
     names = list(SCENARIOS)
-    weights = [SCENARIOS[s][0] for s in names]
+    if weights is not None:
+        unknown = set(weights) - set(names)
+        if unknown:
+            raise ValueError(f"unknown scenarios: {sorted(unknown)}")
+    weights_l = [SCENARIOS[s][0] for s in names] if weights is None else [weights.get(s, 0) for s in names]
     patients: list[dict[str, Any]] = []
     raw: list[tuple[datetime, str, str, Any, str]] = []  # (event time, kind, pid, payload, key)
     truths: dict[str, Truth] = {}
 
     for i in range(n):
         pid = f"p-b{i:05d}"
-        scenario = rng.choices(names, weights)[0]
+        scenario = rng.choices(names, weights_l)[0]
         lang = rng.choice(["en", "ar"])
         has_fp = rng.random() >= no_fp_rate
         patients.append({"id": pid, "display_name": f"Bench {i}", "preferred_language": lang,
@@ -260,4 +266,5 @@ def generate(n: int = 1000, seed: int = 2026, dup_rate: float = 0.10, late_rate:
     deliveries.sort(key=lambda d: (d.at, d.key))
     return Cohort(seed=seed, base=BASE, horizon=horizon, patients=patients, deliveries=deliveries, truths=truths,
                   config={"n": n, "dup_rate": dup_rate, "late_rate": late_rate, "late_max_hours": late_max_hours,
-                          "no_fp_rate": no_fp_rate, "horizon_days": HORIZON_DAYS})
+                          "no_fp_rate": no_fp_rate, "horizon_days": HORIZON_DAYS,
+                          "weights": dict(zip(names, weights_l, strict=True))})

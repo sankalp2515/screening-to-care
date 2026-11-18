@@ -1,0 +1,10 @@
+# Applies only to builds whose context is the repository root (the frontend image).
+# Allow-list: the frontend source and the synthetic demo bundle. Everything else, including backend/.env,
+# stays out of the build context.
+**
+!frontend/**
+!docs/lovable/demo/demo-bundle.json
+!docs/evidence/REAL_WORLD_FIT.md
+frontend/node_modules
+frontend/dist
+frontend/public/demo-bundle.json

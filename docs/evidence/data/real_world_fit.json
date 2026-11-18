@@ -1,0 +1,1620 @@
+{
+  "n": 2000,
+  "seeds": [
+    2026,
+    2027,
+    2028
+  ],
+  "calibrated_weights": {
+    "CLEAN_COMPLETE": 486,
+    "CLEAN_IN_PROGRESS": 40,
+    "NEVER_INVITED": 10,
+    "NOT_DISCUSSED": 10,
+    "NOT_REFERRED": 77,
+    "REFERRAL_REJECTED": 23,
+    "NOT_BOOKED": 70,
+    "NO_SHOW": 189,
+    "NO_PROCEDURE": 14,
+    "FALSE_DONE": 30,
+    "REPORT_NOT_COMMUNICATED": 41,
+    "DISTRESS": 10
+  },
+  "results": [
+    {
+      "seed": 2026,
+      "n": 2000,
+      "deliveries": 24606,
+      "elapsed_s": 217.7,
+      "scenarios": {
+        "CLEAN_COMPLETE": 979,
+        "NO_SHOW": 373,
+        "NOT_BOOKED": 128,
+        "FALSE_DONE": 67,
+        "NOT_DISCUSSED": 22,
+        "REPORT_NOT_COMMUNICATED": 93,
+        "NOT_REFERRED": 150,
+        "CLEAN_IN_PROGRESS": 80,
+        "REFERRAL_REJECTED": 58,
+        "DISTRESS": 11,
+        "NO_PROCEDURE": 26,
+        "NEVER_INVITED": 13
+      },
+      "arms": {
+        "A": {
+          "arm": "A: reminders only",
+          "failures": 941,
+          "detected_pct": 0.0,
+          "median_days": null,
+          "p90_days": null,
+          "right_reason_pct": 0.0,
+          "clean": 1059,
+          "false_alert_pct": 0.0,
+          "alerts_per_100": 0.0,
+          "counted_done": null,
+          "false_done": null,
+          "truly_complete": 990,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 13,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 22,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 150,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 58,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 128,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 373,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 26,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 67,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 93,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 11,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 1727,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 837,
+            "detected": 0,
+            "pct": 0.0,
+            "median_days": null
+          },
+          "alerts_by_role": {}
+        },
+        "B: status only, generous (14 d / 30 d)": {
+          "arm": "B: status only, generous (14 d / 30 d)",
+          "failures": 941,
+          "detected_pct": 81.8,
+          "median_days": 16.4,
+          "p90_days": 30.3,
+          "right_reason_pct": 0.0,
+          "clean": 1059,
+          "false_alert_pct": 0.0,
+          "alerts_per_100": 38.5,
+          "counted_done": 1150,
+          "false_done": 160,
+          "truly_complete": 990,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 13,
+              "detected_pct": 100.0,
+              "median_days": 14.3,
+              "p90_days": 14.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 22,
+              "detected_pct": 100.0,
+              "median_days": 13.4,
+              "p90_days": 14.3,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 150,
+              "detected_pct": 100.0,
+              "median_days": 10.4,
+              "p90_days": 12.0,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 58,
+              "detected_pct": 100.0,
+              "median_days": 0.5,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 128,
+              "detected_pct": 100.0,
+              "median_days": 30.4,
+              "p90_days": 30.9,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 373,
+              "detected_pct": 100.0,
+              "median_days": 19.2,
+              "p90_days": 24.8,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 26,
+              "detected_pct": 100.0,
+              "median_days": 18.6,
+              "p90_days": 24.6,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 67,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 93,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 11,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 837,
+            "detected": 770,
+            "pct": 92.0,
+            "median_days": 16.5
+          },
+          "alerts_by_role": {
+            "Physician": 746,
+            "Programme coordinator": 24
+          }
+        },
+        "B': status only, tight (7 d / 14 d, repeats)": {
+          "arm": "B': status only, tight (7 d / 14 d, repeats)",
+          "failures": 941,
+          "detected_pct": 82.5,
+          "median_days": 6.4,
+          "p90_days": 14.3,
+          "right_reason_pct": 0.0,
+          "clean": 1059,
+          "false_alert_pct": 57.0,
+          "alerts_per_100": 275.8,
+          "counted_done": 1150,
+          "false_done": 160,
+          "truly_complete": 990,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 13,
+              "detected_pct": 100.0,
+              "median_days": 7.3,
+              "p90_days": 7.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 22,
+              "detected_pct": 100.0,
+              "median_days": 6.4,
+              "p90_days": 7.3,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 150,
+              "detected_pct": 100.0,
+              "median_days": 3.4,
+              "p90_days": 5.0,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 58,
+              "detected_pct": 100.0,
+              "median_days": 0.5,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 128,
+              "detected_pct": 100.0,
+              "median_days": 14.4,
+              "p90_days": 14.9,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 373,
+              "detected_pct": 100.0,
+              "median_days": 8.1,
+              "p90_days": 12.3,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 26,
+              "detected_pct": 100.0,
+              "median_days": 6.2,
+              "p90_days": 11.3,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 67,
+              "detected_pct": 7.5,
+              "median_days": 0.4,
+              "p90_days": 1.7,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 93,
+              "detected_pct": 1.1,
+              "median_days": 0.1,
+              "p90_days": 0.1,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 11,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 837,
+            "detected": 775,
+            "pct": 92.6,
+            "median_days": 6.4
+          },
+          "alerts_by_role": {
+            "Physician": 5338,
+            "Programme coordinator": 178
+          }
+        },
+        "B'': status only, very tight (3 d / 7 d, repeats)": {
+          "arm": "B'': status only, very tight (3 d / 7 d, repeats)",
+          "failures": 941,
+          "detected_pct": 83.5,
+          "median_days": 2.7,
+          "p90_days": 7.3,
+          "right_reason_pct": 0.0,
+          "clean": 1059,
+          "false_alert_pct": 99.9,
+          "alerts_per_100": 725.3,
+          "counted_done": 1150,
+          "false_done": 160,
+          "truly_complete": 990,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 13,
+              "detected_pct": 100.0,
+              "median_days": 3.3,
+              "p90_days": 3.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 22,
+              "detected_pct": 100.0,
+              "median_days": 2.4,
+              "p90_days": 3.3,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 150,
+              "detected_pct": 100.0,
+              "median_days": 1.6,
+              "p90_days": 2.8,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 58,
+              "detected_pct": 100.0,
+              "median_days": 0.5,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 128,
+              "detected_pct": 100.0,
+              "median_days": 7.5,
+              "p90_days": 7.9,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 373,
+              "detected_pct": 100.0,
+              "median_days": 3.2,
+              "p90_days": 6.1,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 26,
+              "detected_pct": 100.0,
+              "median_days": 3.2,
+              "p90_days": 5.1,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 67,
+              "detected_pct": 19.4,
+              "median_days": 0.9,
+              "p90_days": 1.5,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 93,
+              "detected_pct": 2.2,
+              "median_days": 0.1,
+              "p90_days": 1.2,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 11,
+              "detected_pct": 9.1,
+              "median_days": 0.6,
+              "p90_days": 0.6,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 837,
+            "detected": 783,
+            "pct": 93.5,
+            "median_days": 2.8
+          },
+          "alerts_by_role": {
+            "Physician": 14045,
+            "Programme coordinator": 461
+          }
+        },
+        "C": {
+          "arm": "C: Tasleem",
+          "failures": 941,
+          "detected_pct": 99.9,
+          "median_days": 3.2,
+          "p90_days": 7.7,
+          "right_reason_pct": 99.9,
+          "clean": 1059,
+          "false_alert_pct": 0.2,
+          "alerts_per_100": 53.5,
+          "counted_done": 990,
+          "false_done": 0,
+          "truly_complete": 990,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 13,
+              "detected_pct": 100.0,
+              "median_days": 3.3,
+              "p90_days": 3.9,
+              "right_reason_pct": 100.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 22,
+              "detected_pct": 100.0,
+              "median_days": 7.4,
+              "p90_days": 7.8,
+              "right_reason_pct": 100.0
+            },
+            "NOT_REFERRED": {
+              "n": 150,
+              "detected_pct": 100.0,
+              "median_days": 3.6,
+              "p90_days": 4.0,
+              "right_reason_pct": 100.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 58,
+              "detected_pct": 100.0,
+              "median_days": 0.0,
+              "p90_days": 0.0,
+              "right_reason_pct": 100.0
+            },
+            "NOT_BOOKED": {
+              "n": 128,
+              "detected_pct": 100.0,
+              "median_days": 7.5,
+              "p90_days": 7.9,
+              "right_reason_pct": 100.0
+            },
+            "NO_SHOW": {
+              "n": 373,
+              "detected_pct": 100.0,
+              "median_days": 0.7,
+              "p90_days": 1.8,
+              "right_reason_pct": 100.0
+            },
+            "NO_PROCEDURE": {
+              "n": 26,
+              "detected_pct": 100.0,
+              "median_days": 21.4,
+              "p90_days": 21.8,
+              "right_reason_pct": 100.0
+            },
+            "FALSE_DONE": {
+              "n": 67,
+              "detected_pct": 100.0,
+              "median_days": 4.6,
+              "p90_days": 6.1,
+              "right_reason_pct": 100.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 93,
+              "detected_pct": 100.0,
+              "median_days": 7.5,
+              "p90_days": 7.8,
+              "right_reason_pct": 100.0
+            },
+            "DISTRESS": {
+              "n": 11,
+              "detected_pct": 90.9,
+              "median_days": 0.0,
+              "p90_days": 0.0,
+              "right_reason_pct": 90.9
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": 0,
+          "barrier": {
+            "n": 204,
+            "correct": 164,
+            "abstained": 40,
+            "wrong": 0
+          },
+          "no_fp_owned": 62,
+          "no_fp_total": 62,
+          "care_failures": {
+            "n": 837,
+            "detected": 837,
+            "pct": 100.0,
+            "median_days": 1.9
+          },
+          "alerts_by_role": {
+            "Physician": 1037,
+            "Programme coordinator": 33
+          }
+        }
+      },
+      "barrier_keyword": {
+        "n": 204,
+        "correct": 164,
+        "abstained": 40,
+        "wrong": 0
+      },
+      "distress_rules": {
+        "n": 11,
+        "to_clinician_24h": 10
+      }
+    },
+    {
+      "seed": 2027,
+      "n": 2000,
+      "deliveries": 24595,
+      "elapsed_s": 219.5,
+      "scenarios": {
+        "CLEAN_COMPLETE": 996,
+        "NO_PROCEDURE": 30,
+        "REPORT_NOT_COMMUNICATED": 75,
+        "NO_SHOW": 354,
+        "NOT_REFERRED": 149,
+        "CLEAN_IN_PROGRESS": 79,
+        "NOT_BOOKED": 133,
+        "FALSE_DONE": 64,
+        "NOT_DISCUSSED": 21,
+        "REFERRAL_REJECTED": 55,
+        "DISTRESS": 24,
+        "NEVER_INVITED": 20
+      },
+      "arms": {
+        "A": {
+          "arm": "A: reminders only",
+          "failures": 925,
+          "detected_pct": 0.0,
+          "median_days": null,
+          "p90_days": null,
+          "right_reason_pct": 0.0,
+          "clean": 1075,
+          "false_alert_pct": 0.0,
+          "alerts_per_100": 0.0,
+          "counted_done": null,
+          "false_done": null,
+          "truly_complete": 1020,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 20,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 21,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 149,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 55,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 133,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 354,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 30,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 64,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 75,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 24,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 1685,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 826,
+            "detected": 0,
+            "pct": 0.0,
+            "median_days": null
+          },
+          "alerts_by_role": {}
+        },
+        "B: status only, generous (14 d / 30 d)": {
+          "arm": "B: status only, generous (14 d / 30 d)",
+          "failures": 925,
+          "detected_pct": 82.4,
+          "median_days": 16.2,
+          "p90_days": 30.5,
+          "right_reason_pct": 0.0,
+          "clean": 1075,
+          "false_alert_pct": 0.0,
+          "alerts_per_100": 38.1,
+          "counted_done": 1159,
+          "false_done": 139,
+          "truly_complete": 1020,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 20,
+              "detected_pct": 100.0,
+              "median_days": 14.7,
+              "p90_days": 14.8,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 21,
+              "detected_pct": 100.0,
+              "median_days": 13.5,
+              "p90_days": 14.1,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 149,
+              "detected_pct": 100.0,
+              "median_days": 10.4,
+              "p90_days": 12.2,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 55,
+              "detected_pct": 100.0,
+              "median_days": 0.5,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 133,
+              "detected_pct": 100.0,
+              "median_days": 30.6,
+              "p90_days": 30.9,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 354,
+              "detected_pct": 100.0,
+              "median_days": 18.6,
+              "p90_days": 24.6,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 30,
+              "detected_pct": 100.0,
+              "median_days": 19.4,
+              "p90_days": 23.3,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 64,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 75,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 24,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 826,
+            "detected": 762,
+            "pct": 92.3,
+            "median_days": 16.3
+          },
+          "alerts_by_role": {
+            "Physician": 741,
+            "Programme coordinator": 21
+          }
+        },
+        "B': status only, tight (7 d / 14 d, repeats)": {
+          "arm": "B': status only, tight (7 d / 14 d, repeats)",
+          "failures": 925,
+          "detected_pct": 83.1,
+          "median_days": 6.5,
+          "p90_days": 14.5,
+          "right_reason_pct": 0.0,
+          "clean": 1075,
+          "false_alert_pct": 57.9,
+          "alerts_per_100": 276.1,
+          "counted_done": 1159,
+          "false_done": 139,
+          "truly_complete": 1020,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 20,
+              "detected_pct": 100.0,
+              "median_days": 7.7,
+              "p90_days": 7.8,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 21,
+              "detected_pct": 100.0,
+              "median_days": 6.5,
+              "p90_days": 7.1,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 149,
+              "detected_pct": 100.0,
+              "median_days": 3.4,
+              "p90_days": 5.2,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 55,
+              "detected_pct": 100.0,
+              "median_days": 0.5,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 133,
+              "detected_pct": 100.0,
+              "median_days": 14.6,
+              "p90_days": 14.9,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 354,
+              "detected_pct": 100.0,
+              "median_days": 7.6,
+              "p90_days": 12.3,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 30,
+              "detected_pct": 100.0,
+              "median_days": 6.2,
+              "p90_days": 11.6,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 64,
+              "detected_pct": 9.4,
+              "median_days": 0.5,
+              "p90_days": 2.0,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 75,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 24,
+              "detected_pct": 4.2,
+              "median_days": 0.5,
+              "p90_days": 0.5,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 826,
+            "detected": 768,
+            "pct": 93.0,
+            "median_days": 6.6
+          },
+          "alerts_by_role": {
+            "Physician": 5367,
+            "Programme coordinator": 154
+          }
+        },
+        "B'': status only, very tight (3 d / 7 d, repeats)": {
+          "arm": "B'': status only, very tight (3 d / 7 d, repeats)",
+          "failures": 925,
+          "detected_pct": 83.7,
+          "median_days": 2.8,
+          "p90_days": 7.5,
+          "right_reason_pct": 0.0,
+          "clean": 1075,
+          "false_alert_pct": 99.5,
+          "alerts_per_100": 727.9,
+          "counted_done": 1159,
+          "false_done": 139,
+          "truly_complete": 1020,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 20,
+              "detected_pct": 100.0,
+              "median_days": 3.7,
+              "p90_days": 3.8,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 21,
+              "detected_pct": 100.0,
+              "median_days": 2.5,
+              "p90_days": 3.1,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 149,
+              "detected_pct": 100.0,
+              "median_days": 1.5,
+              "p90_days": 2.7,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 55,
+              "detected_pct": 100.0,
+              "median_days": 0.5,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 133,
+              "detected_pct": 100.0,
+              "median_days": 7.6,
+              "p90_days": 7.9,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 354,
+              "detected_pct": 100.0,
+              "median_days": 3.0,
+              "p90_days": 6.2,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 30,
+              "detected_pct": 100.0,
+              "median_days": 4.0,
+              "p90_days": 6.2,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 64,
+              "detected_pct": 14.1,
+              "median_days": 1.2,
+              "p90_days": 2.0,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 75,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 24,
+              "detected_pct": 12.5,
+              "median_days": 0.5,
+              "p90_days": 0.6,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 826,
+            "detected": 771,
+            "pct": 93.3,
+            "median_days": 2.8
+          },
+          "alerts_by_role": {
+            "Physician": 14137,
+            "Programme coordinator": 421
+          }
+        },
+        "C": {
+          "arm": "C: Tasleem",
+          "failures": 925,
+          "detected_pct": 99.5,
+          "median_days": 3.2,
+          "p90_days": 7.7,
+          "right_reason_pct": 99.5,
+          "clean": 1075,
+          "false_alert_pct": 0.1,
+          "alerts_per_100": 52.0,
+          "counted_done": 1020,
+          "false_done": 0,
+          "truly_complete": 1020,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 20,
+              "detected_pct": 100.0,
+              "median_days": 3.7,
+              "p90_days": 3.8,
+              "right_reason_pct": 100.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 21,
+              "detected_pct": 100.0,
+              "median_days": 7.5,
+              "p90_days": 7.8,
+              "right_reason_pct": 100.0
+            },
+            "NOT_REFERRED": {
+              "n": 149,
+              "detected_pct": 100.0,
+              "median_days": 3.4,
+              "p90_days": 3.9,
+              "right_reason_pct": 100.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 55,
+              "detected_pct": 100.0,
+              "median_days": 0.0,
+              "p90_days": 0.0,
+              "right_reason_pct": 100.0
+            },
+            "NOT_BOOKED": {
+              "n": 133,
+              "detected_pct": 100.0,
+              "median_days": 7.6,
+              "p90_days": 7.9,
+              "right_reason_pct": 100.0
+            },
+            "NO_SHOW": {
+              "n": 354,
+              "detected_pct": 100.0,
+              "median_days": 1.1,
+              "p90_days": 1.8,
+              "right_reason_pct": 100.0
+            },
+            "NO_PROCEDURE": {
+              "n": 30,
+              "detected_pct": 100.0,
+              "median_days": 21.4,
+              "p90_days": 22.0,
+              "right_reason_pct": 100.0
+            },
+            "FALSE_DONE": {
+              "n": 64,
+              "detected_pct": 100.0,
+              "median_days": 5.1,
+              "p90_days": 6.3,
+              "right_reason_pct": 100.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 75,
+              "detected_pct": 100.0,
+              "median_days": 7.4,
+              "p90_days": 7.8,
+              "right_reason_pct": 100.0
+            },
+            "DISTRESS": {
+              "n": 24,
+              "detected_pct": 79.2,
+              "median_days": 0.0,
+              "p90_days": 0.0,
+              "right_reason_pct": 79.2
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": 0,
+          "barrier": {
+            "n": 213,
+            "correct": 179,
+            "abstained": 34,
+            "wrong": 0
+          },
+          "no_fp_owned": 67,
+          "no_fp_total": 67,
+          "care_failures": {
+            "n": 826,
+            "detected": 826,
+            "pct": 100.0,
+            "median_days": 3.0
+          },
+          "alerts_by_role": {
+            "Physician": 1010,
+            "Programme coordinator": 30
+          }
+        }
+      },
+      "barrier_keyword": {
+        "n": 213,
+        "correct": 179,
+        "abstained": 34,
+        "wrong": 0
+      },
+      "distress_rules": {
+        "n": 24,
+        "to_clinician_24h": 19
+      }
+    },
+    {
+      "seed": 2028,
+      "n": 2000,
+      "deliveries": 24392,
+      "elapsed_s": 221.9,
+      "scenarios": {
+        "CLEAN_COMPLETE": 967,
+        "NO_SHOW": 387,
+        "NEVER_INVITED": 22,
+        "REPORT_NOT_COMMUNICATED": 65,
+        "NOT_REFERRED": 158,
+        "CLEAN_IN_PROGRESS": 88,
+        "NOT_BOOKED": 154,
+        "FALSE_DONE": 63,
+        "NO_PROCEDURE": 23,
+        "DISTRESS": 18,
+        "NOT_DISCUSSED": 17,
+        "REFERRAL_REJECTED": 38
+      },
+      "arms": {
+        "A": {
+          "arm": "A: reminders only",
+          "failures": 945,
+          "detected_pct": 0.0,
+          "median_days": null,
+          "p90_days": null,
+          "right_reason_pct": 0.0,
+          "clean": 1055,
+          "false_alert_pct": 0.0,
+          "alerts_per_100": 0.0,
+          "counted_done": null,
+          "false_done": null,
+          "truly_complete": 985,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 22,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 17,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 158,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 38,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 154,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 387,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 23,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 63,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 65,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 18,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 1665,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 862,
+            "detected": 0,
+            "pct": 0.0,
+            "median_days": null
+          },
+          "alerts_by_role": {}
+        },
+        "B: status only, generous (14 d / 30 d)": {
+          "arm": "B: status only, generous (14 d / 30 d)",
+          "failures": 945,
+          "detected_pct": 84.6,
+          "median_days": 16.6,
+          "p90_days": 30.4,
+          "right_reason_pct": 0.0,
+          "clean": 1055,
+          "false_alert_pct": 0.0,
+          "alerts_per_100": 40.0,
+          "counted_done": 1113,
+          "false_done": 128,
+          "truly_complete": 985,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 22,
+              "detected_pct": 100.0,
+              "median_days": 14.5,
+              "p90_days": 14.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 17,
+              "detected_pct": 100.0,
+              "median_days": 13.6,
+              "p90_days": 14.0,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 158,
+              "detected_pct": 100.0,
+              "median_days": 10.4,
+              "p90_days": 12.2,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 38,
+              "detected_pct": 100.0,
+              "median_days": 0.6,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 154,
+              "detected_pct": 100.0,
+              "median_days": 30.5,
+              "p90_days": 30.9,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 387,
+              "detected_pct": 100.0,
+              "median_days": 18.7,
+              "p90_days": 25.0,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 23,
+              "detected_pct": 100.0,
+              "median_days": 16.6,
+              "p90_days": 25.1,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 63,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 65,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 18,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 862,
+            "detected": 799,
+            "pct": 92.7,
+            "median_days": 16.6
+          },
+          "alerts_by_role": {
+            "Physician": 776,
+            "Programme coordinator": 23
+          }
+        },
+        "B': status only, tight (7 d / 14 d, repeats)": {
+          "arm": "B': status only, tight (7 d / 14 d, repeats)",
+          "failures": 945,
+          "detected_pct": 84.6,
+          "median_days": 7.3,
+          "p90_days": 14.4,
+          "right_reason_pct": 0.0,
+          "clean": 1055,
+          "false_alert_pct": 57.8,
+          "alerts_per_100": 293.4,
+          "counted_done": 1113,
+          "false_done": 128,
+          "truly_complete": 985,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 22,
+              "detected_pct": 100.0,
+              "median_days": 7.5,
+              "p90_days": 7.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 17,
+              "detected_pct": 100.0,
+              "median_days": 6.6,
+              "p90_days": 7.0,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 158,
+              "detected_pct": 100.0,
+              "median_days": 3.5,
+              "p90_days": 5.2,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 38,
+              "detected_pct": 100.0,
+              "median_days": 0.6,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 154,
+              "detected_pct": 100.0,
+              "median_days": 14.5,
+              "p90_days": 14.9,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 387,
+              "detected_pct": 100.0,
+              "median_days": 8.1,
+              "p90_days": 12.5,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 23,
+              "detected_pct": 100.0,
+              "median_days": 9.2,
+              "p90_days": 12.8,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 63,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 65,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 18,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 862,
+            "detected": 799,
+            "pct": 92.7,
+            "median_days": 7.3
+          },
+          "alerts_by_role": {
+            "Physician": 5683,
+            "Programme coordinator": 186
+          }
+        },
+        "B'': status only, very tight (3 d / 7 d, repeats)": {
+          "arm": "B'': status only, very tight (3 d / 7 d, repeats)",
+          "failures": 945,
+          "detected_pct": 85.9,
+          "median_days": 2.9,
+          "p90_days": 7.4,
+          "right_reason_pct": 0.0,
+          "clean": 1055,
+          "false_alert_pct": 99.6,
+          "alerts_per_100": 764.1,
+          "counted_done": 1113,
+          "false_done": 128,
+          "truly_complete": 985,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 22,
+              "detected_pct": 100.0,
+              "median_days": 3.5,
+              "p90_days": 3.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 17,
+              "detected_pct": 100.0,
+              "median_days": 2.6,
+              "p90_days": 3.0,
+              "right_reason_pct": 0.0
+            },
+            "NOT_REFERRED": {
+              "n": 158,
+              "detected_pct": 100.0,
+              "median_days": 1.3,
+              "p90_days": 2.6,
+              "right_reason_pct": 0.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 38,
+              "detected_pct": 100.0,
+              "median_days": 0.6,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "NOT_BOOKED": {
+              "n": 154,
+              "detected_pct": 100.0,
+              "median_days": 7.5,
+              "p90_days": 7.9,
+              "right_reason_pct": 0.0
+            },
+            "NO_SHOW": {
+              "n": 387,
+              "detected_pct": 100.0,
+              "median_days": 3.1,
+              "p90_days": 6.4,
+              "right_reason_pct": 0.0
+            },
+            "NO_PROCEDURE": {
+              "n": 23,
+              "detected_pct": 100.0,
+              "median_days": 3.1,
+              "p90_days": 6.0,
+              "right_reason_pct": 0.0
+            },
+            "FALSE_DONE": {
+              "n": 63,
+              "detected_pct": 19.0,
+              "median_days": 1.6,
+              "p90_days": 1.9,
+              "right_reason_pct": 0.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 65,
+              "detected_pct": 1.5,
+              "median_days": 0.9,
+              "p90_days": 0.9,
+              "right_reason_pct": 0.0
+            },
+            "DISTRESS": {
+              "n": 18,
+              "detected_pct": 0.0,
+              "median_days": null,
+              "p90_days": null,
+              "right_reason_pct": 0.0
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": null,
+          "care_failures": {
+            "n": 862,
+            "detected": 811,
+            "pct": 94.1,
+            "median_days": 2.9
+          },
+          "alerts_by_role": {
+            "Physician": 14795,
+            "Programme coordinator": 488
+          }
+        },
+        "C": {
+          "arm": "C: Tasleem",
+          "failures": 945,
+          "detected_pct": 99.7,
+          "median_days": 3.2,
+          "p90_days": 7.7,
+          "right_reason_pct": 99.7,
+          "clean": 1055,
+          "false_alert_pct": 0.2,
+          "alerts_per_100": 52.3,
+          "counted_done": 985,
+          "false_done": 0,
+          "truly_complete": 985,
+          "by_scenario": {
+            "NEVER_INVITED": {
+              "n": 22,
+              "detected_pct": 100.0,
+              "median_days": 3.5,
+              "p90_days": 3.9,
+              "right_reason_pct": 100.0
+            },
+            "NOT_DISCUSSED": {
+              "n": 17,
+              "detected_pct": 100.0,
+              "median_days": 7.5,
+              "p90_days": 7.9,
+              "right_reason_pct": 100.0
+            },
+            "NOT_REFERRED": {
+              "n": 158,
+              "detected_pct": 100.0,
+              "median_days": 3.5,
+              "p90_days": 3.9,
+              "right_reason_pct": 100.0
+            },
+            "REFERRAL_REJECTED": {
+              "n": 38,
+              "detected_pct": 100.0,
+              "median_days": 0.0,
+              "p90_days": 0.0,
+              "right_reason_pct": 100.0
+            },
+            "NOT_BOOKED": {
+              "n": 154,
+              "detected_pct": 100.0,
+              "median_days": 7.4,
+              "p90_days": 7.9,
+              "right_reason_pct": 100.0
+            },
+            "NO_SHOW": {
+              "n": 387,
+              "detected_pct": 100.0,
+              "median_days": 1.0,
+              "p90_days": 1.7,
+              "right_reason_pct": 100.0
+            },
+            "NO_PROCEDURE": {
+              "n": 23,
+              "detected_pct": 100.0,
+              "median_days": 21.4,
+              "p90_days": 21.9,
+              "right_reason_pct": 100.0
+            },
+            "FALSE_DONE": {
+              "n": 63,
+              "detected_pct": 100.0,
+              "median_days": 5.2,
+              "p90_days": 6.5,
+              "right_reason_pct": 100.0
+            },
+            "REPORT_NOT_COMMUNICATED": {
+              "n": 65,
+              "detected_pct": 100.0,
+              "median_days": 7.5,
+              "p90_days": 7.9,
+              "right_reason_pct": 100.0
+            },
+            "DISTRESS": {
+              "n": 18,
+              "detected_pct": 83.3,
+              "median_days": 0.0,
+              "p90_days": 0.0,
+              "right_reason_pct": 83.3
+            }
+          },
+          "reminders_sent": 0,
+          "ingest_errors": 0,
+          "open_without_owner": 0,
+          "barrier": {
+            "n": 223,
+            "correct": 182,
+            "abstained": 41,
+            "wrong": 0
+          },
+          "no_fp_owned": 60,
+          "no_fp_total": 60,
+          "care_failures": {
+            "n": 862,
+            "detected": 862,
+            "pct": 100.0,
+            "median_days": 3.0
+          },
+          "alerts_by_role": {
+            "Physician": 1016,
+            "Programme coordinator": 30
+          }
+        }
+      },
+      "barrier_keyword": {
+        "n": 223,
+        "correct": 182,
+        "abstained": 41,
+        "wrong": 0
+      },
+      "distress_rules": {
+        "n": 18,
+        "to_clinician_24h": 15
+      }
+    }
+  ]
+}
