@@ -85,8 +85,8 @@ patient_messages:
     en: "Your colonoscopy is booked. Tell us if anything could stop you from going."
     ar: "تم حجز موعد تنظير القولون. أخبرنا إذا كان هناك ما قد يمنعك من الحضور."
   ATTENDED:
-    en: "Thank you for attending. Your care team will follow up."
-    ar: "شكراً لحضورك. سيتابع معك فريق الرعاية."
+    en: "Thank you for attending. Your follow-up is not finished yet: we are waiting for the report from the clinic, and your doctor will contact you about it. You do not need to do anything now."
+    ar: "شكراً لحضورك. لم تنته متابعتك بعد: ننتظر التقرير من العيادة، وسيتواصل معك طبيبك بشأنه. لا تحتاج إلى فعل أي شيء الآن."
   PROCEDURE_DONE:
     en: "Your test is done. Your doctor will share the results with you."
     ar: "تم إجراء الفحص. سيشاركك طبيبك النتائج."

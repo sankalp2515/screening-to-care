@@ -35,7 +35,8 @@ NEXT_STEP: list[tuple[str, str, str]] = [
     (StallReason.BOOKED_NOT_ATTENDED, "navigator", "Reach the patient, record what got in the way, and rebook."),
     (StallReason.CONSULT_NO_PROCEDURE, "owner", "Seen by the specialist but no procedure: confirm the plan."),
     (StallReason.REPORT_NOT_COMMUNICATED, "owner", "The result is back. Tell the patient and record it."),
-    (StallReason.HANDOFF_NOT_ACCEPTED, "owner", "Your handoff is waiting. Chase the receiver or withdraw."),
+    (StallReason.HANDOFF_NOT_ACCEPTED, "owner",
+     "Your handoff is waiting. Ask the receiver to accept or decline; you stay the owner until then."),
     (StallReason.CONSULT_UNANSWERED, "owner", "An e-consult is unanswered. Chase the specialist."),
     (StallReason.STEP_OVERDUE, "owner", "The next step is overdue. Contact the patient or the next service."),
 ]

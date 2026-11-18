@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Any
 
 from ..domain.actions import next_step
-from ..domain.model import CaseState, Event, EventType
+from ..domain.model import BarrierCode, CaseState, Event, EventType
 from ..domain.pathways import Pathway
 from .directory import Directory
 from .views import STALL_LABELS, patient_view_for
@@ -22,7 +22,9 @@ PATIENT_FACING = {EventType.CASE_OPENED, EventType.STAGE_REACHED, EventType.APPO
                   EventType.CASE_CLOSED}
 
 
-def assignments(state: CaseState, directory: Directory) -> list[Assignment]:
+def assignments(state: CaseState, directory: Directory, pathway: Pathway | None = None) -> list[Assignment]:
+    """Every person who must act on this case, and why. Anything the case says a named person must do has to
+    appear in that person's work list: a step nobody sees is a step nobody takes (found by the AI-user run)."""
     if not state.is_open:
         return []
     out: list[Assignment] = [(state.owner_id, "owner", "-", state.opened_at)]
@@ -45,6 +47,19 @@ def assignments(state: CaseState, directory: Directory) -> list[Assignment]:
         if b.status == "confirmed" and b.assignee_role:
             who = directory.person_for_role(state, b.assignee_role)
             out.append((who, "task", b.id, b.due_at or b.reported_at))
+        elif b.status == "reported":
+            # The patient's own words wait for a person to confirm the AI suggestion (R5): the navigator.
+            out.append((directory.person_for_role(state, "navigator"), "task", b.id, b.reported_at))
+            if BarrierCode.DONE_ELSEWHERE in {*b.reported_codes, b.suggested_code}:
+                # Only a clinician can accept evidence from another provider (R3), so one must see it now.
+                out.append((directory.person_for_role(state, "clinician"), "task", b.id, b.reported_at))
+    if pathway is not None:
+        step = next_step(state, pathway)
+        if step and step.get("who") == "navigator":
+            nav = directory.person_for_role(state, "navigator")
+            reason = str(step.get("reason") or "step")
+            since = next((s.flagged_at for s in state.stalls.values() if s.reason.value == reason), state.opened_at)
+            out.append((nav, "task", f"step:{reason}", since))
     # one row per (person, kind, ref)
     seen: dict[tuple[str, str, str], Assignment] = {}
     for a in out:

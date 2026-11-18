@@ -30,7 +30,7 @@ export function BenchmarkChart() {
 export const TILES: [string, string][] = [
   ["0 vs 125", "journeys falsely counted as done (Tasleem vs status only)"],
   ["4 vs 14.4 days", "median time from care stopping to an alert"],
-  ["204", "automated tests passing"],
+  ["212", "automated tests passing"],
   ["64 of 67", "labelled hard cases handled"],
 ];
 

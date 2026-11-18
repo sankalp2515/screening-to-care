@@ -13,7 +13,7 @@ Entry for the Future Health Digital Innovation Challenge 2026 · Population Heal
 | [docs/product/WORKFLOW_AND_INTEGRATION.md](docs/product/WORKFLOW_AND_INTEGRATION.md) | How it fits the Abu Dhabi workflow (Malaffi, Sahatna, EMR) and how it scales |
 | [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) · [ADR-001](docs/architecture/ADR-001-service-boundaries.md) | System design, services, API, schema; why the safety core is one service |
 | [docs/engineering/](docs/engineering/) | [Security audit](docs/engineering/SECURITY_AUDIT.md), [failure modes](docs/engineering/FAILURE_MODES.md), [testing strategy](docs/engineering/TESTING_STRATEGY.md), [operations](docs/engineering/OPERATIONS.md) |
-| [docs/evidence/](docs/evidence/) | [Test cases](docs/evidence/TEST_CASES.md), [hard cases](docs/evidence/HARD_CASES.md), [benchmark](docs/evidence/benchmark.md), [scale](docs/evidence/SCALE_POSTGRES.md), [real-world fit](docs/evidence/REAL_WORLD_FIT.md) |
+| [docs/evidence/](docs/evidence/) | [Test cases](docs/evidence/TEST_CASES.md), [hard cases](docs/evidence/HARD_CASES.md), [benchmark](docs/evidence/benchmark.md), [scale](docs/evidence/SCALE_POSTGRES.md), [real-world fit](docs/evidence/REAL_WORLD_FIT.md), [AI-user simulation](docs/evidence/PERSONA_SIMULATION.md) |
 | [docs/api/](docs/api/) | OpenAPI contracts for case-core, agent, notifier and the HL7 connector |
 | [frontend/](frontend/) | Web app: staff console, patient companion and landing page |
 

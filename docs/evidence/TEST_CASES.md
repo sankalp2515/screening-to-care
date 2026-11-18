@@ -190,6 +190,23 @@ Run: `python -m tasleem.bench.reality` ([REAL_WORLD_FIT.md](REAL_WORLD_FIT.md)).
 | F24 | Landing numbers are traceable | every value in `landing-facts.ts` | none blank; real-world values appear in REAL_WORLD_FIT.md | pass | lib/landing-facts.ts |
 | F25 | Container gateway, live mode | `docker run` the web image on the stack network; GET `/api/core/v1/me`, `/api/{agent,notifier,connector}/healthz`, `/app/work` | 200 from every service through one origin; SPA route served | pass (manual) | frontend/Dockerfile, deploy/nginx.conf |
 
+
 Finding from RW5: before the fix, 1 of 11 distress messages in seed 2026 went to a non-clinician. The design-mix benchmark never produced a patient with both no family physician and a distress message, so the gap only showed on a larger, realistic run.
 
 Known flaky test (not changed): `test_workflow.py::test_outbox_notifies_named_people_and_never_leaks_results_to_patients` searches the whole payload JSON for "162" and "7.2", which a random id or timestamp can contain. It failed once in about five full runs.
+
+## AI users with a job to be done (18 Nov)
+
+`backend/tasleem/bench/personas.py`: 11 personas (6 patients, 5 staff), each with a profile, incentives and a job to be done, act through the real API in a shared synthetic world; deterministic checks decide pass or fail. Write-up: [PERSONA_SIMULATION.md](PERSONA_SIMULATION.md). Automated in `tests/test_bench_personas.py`.
+
+| # | Case | Input | Expected | Actual | Component |
+|---|---|---|---|---|---|
+| P1 | **Missed appointment reaches the navigator** | Noura (seeded): booked, not attended; next step says nav-aisha must rebook | case in nav-aisha's "Tasks" section | **failed before the fix** (Aisha's work list was empty); pass after | services/routing.py `assignments` (navigator next step) |
+| P2 | **Patient reply waits for a person to confirm it** | Yousef: "I have a shift that day" (TIME_OR_WORK), then nav-aisha confirms | before confirming: in nav-aisha's Tasks; after: confirmed, assignee navigator, still in her Tasks | **failed before the fix** (unconfirmed replies were in nobody's work list); pass after | services/routing.py (reported barriers) |
+| P3 | **"Done elsewhere" with no family physician reaches a clinician** | John (owner: programme coordinator) reports DONE_ELSEWHERE; coordinator confirms | a clinician sees it at once; the confirmed task goes to a clinician only | **failed before the fix** (report and task both sat with the coordinator, who cannot accept evidence under R3); pass after | services/directory.py `person_for_role("clinician")` |
+| P4 | Whole simulation, scripted agents (offline) | 11 personas, 1 round | every job check and invariant passes (R1, R3, R6, distress to a clinician, no 5xx) | pass | bench/personas.py |
+| P5 | **Attended, no report: the patient must not think he is done** | Rajesh (seeded: attended, Malaffi COMPLETED, no report) opens the companion | "not finished yet: we are waiting for the report"; no result words | **failed before the fix** (his AI user read "Your care team will follow up" as "I'm all set"); pass after | pathways/fit-positive.yaml ATTENDED |
+| P6 | **The companion acknowledges what the patient reported** | John reports DONE_ELSEWHERE; Fatma asks for a call (EN and AR) | John: "A doctor will review the test you had elsewhere… no need to book"; Fatma: "will call you" / "شكراً…" | **failed before the fix** (John was still told to book a visit; Fatma was not told her request arrived); pass after | services/views.py `OPEN_REQUEST_MESSAGE` |
+| P7 | **Escalation gives the power to reassign** | Dr. Hessa (clinic lead), a stall escalated to her; offers the case to dr-salma | allowed; owner unchanged until dr-salma accepts (R2); a clinician with no escalation is still refused | **failed before the fix** (R2_NOT_OWNER: the lead could see a stuck case but not move it); pass after | domain/engine.py `offer_handoff` |
+| P8 | Next step offers only real actions | handoff waiting (HANDOFF_NOT_ACCEPTED) | text names accept or decline, not "withdraw" (no such command) | changed | domain/actions.py |
+| P9 | Whole simulation, LLM agents (groq `openai/gpt-oss-120b`, free tier) | 11 personas × 2 rounds × up to 3 steps, shared world | every check passes | before the fixes: 31 of 36 (5 failures, P1–P3); after: **42 of 42**; 0 server errors; 0 lost turns | bench/personas.py |

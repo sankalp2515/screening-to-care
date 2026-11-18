@@ -122,8 +122,13 @@ def trigger_repeated(state: CaseState, s: Signal, actor: Actor) -> list[Event]:
 def offer_handoff(state: CaseState, actor: Actor, to_id: str, reason: str, now: datetime) -> list[Event]:
     _require_open(state)
     _require_staff(actor, "hand off a case")
-    if actor.id != state.owner_id and actor.type != ActorType.COORDINATOR:
-        raise DomainError("R2_NOT_OWNER", "Only the current owner or a coordinator can offer a handoff.")
+    # The person a stall is escalated to (R4) must be able to reassign it, or escalation only adds a watcher:
+    # found by the AI-user run, where the clinic lead could see a stuck case but was refused the handoff.
+    # R2 is unchanged: the owner stays owner until the receiver accepts.
+    escalated_to_actor = any(s.escalated_to == actor.id for s in state.stalls.values())
+    if actor.id != state.owner_id and actor.type != ActorType.COORDINATOR and not escalated_to_actor:
+        raise DomainError("R2_NOT_OWNER", "Only the current owner, a coordinator, or the person the case is "
+                                          "escalated to can offer a handoff.")
     if state.pending_handoff is not None:
         raise DomainError("R2_HANDOFF_PENDING", "A handoff is already waiting for acceptance.",
                           to_id=state.pending_handoff.to_id)

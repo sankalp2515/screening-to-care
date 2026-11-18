@@ -154,8 +154,13 @@ class Directory:
         return self.coordinator_id()
 
     def person_for_role(self, state: CaseState, role: str) -> str:
-        """Named person for a playbook role on this case: clinician = owner, navigator = a navigator in the
-        owner's organisation, coordinator = the program coordinator. Falls back to the owner (R1/R4)."""
+        """Named person for a playbook role on this case: clinician = the owner if a clinician, else the
+        patient's family physician, else a fallback clinician (never a non-clinician owner: found by the AI-user
+        run, where a 'done elsewhere' report from a patient with no family physician went to the coordinator);
+        navigator = a navigator in the owner's organisation; coordinator = the program coordinator. Falls back to
+        the owner (R1/R4)."""
+        if role == "clinician":
+            return self.resolver(state, "clinician")
         if role == "navigator":
             owner = self.person(state.owner_id)
             if owner is not None:

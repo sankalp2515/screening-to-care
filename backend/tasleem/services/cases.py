@@ -102,7 +102,7 @@ class CaseService:
         return state
 
     def _side_effects(self, state: CaseState, pathway: Pathway, events: Sequence[Event], first_seq: int) -> None:
-        self.repo.write_side_effects(state.id, routing.assignments(state, self.directory),
+        self.repo.write_side_effects(state.id, routing.assignments(state, self.directory, pathway),
                                      routing.outbox(state, pathway, events, first_seq, self.directory))
 
     def apply_signal(self, case_id: str, s: Signal, actor: Actor, now: datetime) -> tuple[CaseState, int]:

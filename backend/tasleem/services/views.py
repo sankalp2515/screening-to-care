@@ -154,6 +154,35 @@ def patient_view(st: CaseState, registry: PathwayRegistry, lang: str) -> dict[st
     return patient_view_for(st, registry.get(st.pathway_id), lang)
 
 
+OPEN_REQUEST_MESSAGE = {
+    "distress": {"en": "Thank you for telling us. A doctor has been told and will contact you.",
+                 "ar": "شكراً لإخبارنا. تم إبلاغ الطبيب وسيتواصل معك."},
+    "done_elsewhere": {"en": "Thank you. A doctor will review the test you had elsewhere. Please keep the report. "
+                             "You do not need to book anything for now.",
+                       "ar": "شكراً لك. سيراجع الطبيب الفحص الذي أجريته في مكان آخر. يرجى الاحتفاظ بالتقرير. "
+                             "لا تحتاج إلى حجز أي موعد الآن."},
+    "callback": {"en": "Thank you. Your doctor's team has your request and will call you.",
+                 "ar": "شكراً لك. وصل طلبك إلى فريق طبيبك وسيتصلون بك."},
+    "other": {"en": "Thank you for telling us. Your care team has your message and will contact you to help.",
+              "ar": "شكراً لإخبارنا. وصلت رسالتك إلى فريق الرعاية وسيتواصلون معك للمساعدة."},
+}
+
+
+def _open_request_key(st: CaseState) -> str | None:
+    """Which acknowledgement fits the patient's open requests, most urgent first."""
+    if st.open_distress:
+        return "distress"
+    open_bars = [b for b in st.barriers.values() if b.status != "resolved"]
+    if not open_bars:
+        return None
+    codes = {c for b in open_bars for c in (*b.reported_codes, b.suggested_code, b.confirmed_code) if c}
+    if BarrierCode.DONE_ELSEWHERE in codes:
+        return "done_elsewhere"
+    if BarrierCode.WANTS_CALLBACK in codes:
+        return "callback"
+    return "other"
+
+
 def patient_view_for(st: CaseState, p: Pathway, lang: str) -> dict[str, Any]:
     lang = lang if lang in ("en", "ar") else "en"
     key = p.furthest_stage(set(st.stages)) or "OPENED"
@@ -161,6 +190,12 @@ def patient_view_for(st: CaseState, p: Pathway, lang: str) -> dict[str, Any]:
     message = msgs.get(lang) or msgs.get("en") or ""
     if StallReason.BOOKED_NOT_ATTENDED.value in st.stalls:
         message = MISSED_MESSAGE[lang]
+    ack = _open_request_key(st)
+    if ack:
+        # Once the patient has told us something, the companion says it was received and who acts next,
+        # instead of repeating the stage prompt (found by the AI-user run: patients who reported a problem
+        # were left unsure anyone had read it, and "done elsewhere" was still asked to book a visit).
+        message = OPEN_REQUEST_MESSAGE[ack][lang]
     return {
         "case_id": st.id,
         "status": st.status,

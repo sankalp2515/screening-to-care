@@ -60,7 +60,7 @@ INBOX_LABELS = {
     "escalated": "Stalled cases you own or that were escalated to you",
     "handoff": "Cases offered to you",
     "consult": "E-consult questions for you",
-    "task": "Barrier tasks assigned to you",
+    "task": "Tasks assigned to you: patient replies to confirm, calls and rebooking",
     "owner": "All open cases you own",
 }
 

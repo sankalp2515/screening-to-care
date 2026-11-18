@@ -10,7 +10,7 @@ from conftest import AI, COORD, FP, FP2, INTEG, NAV, PATIENT, SYS, T0, Case, res
 from tasleem.domain import checks, engine
 from tasleem.domain.barriers import KeywordBarrierClassifier
 from tasleem.domain.errors import DomainError
-from tasleem.domain.model import AdminStatus, BarrierCode, EventType, Outcome, SignalKind, StallReason
+from tasleem.domain.model import Actor, ActorType, AdminStatus, BarrierCode, EventType, Outcome, SignalKind, StallReason
 
 D = timedelta(days=1)
 CLS = KeywordBarrierClassifier()
@@ -169,6 +169,21 @@ def test_r2_only_owner_or_coordinator_can_offer(fit):
         engine.offer_handoff(c.state, NAV, "dr-fp2", "x", T0)
     assert e.value.code == "R2_NOT_OWNER"
     assert engine.offer_handoff(c.state, COORD, "dr-fp2", "x", T0)
+
+
+def test_r2_the_person_a_stall_is_escalated_to_can_offer_but_owner_stays_until_accepted(fit):
+    """Found by the AI-user run: the clinic lead saw an escalated case but could not reassign it."""
+    c = Case(fit)
+    for day in range(4, 8):  # one escalation level per scheduler run: owner, then the clinic lead (level 2)
+        c.tick(T0 + day * D)
+    lead_stalls = [s for s in c.state.stalls.values() if s.escalated_to == "lead"]
+    assert lead_stalls, "the overdue step escalates to the clinic lead"
+    lead = Actor(id="lead", type=ActorType.CLINICIAN)
+    c.run(engine.offer_handoff(c.state, lead, "dr-fp2", "Dr. FP on leave", T0 + 8 * D), T0 + 8 * D)
+    assert c.state.owner_id == "dr-fp" and c.state.pending_handoff.to_id == "dr-fp2"  # R2: still the sender's
+    stranger = Actor(id="dr-other", type=ActorType.CLINICIAN)
+    with pytest.raises(DomainError):
+        engine.offer_handoff(c.state, stranger, "dr-fp2", "x", T0 + 8 * D)
 
 
 # ---- R3 / R5 closure -----------------------------------------------------------------------------

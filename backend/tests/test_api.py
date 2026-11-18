@@ -100,7 +100,8 @@ def test_ingest_is_idempotent_and_validates(client):
 def test_patient_view_is_plain_language_without_result_values(client):
     r = client.get("/v1/me/cases", headers=as_("p-noura"))
     item = r.json()["items"][0]
-    assert item["direction"] == "rtl" and "لاحظنا" in item["message"]
+    # Noura missed her appointment and already told us why, so she sees that her message was received.
+    assert item["direction"] == "rtl" and item["message"].startswith("شكراً لإخبارنا")
     raw = json.dumps(r.json(), ensure_ascii=False)
     for forbidden in ("29771-3", "POS", "positive", "colonoscopy report", "interpretation"):
         assert forbidden not in raw
