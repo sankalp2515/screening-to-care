@@ -16,7 +16,7 @@ All people below are fictional and all data is synthetic. Each step names the en
 - In Abu Dhabi, only 30.5% of positive stool tests had a follow-up colonoscopy (BMC Cancer 2021, 2015–16 data).
 - In a New York system, more referrals got scheduled while completed specialist visits did not change (JAMA Health Forum 2021).
 
-Sources: [00-PRODUCT-LIFECYCLE.md](00-PRODUCT-LIFECYCLE.md).
+Sources: BMC Cancer 2021 (Abu Dhabi data, 2015–16; 36.3% of the 933 non-completers had been referred and did not attend); JAMA Health Forum 2021 (New York safety-net system: eConsult raised scheduling from 66.5% to 82.3%, completed visits within 90 days stayed 38.4% vs 37.9%). More in [PRODUCT_FIT_ANALYSIS.md](PRODUCT_FIT_ANALYSIS.md).
 
 **One sentence.** For family physicians whose positive-FIT patients stall silently after referral, Tasleem watches Malaffi events and clinical evidence, gives every case a named owner and escalates stalls, so that every stalled journey reaches a named person within days.
 

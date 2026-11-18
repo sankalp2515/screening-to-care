@@ -1,6 +1,6 @@
 """Record a complete, self-consistent demo bundle from a running Tasleem stack (synthetic data only).
 
-    python -m tasleem.demo_bundle --out ../docs/lovable/demo/demo-bundle.json
+    python -m tasleem.demo_bundle --out ../frontend/demo/demo-bundle.json
 
 The frontend's demo mode replays this file, so reviewers can click through the real product behaviour
 with no backend deployed. Every response is what the real services returned; nothing is hand-written.
@@ -72,7 +72,7 @@ def next_0600_utc() -> str:
 
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--out", default="../docs/lovable/demo/demo-bundle.json")
+    ap.add_argument("--out", default="../frontend/demo/demo-bundle.json")
     args = ap.parse_args(argv)
     r = Recorder()
     r.call(CORE, "POST", "/v1/admin/reset-demo")

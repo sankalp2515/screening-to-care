@@ -4,7 +4,7 @@ Status: **accepted, 17 Nov 2026**. Supersedes the "one deployable service" note 
 
 ## Context
 - **The request:** move to a microservice architecture.
-- **The constraint** ([AGENTS.md](../../AGENTS.md)): rules R1 to R6 must never weaken.
+- **The constraint**: safety rules R1 to R6 (see [ARCHITECTURE.md](ARCHITECTURE.md)) must never weaken.
 - **The coupling:** R1 (one named owner), R3 (closure on evidence), R4 (escalation to a named human) and R6 (hash-chained audit) are enforced by writing four things in a single database transaction:
   1. the case events with their hash chain;
   2. the case projection;

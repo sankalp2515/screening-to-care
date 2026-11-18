@@ -145,7 +145,7 @@ Limits of this set: the barrier and distress lexicons were written by the team; 
 
 ## Frontend (demo replayer and safety in the UI)
 
-Automated in `frontend/src/test/demo.test.ts`. Run: `cd frontend && npm test`. Last run: **18 Nov 2026, 23 passed, 0 failed** (Vitest, Node 22, the recorded synthetic bundle `docs/lovable/demo/demo-bundle.json`). Typecheck clean, production build passes. Checked by hand in the browser at 1440 px and 375 px the same day (rows F19–F22).
+Automated in `frontend/src/test/demo.test.ts`. Run: `cd frontend && npm test`. Last run: **18 Nov 2026, 23 passed, 0 failed** (Vitest, Node 22, the recorded synthetic bundle `frontend/demo/demo-bundle.json`). Typecheck clean, production build passes. Checked by hand in the browser at 1440 px and 375 px the same day (rows F19–F22).
 
 | # | Case | Input | Expected | Actual | Component |
 |---|---|---|---|---|---|

@@ -125,7 +125,7 @@ Tasleem doesn't replace Malaffi, Sahatna or any EMR. It is a thin layer that **l
   - production OIDC;
   - provider-specific bridges to the real Sahatna, EMR and SMS gateways (the notifier's signed webhook is the contract they implement);
   - MLLP over TCP (interface engines relay to HTTPS);
-  - the clinician and patient user interfaces, which are being built separately in Lovable against this API.
+  - production sign-in for the clinician and patient web app (it runs today with demo personas).
 
 ## 7. Check it yourself
 

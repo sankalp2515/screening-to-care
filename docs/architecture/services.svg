@@ -87,7 +87,7 @@
 
   <!-- UI -->
   <rect x="590" y="500" width="290" height="70" rx="12" fill="#FFFFFF" stroke="#0F5C6E" stroke-dasharray="4 3"/>
-  <text x="640" y="528" class="t">Tasleem web app (Lovable)</text>
+  <text x="640" y="528" class="t">Tasleem web app (React)</text>
   <text x="640" y="550" class="s">My work, case view, programme, patient</text>
 
   <!-- Arrows -->

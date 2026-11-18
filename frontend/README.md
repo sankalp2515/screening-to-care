@@ -1,7 +1,7 @@
 # Tasleem frontend
 
 React 18, Vite, TypeScript, Tailwind 4, Radix (shadcn-style primitives), TanStack Query, Recharts, lucide-react.
-Design rules: [../DESIGN.md](../DESIGN.md) ("Sheet and biro"). Product spec for every screen: [../docs/lovable/LOVABLE_ONE_SHOT.md](../docs/lovable/LOVABLE_ONE_SHOT.md).
+Product context: [../docs/product/USER_JOURNEYS.md](../docs/product/USER_JOURNEYS.md). API contracts: [../docs/api/](../docs/api/).
 
 ```bash
 npm install
@@ -11,7 +11,7 @@ npm run build    # static site in dist/
 ```
 
 ## Modes
-- **Demo (default):** replays `docs/lovable/demo/demo-bundle.json`, real responses recorded from the Tasleem services (copied to `public/` by `scripts/sync-bundle.mjs`). Rule outcomes come from the recorded server `actions`; the patient-message policy is an exact port of `backend/tasleem/domain/messaging.py`. Actions that were not recorded answer `DEMO_NOT_RECORDED` instead of pretending.
+- **Demo (default):** replays `demo/demo-bundle.json`, real responses recorded from the Tasleem services (copied to `public/` by `scripts/sync-bundle.mjs`). Rule outcomes come from the recorded server `actions`; the patient-message policy is an exact port of `backend/tasleem/domain/messaging.py`. Actions that were not recorded answer `DEMO_NOT_RECORDED` instead of pretending.
 - **Live:** set `VITE_API_BASE_URL` (core), `VITE_AGENT_URL`, `VITE_NOTIFIER_URL`, `VITE_CONNECTOR_URL` and leave `VITE_DEMO_MODE` unset. Requests carry `X-Demo-User: <persona>`. Never put live keys in a committed file.
 
 ## Container

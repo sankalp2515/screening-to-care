@@ -5,8 +5,7 @@
 | Status | Approved for build, 16 Nov 2026 |
 | Challenge | Future Health Digital Innovation Challenge 2026 · Population Health · Challenge 05 |
 | Release | MVP for submission, 20 Nov 2026 11:59 PM IST |
-| Constraints | [Additional.md](../../Additional.md) (overrides this PRD on conflict) |
-| Background | [00-PRODUCT-LIFECYCLE.md](00-PRODUCT-LIFECYCLE.md) |
+| Background | [USER_JOURNEYS.md](USER_JOURNEYS.md) · [PRODUCT_FIT_ANALYSIS.md](PRODUCT_FIT_ANALYSIS.md) |
 
 ## 1. Summary
 Malaffi now tells you a referral exists. **Tasleem tells you whether the care actually happened, why not, and who is fixing it.**

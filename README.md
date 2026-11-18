@@ -7,17 +7,15 @@ Entry for the Future Health Digital Innovation Challenge 2026 · Population Heal
 ## Read first
 | File | What it is |
 |---|---|
-| [AGENTS.md](AGENTS.md) | Rules for anyone (or any coding agent) building here |
-| [Additional.md](Additional.md) | Organizer guidance: what to do and not do |
 | [docs/product/USER_JOURNEYS.md](docs/product/USER_JOURNEYS.md) | **The real problem, the real user, and each person's simple flow and channel** |
-| [docs/product/00-PRODUCT-LIFECYCLE.md](docs/product/00-PRODUCT-LIFECYCLE.md) | Problem, evidence, users, market, metrics, risks, pilot path, and the status of each lifecycle stage |
-| [docs/product/PRD.md](docs/product/PRD.md) · [BACKLOG.md](docs/product/BACKLOG.md) | Requirements and the prioritized backlog with status |
+| [docs/product/PRD.md](docs/product/PRD.md) | Requirements |
+| [docs/product/PRODUCT_FIT_ANALYSIS.md](docs/product/PRODUCT_FIT_ANALYSIS.md) | Does it solve the real problem for real users, and what AI does (and does not) do |
 | [docs/product/WORKFLOW_AND_INTEGRATION.md](docs/product/WORKFLOW_AND_INTEGRATION.md) | How it fits the Abu Dhabi workflow (Malaffi, Sahatna, EMR) and how it scales |
 | [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) · [ADR-001](docs/architecture/ADR-001-service-boundaries.md) | System design, services, API, schema; why the safety core is one service |
 | [docs/engineering/](docs/engineering/) | [Security audit](docs/engineering/SECURITY_AUDIT.md), [failure modes](docs/engineering/FAILURE_MODES.md), [testing strategy](docs/engineering/TESTING_STRATEGY.md), [operations](docs/engineering/OPERATIONS.md) |
-| [docs/evidence/](docs/evidence/) | [Test cases](docs/evidence/TEST_CASES.md), [hard cases](docs/evidence/HARD_CASES.md), [benchmark](docs/evidence/benchmark.md), [scale](docs/evidence/SCALE_POSTGRES.md), [review checklist](docs/evidence/REVIEW.md) |
-| [docs/lovable/LOVABLE_BRIEF.md](docs/lovable/LOVABLE_BRIEF.md) | UI brief for Lovable, with the API contract, OpenAPI files and real response fixtures |
-| [docs/submission/](docs/submission/) | Form text and video script drafts |
+| [docs/evidence/](docs/evidence/) | [Test cases](docs/evidence/TEST_CASES.md), [hard cases](docs/evidence/HARD_CASES.md), [benchmark](docs/evidence/benchmark.md), [scale](docs/evidence/SCALE_POSTGRES.md), [real-world fit](docs/evidence/REAL_WORLD_FIT.md) |
+| [docs/api/](docs/api/) | OpenAPI contracts for case-core, agent, notifier and the HL7 connector |
+| [frontend/](frontend/) | Web app: staff console, patient companion and landing page |
 
 ## The services
 | Service | Port | What it does |
@@ -64,4 +62,3 @@ Evidence commands:
 | `coord-sara` | Programme coordinator (escalation level 3) | Daily e-mail digest |
 | `p-noura`, `p-sunita`, … | Patients (companion view at `/v1/me/cases`) | Sahatna; SMS nudge; a navigator's call |
 
-Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).

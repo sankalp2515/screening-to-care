@@ -1,8 +1,0 @@
-{
-  "id": "dr-fatima",
-  "name": "Dr. Fatima (family physician)",
-  "role": "family_physician",
-  "actor_type": "clinician",
-  "org_id": "org-ghaf",
-  "sees_all_cases": false
-}

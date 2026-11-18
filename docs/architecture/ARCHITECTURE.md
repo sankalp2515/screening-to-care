@@ -1,6 +1,6 @@
 # Tasleem — System architecture
 
-Audience: engineering. Product context: [PRD](../product/PRD.md). Constraints: [Additional.md](../../Additional.md).
+Audience: engineering. Product context: [PRD](../product/PRD.md).
 
 Design goals, in priority order:
 1. **Safety rules are provable.** R1–R6 live in one pure, side-effect-free domain module that can be tested exhaustively.
@@ -38,7 +38,7 @@ flowchart LR
     R[(Redis)]
   end
   subgraph People
-    UI[Tasleem web app<br/>Lovable]
+    UI[Tasleem web app<br/>React, nginx gateway]
     SAH[Sahatna app<br/>patients]
     EMR[EMR inbox<br/>clinicians]
     SMS[SMS gateway]

@@ -1,12 +1,12 @@
 # Operations: deploy, configure, observe, recover
 
-**Status:** the full stack runs locally in Docker and passes 32 of 32 end-to-end checks. Nothing is deployed to a cloud yet (backlog TSL-120). Everything below is the production design. Items marked *built* exist in the code.
+**Status:** the full stack runs locally in Docker and passes 32 of 32 end-to-end checks. Nothing is deployed to a cloud yet. Everything below is the production design. Items marked *built* exist in the code.
 
 ## 1. Environments
 | Environment | Purpose | Data | Demo mode |
 |---|---|---|---|
 | local | Development, tests | SQLite in memory or Docker Postgres | on |
-| demo | Judges and the Lovable UI | Synthetic seed, reset on demand | on (guest personas) |
+| demo | Reviewers and the web app | Synthetic seed, reset on demand | on (guest personas) |
 | pilot | One provider network | Real data under a DoH agreement | **off**: OIDC, keys and migrations required |
 
 Every service refuses to start in an unsafe state outside demo mode (*built*):
@@ -15,7 +15,7 @@ Every service refuses to start in an unsafe state outside demo mode (*built*):
 - **connector:** no inbound key.
 
 ## 2. Deployment target (UAE data residency)
-Hosting: Azure UAE North (or any UAE-hosted Kubernetes). Additional.md asks us not to require platform lock-in, so the design needs only containers, Postgres and Redis.
+Hosting: Azure UAE North (or any UAE-hosted Kubernetes). To avoid platform lock-in, the design needs only containers, Postgres and Redis.
 
 | Component | Production form | Scaling |
 |---|---|---|

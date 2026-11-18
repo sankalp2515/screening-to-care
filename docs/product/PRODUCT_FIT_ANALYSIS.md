@@ -60,23 +60,20 @@ Two further failures the study did not measure, and which status monitoring cann
 | Suggest a barrier code from free text | Keywords, or an LLM when switched on | The LLM was 14/15 against keywords' 13/15 on 15 labelled messages. Too few to call it better |
 | Brief a physician; draft or translate a patient message | Templates, or an LLM when switched on | Wording quality only. Every LLM draft passes the same validators (numbers must match cited facts; no results in patient text) |
 
-**Verdict.** The product's value is a verification engine plus named human ownership. AI is the voice and the reading glasses, not the judge. That is what the organisers asked for:
-- V1: "don't leave the judgment to the AI";
-- V3: clinical teams remain central;
-- V4: AI isn't mandatory.
+**Verdict.** The product's value is a verification engine plus named human ownership. AI is the voice and the reading glasses, not the judge: clinical judgment stays with the clinical team, and the product works with AI switched off.
 
-**What this means for the pitch.** Don't sell it as "an AI product". Sell it as *an agent whose judgment is tested rules and whose voice is AI*: it senses Malaffi events, decides with rules, acts by assigning, escalating and drafting, and hands off to a clinician. When a judge asks "why AI?", the honest answer is that the hard problem (did care happen?) needs evidence, not a model. AI is used where language is the bottleneck: Arabic and Gulf-dialect free text, drafting and translation.
+The hard problem (did care happen?) needs evidence, not a model. AI is used where language is the bottleneck: Arabic and Gulf-dialect free text, drafting and translation, always confirmed by a person.
 
 ## 4. Where AI would add real value next (not built; each keeps R5)
 
-Ranked by value to the users above, using only what the organisers allow:
+Ranked by value to the users above:
 
 1. **An escalate-only second reader for distress.** A model reads every patient message the keyword rules did *not* flag, and can only *add* a human review, never remove one. It targets the one miss in every run ("My stomach hurts so much I can barely stand"). It is safe under R5 because the model never decides; it asks a clinician to look. Measure it on a new, unseen labelled set before switching it on.
 2. **Barrier reading for Gulf Arabic, Urdu and Hindi.** 40 of 204 replies got no suggestion. Grow the labelled set (the eval is one command) and switch the LLM suggestion on only if it beats keywords on unseen messages.
-3. **Document recognition for "done elsewhere".** A patient uploads a colonoscopy report from abroad. Form recognition extracts the date, procedure and findings for a clinician to confirm as evidence. Stephan (V4) recommended document recognition over plain OCR.
+3. **Document recognition for "done elsewhere".** A patient uploads a colonoscopy report from abroad. Form recognition extracts the date, procedure and findings for a clinician to confirm as evidence. Document recognition, not plain OCR, because layout carries meaning in clinical reports.
 4. **Physician brief.** Already built with citation checks. Measure the time saved in the pilot, not before.
 
-Not to build, per the organisers: no-show prediction or risk models (no data to validate them), and anything that sets priority or closes a case.
+Not to build: no-show prediction or risk models (no data to validate them), and anything that sets priority or closes a case.
 
 ## 5. What we do not know, and how the pilot answers it
 

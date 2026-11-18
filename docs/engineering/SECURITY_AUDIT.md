@@ -28,7 +28,7 @@ Synthetic data only. **Fixed** means the fix is in the code and a named test pro
 
 ## Unchanged by design
 - **SQL injection:** all queries go through SQLAlchemy with bound parameters. There is no string-built SQL.
-- **XSS:** the API returns JSON only. The UI must escape text, and the Lovable brief says so.
+- **XSS:** the API returns JSON only. The UI must escape text; the React web app renders all text as escaped text nodes.
 - **CSRF:** no cookies; identity travels in headers (demo) or bearer tokens (production).
 - **RCE:** YAML is loaded with `safe_load`, HL7 is parsed without evaluation, and no `eval` or `pickle` is used.
 - **File upload:** none.

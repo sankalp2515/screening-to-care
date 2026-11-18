@@ -1,4 +1,4 @@
-// Fields the UI reads. Shapes come from the recorded Tasleem responses (docs/lovable/demo/demo-bundle.json).
+// Fields the UI reads. Shapes come from the recorded Tasleem responses (frontend/demo/demo-bundle.json).
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type Service = "core" | "agent" | "notifier" | "connector";

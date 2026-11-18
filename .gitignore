@@ -9,3 +9,22 @@ __pycache__/
 build/
 dist/
 node_modules/
+
+# Internal working notes, tool briefs and drafts: kept on the team's machines, not published
+Additional.md
+AGENTS.md
+CLAUDE.md
+CONTRIBUTING.md
+DESIGN.md
+docs/lovable/
+docs/replit/
+docs/design/
+docs/submission/
+docs/product/00-PRODUCT-LIFECYCLE.md
+docs/product/BACKLOG.md
+docs/product/COMPETITIVE_AND_LAUNCH_READINESS.md
+docs/product/LANDING_PAGE_STRATEGY.md
+docs/evidence/REVIEW.md
+.claude/
+.taste-skill/
+*.tsbuildinfo

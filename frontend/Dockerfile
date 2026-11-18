@@ -1,5 +1,5 @@
 # Tasleem web app: the staff console and the patient companion, as one static bundle behind nginx.
-# Build from the repository root so the synthetic demo bundle (docs/lovable/demo) is in the context:
+# Build from the repository root so the evidence file the tests check (docs/evidence) is in the context:
 #   docker build -f frontend/Dockerfile -t tasleem-frontend:local .
 #
 # Two modes, chosen at build time (Vite inlines VITE_* variables):
@@ -11,7 +11,6 @@ WORKDIR /src/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY frontend/ ./
-COPY docs/lovable/demo/demo-bundle.json /src/docs/lovable/demo/demo-bundle.json
 # The frontend tests check that every landing-page number appears in this evidence file.
 COPY docs/evidence/REAL_WORLD_FIT.md /src/docs/evidence/REAL_WORLD_FIT.md
 ARG VITE_DEMO_MODE=false

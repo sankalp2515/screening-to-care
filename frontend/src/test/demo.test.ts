@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { bundle, demoRequest, demoSession, installBundle, messagePolicy, resetDemo } from "../lib/demo";
 
-const RAW = JSON.parse(readFileSync(resolve(__dirname, "../../../docs/lovable/demo/demo-bundle.json"), "utf-8"));
+const RAW = JSON.parse(readFileSync(resolve(__dirname, "../../demo/demo-bundle.json"), "utf-8"));
 const RAJESH = "case_767b1946ee9e";
 const SUNITA = "case_643f99b63ca1";
 const NOURA = "case_02f77758731b";

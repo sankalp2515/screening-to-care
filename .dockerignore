@@ -3,7 +3,6 @@
 # stays out of the build context.
 **
 !frontend/**
-!docs/lovable/demo/demo-bundle.json
 !docs/evidence/REAL_WORLD_FIT.md
 frontend/node_modules
 frontend/dist

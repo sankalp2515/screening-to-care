@@ -31,7 +31,7 @@ export function Tag({ tone = "muted", children, className, outline }: { tone?: T
   return <span className={cx("inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[12px] font-semibold leading-4 whitespace-nowrap", t, outline && "bg-transparent border border-current", className)}>{children}</span>;
 }
 
-/** Source-of-truth labels (DESIGN.md 6.4, Additional.md V1). */
+/** Source-of-truth labels: every fact on screen says where it came from. */
 export function Source({ kind, children }: { kind: "fact" | "rule" | "ai" | "human"; children?: ReactNode }) {
   if (kind === "fact") return <span className="inline-flex items-center gap-1.5"><Tag tone="muted">FACT</Tag>{children && <span className="mono text-[12px] text-muted">{children}</span>}</span>;
   if (kind === "rule") return <span className="inline-flex items-center gap-1.5"><span className="rounded-sm border border-rule-strong px-1.5 py-0.5 text-[12px] font-semibold leading-4 text-ink-2">RULE</span>{children && <span className="mono text-[12px] text-muted">{children}</span>}</span>;
