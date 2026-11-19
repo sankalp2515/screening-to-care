@@ -56,7 +56,12 @@ def _range(vals: list) -> str:
 
 
 def chart(s: dict, path: Path) -> None:
-    import matplotlib
+    """Draw the benchmark chart. Optional: needs the `bench` extra (matplotlib); the numbers never do."""
+    try:
+        import matplotlib
+    except ImportError:
+        print(f"matplotlib is not installed, so {path.name} was not redrawn (pip install -e '.[bench]').")
+        return
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt

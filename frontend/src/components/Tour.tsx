@@ -22,7 +22,16 @@ export default function Tour() {
   if (!tour.open) return null;
   const step = Math.min(tour.step, TOUR.length - 1);
   const s = TOUR[step];
-  const go = (i: number) => setTour({ open: true, step: i });
+  // Every button takes the reviewer to the screen the step talks about, so "Next" never leaves them reading
+  // about a screen they cannot see.
+  const visit = async (i: number) => {
+    const target = TOUR[i];
+    setTour({ open: true, step: i });
+    setPersona(target.persona);
+    if (!target.patient) { nav(target.to ?? "/app/work"); return; }
+    const id = await caseIdForPatient(target.patient, target.persona).catch(() => null);
+    nav(id ? `/app/cases/${id}${target.suffix ?? ""}` : "/app/cases");
+  };
   return (
     <aside aria-label="Reviewer tour" className="reveal fixed bottom-4 end-4 z-30 w-[min(360px,calc(100vw-32px))] rounded border border-ink bg-sheet p-4">
       <div className="flex items-center justify-between">
@@ -31,15 +40,12 @@ export default function Tour() {
       </div>
       <p className="mt-2 text-[15px] leading-[22px] text-ink">{s.text}</p>
       <div className="mt-4 flex items-center gap-2">
-        <Button variant="primary" size="sm" onClick={async () => {
-          setPersona(s.persona);
-          if (!s.patient) { nav(s.to ?? "/app/work"); return; }
-          const id = await caseIdForPatient(s.patient, s.persona).catch(() => null);
-          nav(id ? `/app/cases/${id}${s.suffix ?? ""}` : "/app/cases");
-        }}>Take me there</Button>
+        <Button variant="primary" size="sm" onClick={() => visit(step)}>Take me there</Button>
         <div className="ms-auto flex gap-1">
-          <Button variant="quiet" size="sm" disabled={step === 0} onClick={() => go(step - 1)}>Back</Button>
-          <Button size="sm" disabled={step === TOUR.length - 1} onClick={() => go(step + 1)}>Next</Button>
+          <Button variant="quiet" size="sm" disabled={step === 0} onClick={() => visit(step - 1)}>Back</Button>
+          {step === TOUR.length - 1
+            ? <Button size="sm" onClick={() => setTour({ ...tour, open: false })}>Finish</Button>
+            : <Button size="sm" onClick={() => visit(step + 1)}>Next</Button>}
         </div>
       </div>
     </aside>

@@ -1,6 +1,6 @@
 # Hard cases
 
-Run: `python -m tasleem.bench.hardcases` (16 Nov 2026). **64 of 67 match the expected result.** Expected results were written before running; misses stay in the table with the reason.
+Run: `python -m tasleem.bench.hardcases` (19 Nov 2026). **64 of 67 match the expected result.** Expected results were written before running; misses stay in the table with the reason.
 
 | Category | Passed |
 |---|---|

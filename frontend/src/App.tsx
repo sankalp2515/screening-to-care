@@ -56,12 +56,15 @@ export function BundleGate({ children }: { children: ReactNode }) {
 
 function RequireStaff({ children }: { children: ReactNode }) {
   const { persona } = usePersona();
-  if (!persona || isPatient(persona)) return <Navigate to="/demo" replace />;
+  // A switch to a patient while inside the care-team app (the tour's last step) lands on the patient screen.
+  if (!persona) return <Navigate to="/demo" replace />;
+  if (isPatient(persona)) return <Navigate to="/patient" replace />;
   return <>{children}</>;
 }
 function RequirePatient({ children }: { children: ReactNode }) {
   const { persona } = usePersona();
-  if (!persona || !isPatient(persona)) return <Navigate to="/demo" replace />;
+  if (!persona) return <Navigate to="/demo" replace />;
+  if (!isPatient(persona)) return <Navigate to="/app/work" replace />;
   return <>{children}</>;
 }
 

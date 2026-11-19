@@ -131,6 +131,22 @@ def test_barrier_flow_and_consent(client):
     assert client.post(f"/v1/me/cases/{cid}/consent", headers=as_("p-yousef")).json()["consent_given"] is True
 
 
+def test_female_doctor_preference_reaches_a_named_navigator(client):
+    """Abu Dhabi evidence (BMC Cancer 2021): embarrassment, above all with a male endoscopist, stops women
+    attending. The patient can say so in one tap; a navigator gets the rebooking task (R4: a named human)."""
+    cid = _case(client, "p-yousef")["id"]
+    opts = client.get("/v1/me/cases?lang=ar", headers=as_("p-yousef")).json()["items"][0]["barrier_options"]
+    assert any(o["code"] == "FEMALE_CLINICIAN" and "طبيبة" in o["label"] for o in opts)
+    r = client.post(f"/v1/cases/{cid}/barriers", headers=as_("p-yousef"), json={"codes": ["FEMALE_CLINICIAN"]}).json()
+    assert r["routed_to_human"] is True
+    bid = r["barrier"]["id"]
+    d = client.post(f"/v1/cases/{cid}/barriers/{bid}/confirm", headers=as_("nav-aisha"),
+                    json={"code": "FEMALE_CLINICIAN"}).json()
+    b = next(x for x in d["barriers"] if x["id"] == bid)
+    assert b["status"] == "confirmed" and b["assignee_role"] == "navigator"
+    assert "female endoscopist" in str(b).lower()
+
+
 def test_distress_blocks_closure_until_a_clinician_resolves(client):
     cid = _case(client, "p-sunita")["id"]
     # Another clinic cannot see it at all (org scoping), and the answer does not reveal it exists.
@@ -221,3 +237,31 @@ def test_close_completed_case_and_reset_demo(client):
     assert {p["id"] for p in people["staff"]} >= {"dr-fatima", "nav-aisha", "coord-sara"}
     out = client.post("/v1/admin/reset-demo").json()
     assert out["seeded"] is True and out["cases"] == 12
+
+
+def test_working_days_follow_the_uae_week():
+    from tasleem.services.views import working_days_between
+    fri = datetime(2026, 11, 20, 9, tzinfo=UTC)  # Friday
+    assert working_days_between(fri, fri) == 0
+    assert working_days_between(fri, fri + timedelta(days=1)) == 0   # Saturday
+    assert working_days_between(fri, fri + timedelta(days=3)) == 1   # Monday
+    assert working_days_between(fri, fri + timedelta(days=7)) == 5   # next Friday
+    assert working_days_between(fri, fri + timedelta(days=45)) == 31  # six weeks on, then Monday
+
+
+def test_programme_reports_the_national_guideline_on_verified_evidence(client):
+    """UAE national CRC guideline (2022): >= 90% referred after a positive FIT, and colonoscopy within 31
+    working days of referral. Both are counted from clinical evidence, never from referral status."""
+    m = client.get("/v1/program/metrics", headers=ALL).json()
+    g = next(x for x in m["guideline"] if x["pathway_id"] == "fit-positive-colonoscopy")
+    assert "National Guideline" in g["source"]
+    by_id = {t["id"]: t for t in g["targets"]}
+    referred, window = by_id["referred"], by_id["colonoscopy_31_working_days"]
+    fit_cases = m["by_pathway"]["fit-positive-colonoscopy"]
+    funnel = {f["stage"]: f["count"] for f in fit_cases["funnel"]}
+    assert referred["due"] == fit_cases["cases"] and referred["met"] == funnel["REFERRED"]
+    assert referred["status"] in ("below", "acceptable", "desirable") and referred["acceptable"] == 0.9
+    assert window["window_working_days"] == 31
+    assert window["met"] <= window["due"] and window["met"] + window["pending"] <= funnel["REFERRED"]
+    # Other pathways carry no guideline block, so nothing is invented for them.
+    assert [x["pathway_id"] for x in m["guideline"]] == ["fit-positive-colonoscopy"]

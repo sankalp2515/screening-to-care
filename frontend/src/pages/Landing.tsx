@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, BellRing, Check, ClipboardCheck, Eye, FileCheck2, GitBranch, HeartHandshake, Lock, Minus, ScrollText, ShieldCheck, Sparkles, UserCheck, Users, Workflow } from "lucide-react";
 import { loadBundle } from "../lib/demo";
-import { MODE } from "../lib/api";
+import { MODE, caseIdForPatient, request } from "../lib/api";
 import { shortName } from "../lib/labels";
 import type { Case } from "../lib/types";
-import { BENCH, EVIDENCE, LIT, REAL, REPO } from "../lib/landing-facts";
+import { BENCH, EVIDENCE, LIT, REAL, REPO, SEHA } from "../lib/landing-facts";
 import { Wordmark } from "../components/Wordmark";
 import { BenchmarkChart } from "../components/Benchmark";
 import { DualBars, Skeleton, StallChip, cx } from "../components/ui";
@@ -18,7 +18,7 @@ const PILOT_MAIL = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Taslee
 
 function PrimaryCta({ children = "Watch a stalled case get caught", className }: { children?: ReactNode; className?: string }) {
   return (
-    <Link to="/demo" className={cx("press inline-flex h-12 items-center gap-2 rounded bg-biro px-5 text-[15px] font-semibold text-white hover:bg-biro-ink", className)}>
+    <Link to="/demo?tour=1" className={cx("press inline-flex h-12 items-center gap-2 rounded bg-biro px-5 text-[15px] font-semibold text-white hover:bg-biro-ink", className)}>
       {children}<ArrowRight size={18} aria-hidden className="cta-arrow" />
     </Link>
   );
@@ -48,8 +48,16 @@ function Cite({ href, children }: { href: string; children: ReactNode }) {
 
 function HeroCase() {
   const [c, setC] = useState<Case | null>(null);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
-    if (MODE !== "demo") return;
+    if (MODE === "live") {
+      // The live demo API is open to guests, so the card shows the real seeded case, not a drawing.
+      caseIdForPatient("p-rajesh", "dr-fatima")
+        .then((id) => (id ? request<Case>("core", "GET", `/v1/cases/${id}`, undefined, "dr-fatima") : null))
+        .then((d) => (d ? setC(d) : setFailed(true)))
+        .catch(() => setFailed(true));
+      return;
+    }
     loadBundle().then((b) => {
       for (const entry of Object.values<{ detail_by_persona: Record<string, Case> }>(b.cases)) {
         const d = entry.detail_by_persona["dr-fatima"];
@@ -67,7 +75,7 @@ function HeroCase() {
       </div>
       <div className="min-h-[338px] space-y-5 p-5">
         {!c ? (
-          MODE === "demo"
+          !failed
             ? <div className="space-y-4" aria-busy="true"><Skeleton className="h-7 w-1/2" /><Skeleton className="h-16" /><Skeleton className="h-10" /><Skeleton className="h-16" /></div>
             : <StaticHeroCase />
         ) : (
@@ -97,7 +105,7 @@ function StaticHeroCase() {
       <p className="serif text-[24px] font-semibold leading-7">Rajesh K. (58)</p>
       <MiniBars reported={9} verified={6} />
       <p className="rounded border border-attn bg-attn-wash px-3 py-2 text-[14px] text-attn">Malaffi says <strong className="mono">COMPLETED</strong>. Evidence stops at “Attended”.</p>
-      <p className="text-[14px] text-ink-2">Open the demo to see the live case.</p>
+      <p className="text-[14px] text-ink-2">Next step for <strong>Dr. Fatima</strong>: ask the GI centre for the report or rebook. Escalates to a named person if nobody acts.</p>
     </div>
   );
 }
@@ -187,13 +195,13 @@ export default function Landing() {
             <h1 className="enter enter-1 text-[42px] font-semibold leading-[46px] md:text-[62px] md:leading-[66px]">Know whether the care <em className="font-medium">actually</em> happened.</h1>
             <p className="enter enter-2 mt-6 max-w-xl text-[18px] leading-[28px] text-ink-2">Malaffi tells you a referral exists. Tasleem checks it against clinical evidence, names one person when a positive screening result stalls, and keeps the case open until the colonoscopy report is back.</p>
             <div className="enter enter-2 mt-8 flex flex-wrap gap-3"><PrimaryCta /><SecondaryCta /></div>
-            <p className="enter enter-3 mt-4 text-[13px] text-muted">60-second guided tour. No sign-up. Synthetic patients only.</p>
+            <p className="enter enter-3 mt-4 text-[13px] text-muted">Guided tour in seven steps, about three minutes. No sign-up. Synthetic patients only.</p>
             <dl className="enter enter-3 mt-10 grid max-w-xl grid-cols-3 gap-px overflow-hidden rounded border border-rule bg-rule">
-              {[[BENCH.tasleemFlagged, "of stalled journeys reach a named person"], [BENCH.falseDoneTasleem, "cases falsely counted as done"], [`${BENCH.tasleemDays} days`, "median time to an alert"]].map(([n, t]) => (
+              {[[REAL.actionFlaggedTasleem, "of stalled journeys reach a named person"], [REAL.falseDoneTasleem, "cases falsely counted as done"], [`${REAL.medianDaysTasleem} days`, "median time to an alert"]].map(([n, t]) => (
                 <div key={t} className="bg-sheet px-4 py-3"><dt className="sr-only">{t}</dt><dd className="serif text-[24px] font-semibold leading-7 tnum">{n}</dd><dd className="mt-1 text-[12px] leading-4 text-ink-2">{t}</dd></div>
               ))}
             </dl>
-            <p className="mt-2 text-[12px] text-muted">On a synthetic benchmark. <a href={`${EVIDENCE}/benchmark.md`} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-ink">How it was measured</a></p>
+            <p className="mt-2 text-[12px] text-muted">On a synthetic cohort of 2,000 with a published failure mix. <a href={`${EVIDENCE}/REAL_WORLD_FIT.md`} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-ink">How it was measured</a></p>
           </div>
           <HeroCase />
         </section>
@@ -229,9 +237,9 @@ export default function Landing() {
           </div>
           <dl className="mt-8 grid gap-6 md:grid-cols-3">
             {[
-              ["42%", <>of people with a positive FIT had no colonoscopy within a year. <Cite href={LIT.martin.url}>{LIT.martin.cite}</Cite></>],
-              ["Nearly half", <>of those missed a booked visit or procedure: a call could have reached them. <Cite href={LIT.martin.url}>Same study</Cite></>],
-              ["9 months", <>Colonoscopy after this delay is linked to more cancer. <Cite href={LIT.forbes.url}>{LIT.forbes.cite}</Cite></>],
+              [SEHA.followedUp, <>of positive stool tests in Abu Dhabi clinics were followed by a colonoscopy. {SEHA.noColonoscopy} people were not. <Cite href={LIT.seha.url}>{LIT.seha.cite}</Cite></>],
+              [SEHA.missedGiVisitPct, <>of those {SEHA.noColonoscopy} were referred, then missed the specialist appointment: a step someone could have caught. <Cite href={LIT.seha.url}>Same study</Cite></>],
+              [SEHA.expectedCancers, <>cancers would be expected among them, at the rate found in the people who did have a colonoscopy (11 in 436). <Cite href={LIT.seha.url}>Same study</Cite></>],
             ].map(([n, t], i) => (
               <div key={i} className="border-t border-rule pt-3"><dt className="serif text-[30px] font-semibold leading-9">{n}</dt><dd className="mt-1 text-[15px] leading-[23px] text-ink-2">{t}</dd></div>
             ))}
@@ -302,11 +310,11 @@ export default function Landing() {
         <Section id="proof" over="Proof you can check" title={<>Tested before it is <em className="font-medium">trusted</em>.</>}
           lead="No customer logos yet, so we show what a clinical panel can verify: a benchmark against today's tools, rerun on a cohort built from published data, and the code that produced it.">
           <div className="grid items-start gap-8 lg:grid-cols-[1.2fr_1fr]">
-            <div className="rounded border border-rule bg-sheet p-6"><BenchmarkChart /><p className="mt-3 text-[13px] text-muted">1,000 synthetic patients, three seeds, same messages and noise for every arm.</p></div>
+            <div className="rounded border border-rule bg-sheet p-6"><BenchmarkChart /><p className="mt-3 text-[13px] text-muted">2,000 synthetic patients with a published failure mix (Martin 2017), three seeds, same messages and noise for every arm.</p></div>
             <dl className="grid grid-cols-2 gap-px overflow-hidden rounded border border-rule bg-rule">
               {[
-                [`${BENCH.falseDoneTasleem} vs ${BENCH.falseDoneStatus}`, "journeys falsely counted as done (Tasleem vs status only)"],
-                [`${BENCH.tasleemDays} vs ${BENCH.statusDays} d`, "median days from care stopping to an alert"],
+                [`${REAL.falseDoneTasleem} vs ${REAL.falseDoneStatus}`, `journeys falsely counted as done, of ${REAL.n} (Tasleem vs status only)`],
+                [`${REAL.medianDaysTasleem} vs ${REAL.medianDaysStatus} d`, "median days from care stopping to an alert"],
                 [REAL.neverColonoscopyFlaggedTasleem, `of people who never got a colonoscopy flagged, on a ${REAL.n}-patient cohort with a published failure mix`],
                 [BENCH.tests, "automated tests passing, plus 64 of 67 labelled hard cases"],
               ].map(([n, t]) => (

@@ -30,7 +30,7 @@ export const STALL_LABELS: Record<string, string> = {
 
 export const BARRIER_LABELS: Record<string, string> = {
   FEAR: "Fear or worry", PREP_UNCLEAR: "Preparation unclear", NO_ESCORT: "No escort home", TRANSPORT: "Transport",
-  COST_OR_INSURANCE: "Cost or insurance", TIME_OR_WORK: "Work or time", LANGUAGE: "Needs an interpreter",
+  COST_OR_INSURANCE: "Cost or insurance", TIME_OR_WORK: "Work or time", LANGUAGE: "Needs an interpreter", FEMALE_CLINICIAN: "Prefers a female doctor",
   WANTS_CALLBACK: "Wants a call", DONE_ELSEWHERE: "Done elsewhere", OTHER: "Something else",
 };
 

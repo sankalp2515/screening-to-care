@@ -261,3 +261,26 @@ def test_agent_settings_accept_azure_openai(monkeypatch):
     monkeypatch.setenv("AGENT_LLM_REASONING_EFFORT", "minimal")
     s = AgentSettings(_env_file=None)
     assert s.llm_provider == "azure_openai" and s.llm_reasoning_effort == "minimal"
+
+
+def test_agent_server_database_pool_heals_dropped_connections():
+    # Live Azure finding (19 Nov): a pooled Postgres connection went idle during a model call and the draft
+    # save failed with "SSL error: unexpected eof" (HTTP 500 on the Assistant tab).
+    from tasleem_agent.app import POOL_RECYCLE_SECONDS, make_engine
+    engine = make_engine("postgresql+psycopg://u:p@db.invalid:5432/agent")
+    assert engine.pool._pre_ping is True
+    assert engine.pool._recycle == POOL_RECYCLE_SECONDS < 240  # under Azure's 4-minute idle cut-off
+    engine.dispose()
+
+
+def test_notifier_server_database_pool_heals_dropped_connections():
+    import tasleem_notifier.store as store
+    seen: dict = {}
+    real = store.create_engine
+    store.create_engine = lambda url, **kw: (seen.update(kw), real("sqlite://"))[1]
+    try:
+        store.make_store("postgresql+psycopg://u:p@db.invalid:5432/notifier")
+    finally:
+        store.create_engine = real
+    assert seen["pool_pre_ping"] is True and seen["pool_recycle"] < 240
+    assert seen["connect_args"]["keepalives"] == 1

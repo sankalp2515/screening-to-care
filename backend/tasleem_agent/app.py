@@ -23,7 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy import JSON, DateTime, String, create_engine, text
+from sqlalchemy import JSON, DateTime, Engine, String, create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -95,15 +95,32 @@ class TranslateIn(BaseModel):
     target: Literal["en", "ar"] = "en"
 
 
+def make_engine(url: str) -> Engine:
+    """SQLite for tests and local runs; a server database gets a self-healing pool.
+
+    Cloud networks drop idle TCP connections (Azure outbound flows after about 4 minutes), so a pooled
+    connection can be dead when a draft is saved after a slow model call. Pre-ping replaces a dead
+    connection at checkout, recycling retires connections before the idle limit, and TCP keepalives
+    stop the network from treating an open connection as idle.
+    """
+    if url.startswith("sqlite"):
+        kwargs: dict[str, Any] = {"connect_args": {"check_same_thread": False}}
+        if url in ("sqlite://", "sqlite:///:memory:"):
+            kwargs["poolclass"] = StaticPool
+        return create_engine(url, **kwargs)
+    connect_args: dict[str, Any] = {}
+    if url.startswith("postgresql"):
+        connect_args = {"keepalives": 1, "keepalives_idle": 60, "keepalives_interval": 15, "keepalives_count": 4}
+    return create_engine(url, pool_pre_ping=True, pool_recycle=POOL_RECYCLE_SECONDS, connect_args=connect_args)
+
+
+POOL_RECYCLE_SECONDS = 180
+
+
 def create_app(settings: AgentSettings | None = None, core: ServiceClient | None = None,
                llm: LLMProvider | None = None) -> FastAPI:
     settings = settings or get_settings()
-    kwargs: dict[str, Any] = {}
-    if settings.database_url.startswith("sqlite"):
-        kwargs["connect_args"] = {"check_same_thread": False}
-        if settings.database_url in ("sqlite://", "sqlite:///:memory:"):
-            kwargs["poolclass"] = StaticPool
-    engine = create_engine(settings.database_url, **kwargs)
+    engine = make_engine(settings.database_url)
     Base.metadata.create_all(engine)
     sessions = sessionmaker(bind=engine, expire_on_commit=False)
     core = core or ServiceClient(settings.core_url, timeout=5.0, retries=1)

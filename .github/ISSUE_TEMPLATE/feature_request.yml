@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest something that helps close the screening-to-care loop
+labels: [enhancement]
+body:
+  - type: textarea
+    id: who
+    attributes:
+      label: Who is it for, and what is stuck today?
+      description: "One person, one moment. For example: a navigator whose patient has no one to take her home."
+    validations: {required: true}
+  - type: textarea
+    id: idea
+    attributes:
+      label: What should Tasleem do?
+    validations: {required: true}
+  - type: textarea
+    id: measure
+    attributes:
+      label: How would we know it worked?
+      description: A measurable outcome, such as days to colonoscopy or verified completion.
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Rules
+      options:
+        - label: This keeps R1–R6 intact, and any AI part only suggests
+          required: true

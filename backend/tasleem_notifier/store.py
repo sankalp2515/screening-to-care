@@ -75,7 +75,12 @@ def make_store(url: str) -> tuple[Engine, sessionmaker]:
         if url in ("sqlite://", "sqlite:///:memory:"):
             kwargs["poolclass"] = StaticPool
     else:
+        # Cloud networks drop idle TCP connections; replace dead ones at checkout and retire them early.
         kwargs["pool_pre_ping"] = True
+        kwargs["pool_recycle"] = 180
+        if url.startswith("postgresql"):
+            kwargs["connect_args"] = {"keepalives": 1, "keepalives_idle": 60, "keepalives_interval": 15,
+                                      "keepalives_count": 4}
     engine = create_engine(url, **kwargs)
     Base.metadata.create_all(engine)  # small, additive schema owned by this service
     return engine, sessionmaker(bind=engine, expire_on_commit=False)

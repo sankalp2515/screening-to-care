@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Radio, Send } from "lucide-react";
 import { request, useCommand, useScenarios } from "../lib/api";
-import { bundle, demoSession } from "../lib/demo";
+import { bundle, demoSession, falseDoneCase, rememberFalseDone } from "../lib/demo";
 import { usePersona } from "../lib/persona";
 import { shortName } from "../lib/labels";
 import { Button, Card, ErrorState, JourneyBar, Skeleton, StallChip, Tag, cx, inputCls, toastError, useToast } from "../components/ui";
@@ -63,8 +63,12 @@ export default function Simulator() {
   const [, force] = useState(0);
   const sess = demoSession();
 
-  const send = (sid: string) => cmd.mutate({ path: `/v1/demo/scenarios/${sid}`, body: {} }, {
-    onSuccess: (res) => { setRun({ sid, res }); force((x) => x + 1); toast({ tone: "done", text: "Events sent. Tasleem reacted below." }); },
+  const fdCase = falseDoneCase();
+  const send = (sid: string) => cmd.mutate({ path: `/v1/demo/scenarios/${sid}`, body: sid === "report-arrives" && fdCase ? { case_id: fdCase } : {} }, {
+    onSuccess: (res) => {
+      if (sid === "false-done") rememberFalseDone(res?.case_id ?? res?.case?.id);
+      setRun({ sid, res }); force((x) => x + 1); toast({ tone: "done", text: "Events sent. Tasleem reacted below." });
+    },
     onError: (e) => toastError(toast, e),
   });
   const sendHl7 = async (text: string) => {
@@ -82,7 +86,7 @@ export default function Simulator() {
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <div className="space-y-3">
           {sc.isLoading ? <Skeleton className="h-80" /> : sc.error ? <ErrorState error={sc.error} /> : sc.data!.items.map((s) => {
-            const locked = s.id === "report-arrives" && !sess.falseDoneRun;
+            const locked = s.id === "report-arrives" && !sess.falseDoneRun && !fdCase;
             return (
               <Card key={s.id} className={cx("flex items-start gap-4 p-4", run?.sid === s.id && "border-biro")}>
                 <div className="min-w-0 flex-1">

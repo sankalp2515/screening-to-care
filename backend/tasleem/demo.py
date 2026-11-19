@@ -17,7 +17,7 @@ from .domain.model import Actor, ActorType, AdminStatus
 from .infra.db import PatientRow
 from .seed import SOURCE, appt, bp, fit, fit_journey, procedure, ref, report
 
-NAMES = ["Hind", "Saeed", "Maryam", "Arjun", "Amal", "Tariq", "Priya", "Nasser", "Huda", "Imran"]
+NAMES = ["Hind", "Saeed", "Layla", "Arjun", "Amal", "Tariq", "Priya", "Nasser", "Huda", "Imran"]
 
 
 def _new_patient(svc: Any, lang: str = "ar", fp: str | None = "dr-fatima", tag: str = "") -> str:

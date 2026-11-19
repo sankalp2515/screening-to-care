@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
-import { bundle, demoRequest, demoSession, installBundle, messagePolicy, resetDemo } from "../lib/demo";
+import { bundle, demoRequest, demoSession, falseDoneCase, installBundle, messagePolicy, rememberFalseDone, resetDemo } from "../lib/demo";
 
 const RAW = JSON.parse(readFileSync(resolve(__dirname, "../../demo/demo-bundle.json"), "utf-8"));
 const RAJESH = "case_767b1946ee9e";
@@ -169,5 +169,17 @@ describe("live-mode helpers and the landing page's numbers", () => {
     for (const [k, v] of Object.entries({ ...BENCH, ...REAL })) expect(v, k).not.toMatch(/^—$|^$/);
     const doc = readFileSync(resolve(__dirname, "../../../docs/evidence/REAL_WORLD_FIT.md"), "utf-8");
     for (const v of [REAL.medianDaysTasleem, REAL.medianDaysStatus, REAL.veryTightDays, REAL.alertsPer100, REAL.veryTightFalseAlertPct]) expect(doc).toContain(v);
+  });
+});
+
+describe("simulator: report-arrives names the false-done case (live API needs its id)", () => {
+  it("remembers the case this browser created and forgets it on reset", () => {
+    expect(falseDoneCase()).toBeNull();
+    rememberFalseDone("case_abc123");
+    expect(falseDoneCase()).toBe("case_abc123");
+    expect(demoSession().falseDoneRun).toBe(true);
+    resetDemo();
+    expect(falseDoneCase()).toBeNull();
+    expect(demoSession().falseDoneRun).toBe(false);
   });
 });

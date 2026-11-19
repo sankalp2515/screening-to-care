@@ -1,17 +1,17 @@
 import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
-export const EVIDENCE_URL = "https://github.com/sankalp2515/screening-to-care/blob/main/docs/evidence/benchmark.md";
+export const EVIDENCE_URL = "https://github.com/sankalp2515/screening-to-care/blob/main/docs/evidence/REAL_WORLD_FIT.md";
 const DATA = [
   { arm: "Reminders only", v: 0 },
-  { arm: "Malaffi status only", v: 70.1 },
-  { arm: "Tasleem", v: 98.5 },
+  { arm: "Malaffi status only", v: 81.8 },
+  { arm: "Tasleem", v: 99.9 },
 ];
 
 export function BenchmarkChart() {
   return (
     <figure className="w-full">
-      <figcaption className="mb-3 text-[14px] font-semibold text-ink">Stalled journeys that reached a named person</figcaption>
-      <div className="h-[168px]" role="img" aria-label="Reminders only 0%, Malaffi status only 70.1%, Tasleem 98.5%">
+      <figcaption className="mb-3 text-[14px] font-semibold text-ink">Journeys needing action that reached a named person</figcaption>
+      <div className="h-[168px]" role="img" aria-label="Reminders only 0%, Malaffi status only 81.8%, Tasleem 99.9%">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={DATA} layout="vertical" margin={{ top: 0, right: 56, bottom: 0, left: 0 }} barCategoryGap={14}>
             <XAxis type="number" domain={[0, 100]} hide />
@@ -28,9 +28,9 @@ export function BenchmarkChart() {
 }
 
 export const TILES: [string, string][] = [
-  ["0 vs 125", "journeys falsely counted as done (Tasleem vs status only)"],
-  ["4 vs 14.4 days", "median time from care stopping to an alert"],
-  ["233", "automated tests passing"],
+  ["0 vs 160", "journeys falsely counted as done, of 2,000 (Tasleem vs status only)"],
+  ["1.9 vs 16.5 days", "median time from care stopping to an alert"],
+  ["241", "automated tests passing"],
   ["64 of 67", "labelled hard cases handled"],
 ];
 

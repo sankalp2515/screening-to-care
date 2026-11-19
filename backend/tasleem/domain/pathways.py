@@ -86,6 +86,25 @@ class Closure(BaseModel):
     min_contact_attempts_for_unreachable: int = 3
 
 
+class GuidelineTarget(BaseModel):
+    """One national quality indicator, measured on verified clinical evidence, never on referral status.
+    Without `from_stage` it is the share of cases that reached `stage`; with it, the share that reached
+    `stage` within `working_days` of `from_stage` (cases still inside the window are counted as pending)."""
+
+    id: str
+    label: str
+    stage: str
+    from_stage: str | None = None
+    working_days: int | None = None
+    acceptable: float = Field(ge=0, le=1)
+    desirable: float = Field(ge=0, le=1)
+
+
+class Guideline(BaseModel):
+    source: str
+    targets: list[GuidelineTarget]
+
+
 class Pathway(BaseModel):
     id: str
     version: int
@@ -101,6 +120,7 @@ class Pathway(BaseModel):
     closure: Closure
     patient_messages: dict[str, dict[str, str]] = Field(default_factory=dict)
     prep_check: list[PrepQuestion] = Field(default_factory=list)
+    guideline: Guideline | None = None
 
     @model_validator(mode="after")
     def _validate(self) -> Pathway:
@@ -120,6 +140,12 @@ class Pathway(BaseModel):
         for st in self.admin_status_map.values():
             if st not in known:
                 raise ValueError(f"{self.id}: admin_status_map stage {st} is not a stage")
+        for t in self.guideline.targets if self.guideline else []:
+            for st in (t.stage, t.from_stage):
+                if st is not None and st not in known:
+                    raise ValueError(f"{self.id}: guideline target {t.id} stage {st} is not a stage")
+            if (t.from_stage is None) != (t.working_days is None):
+                raise ValueError(f"{self.id}: guideline target {t.id} needs both from_stage and working_days")
         if not self.escalation_ladder or self.escalation_ladder[0] != "owner":
             raise ValueError(f"{self.id}: escalation ladder must start with 'owner'")
         if BarrierCode.OTHER not in self.playbooks:

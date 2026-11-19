@@ -105,6 +105,8 @@ class BarrierCode(StrEnum):
     COST_OR_INSURANCE = "COST_OR_INSURANCE"
     TIME_OR_WORK = "TIME_OR_WORK"
     LANGUAGE = "LANGUAGE"
+    # Abu Dhabi evidence: embarrassment, above all a male endoscopist for a female patient (BMC Cancer 2021).
+    FEMALE_CLINICIAN = "FEMALE_CLINICIAN"
     WANTS_CALLBACK = "WANTS_CALLBACK"
     DONE_ELSEWHERE = "DONE_ELSEWHERE"
     OTHER = "OTHER"

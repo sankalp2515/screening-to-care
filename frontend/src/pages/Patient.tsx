@@ -87,8 +87,11 @@ function CaseFlow({ item, lang, name }: { item: PatientCase; lang: "en" | "ar"; 
   );
 
   if (view.kind === "barrier") {
-    const all = item.barrier_options.filter((o) => o.code !== "WANTS_CALLBACK");
-    const opts = more ? all : all.slice(0, 5);
+    // The reasons Abu Dhabi patients give most (BMC Cancer 2021), including a female doctor, come first.
+    const FIRST = ["FEAR", "PREP_UNCLEAR", "NO_ESCORT", "FEMALE_CLINICIAN", "TRANSPORT", "COST_OR_INSURANCE"];
+    const rank = (c: string) => (FIRST.includes(c) ? FIRST.indexOf(c) : FIRST.length);
+    const all = item.barrier_options.filter((o) => o.code !== "WANTS_CALLBACK").sort((a, b) => rank(a.code) - rank(b.code));
+    const opts = more ? all : all.slice(0, FIRST.length);
     return (
       <div className="space-y-2.5">
         <button type="button" onClick={() => setView({ kind: "home" })} className="press -ms-2 flex min-h-[44px] items-center gap-1 rounded px-2 text-[16px] font-medium text-ink-2"><ChevronLeft size={20} className="rtl:rotate-180" aria-hidden />{t.back}</button>
@@ -106,7 +109,7 @@ function CaseFlow({ item, lang, name }: { item: PatientCase; lang: "en" | "ar"; 
             );
           })}
         </fieldset>
-        {!more && all.length > 5 && <button type="button" onClick={() => setMore(true)} className="press min-h-[44px] text-[16px] font-medium text-ink-2 underline underline-offset-4">{t.more}</button>}
+        {!more && all.length > FIRST.length && <button type="button" onClick={() => setMore(true)} className="press min-h-[44px] text-[16px] font-medium text-ink-2 underline underline-offset-4">{t.more}</button>}
         <label htmlFor="words" className="block pt-2 text-[15px] font-semibold text-ink-2">{t.words}</label>
         <textarea id="words" rows={3} dir={lang === "ar" ? "rtl" : "ltr"} value={text} onChange={(e) => setText(e.target.value)} className="w-full resize-none rounded-lg border-[1.5px] border-rule-strong bg-sheet px-3.5 py-3 text-[16px] leading-[1.6]" />
         <div className="pt-2"><BigButton disabled={(!codes.length && !text.trim()) || cmd.isPending} onClick={() => report(codes, text)}>{t.send}</BigButton></div>

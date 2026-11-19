@@ -49,6 +49,16 @@ checks:
 
 escalation_ladder: [owner, clinic_lead, program_coordinator]
 
+# National quality indicators, measured on verified clinical evidence rather than referral status.
+# UAE National Guideline for Colorectal Cancer Screening and Diagnosis, 3rd edition 2022, Appendix 2.
+guideline:
+  source: "UAE National Guideline for Colorectal Cancer Screening and Diagnosis, 3rd edition 2022 (Ministry of Health and Prevention)"
+  targets:
+    - {id: referred, label: "Referred to colonoscopy after a positive FIT", stage: REFERRED,
+       acceptable: 0.90, desirable: 0.95}
+    - {id: colonoscopy_31_working_days, label: "Colonoscopy within 31 working days of referral",
+       stage: PROCEDURE_DONE, from_stage: REFERRED, working_days: 31, acceptable: 0.90, desirable: 0.95}
+
 playbooks:
   FEAR: {assignee_role: navigator, action: "Call to explain colonoscopy and sedation in the patient's language; offer a clinician call-back.", due_days: 1}
   PREP_UNCLEAR: {assignee_role: navigator, action: "Walk through bowel preparation step by step; repeat the teach-back check.", due_days: 1}
@@ -56,6 +66,7 @@ playbooks:
   TRANSPORT: {assignee_role: navigator, action: "Offer a closer in-network centre or transport support.", due_days: 2}
   COST_OR_INSURANCE: {assignee_role: coordinator, action: "Check coverage and route to an in-network centre; resolve pre-authorisation.", due_days: 2}
   TIME_OR_WORK: {assignee_role: navigator, action: "Offer evening or weekend slots; provide a sick-leave note on request.", due_days: 2}
+  FEMALE_CLINICIAN: {assignee_role: navigator, action: "Rebook with a female endoscopist at an in-network GI centre; confirm the new slot by phone.", due_days: 2}
   LANGUAGE: {assignee_role: navigator, action: "Book an interpreter and send instructions in the preferred language.", due_days: 1}
   WANTS_CALLBACK: {assignee_role: clinician, action: "Owner calls the patient back.", due_days: 1}
   DONE_ELSEWHERE: {assignee_role: clinician, action: "Request the report from the other provider; close as COMPLETED_ELSEWHERE only with evidence.", due_days: 3}

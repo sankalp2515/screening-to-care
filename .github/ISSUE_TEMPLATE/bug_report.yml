@@ -1,0 +1,36 @@
+name: Bug report
+description: Something in Tasleem does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Synthetic data only. Never paste real patient information. For security problems, use SECURITY.md instead."
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      options: [Staff console, Patient companion, Programme view, Live simulator, API, Notifier, AI agent, HL7 connector, Deployment, Other]
+    validations: {required: true}
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Which role (for example Dr. Fatima), which case, which clicks.
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations: {required: true}
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Include the error code shown on screen (for example R3_EVIDENCE_REQUIRED) if there is one.
+    validations: {required: true}
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: This may weaken a safety rule (R1–R6), the audit chain or the message policy

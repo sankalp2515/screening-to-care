@@ -13,7 +13,7 @@ export const BENCH = {
   statusDays: "14.4",
   falseDoneStatus: "125",
   falseDoneTasleem: "0",
-  tests: "233",
+  tests: "241",
   hardCases: "64 of 67",
 } as const;
 
@@ -30,10 +30,26 @@ export const REAL = {
   alertsPer100: "53.5",
   falseAlertPct: "0.2%",
   fpMinutesPerWeekMid: "3",
+  // Headline numbers, the same as the submission deck (REAL_WORLD_FIT.md, table rows "All journeys needing
+  // action, flagged" and "false done").
+  actionFlaggedTasleem: "99.9%",
+  actionFlaggedStatus: "81.8%",
+  falseDoneStatus: "160",
+  falseDoneTasleem: "0",
+} as const;
+
+/** Abu Dhabi baseline: SEHA ambulatory clinics, 2015-16 (Almansoori et al., BMC Cancer 2021). 933 positive
+ * tests had no colonoscopy; among the 436 who had one, 11 had cancer. 933 x 11 / 436 = 23.5 expected cancers. */
+export const SEHA = {
+  followedUp: "30.5%",
+  noColonoscopy: "933",
+  missedGiVisitPct: "36%",
+  expectedCancers: "About 24",
 } as const;
 
 /** Published literature used on the page. */
 export const LIT = {
+  seha: { url: "https://link.springer.com/article/10.1186/s12885-021-08623-9", cite: "Almansoori et al., BMC Cancer 2021 (SEHA clinics, Abu Dhabi)" },
   martin: { url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC5164844/", cite: "Martin et al., Am J Med 2017 (n = 1,267)" },
   forbes: { url: "https://www.sciencedirect.com/science/article/pii/S1542356520313781", cite: "Forbes et al., Clin Gastroenterol Hepatol 2021" },
   ciemins: { url: "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2816737", cite: "Ciemins et al., JAMA Netw Open 2024" },

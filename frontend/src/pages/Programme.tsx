@@ -29,6 +29,50 @@ function HBar({ data, color = "var(--ink-2)", height }: { data: { name: string; 
 
 const FILTERS = [["", "All"], ["org=org-ghaf", "Ghaf health centre"], ["org=org-samar", "Samar clinic"], ["language=ar", "Arabic"], ["language=en", "English"]];
 
+const STATUS: Record<string, { text: string; tone: "stop" | "attn" | "done" }> = {
+  below: { text: "Below the national target", tone: "stop" },
+  acceptable: { text: "Meets the acceptable level", tone: "attn" },
+  desirable: { text: "Meets the desirable level", tone: "done" },
+};
+const pct = (v: number) => `${Math.round(v * 100)}%`;
+
+/** UAE national guideline indicators, counted from clinical evidence. Hidden when the API does not send them. */
+function Guideline({ blocks }: { blocks?: any[] }) {
+  const g = blocks?.[0];
+  if (!g) return null;
+  return (
+    <Card className="p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-[16px] font-semibold">National guideline scorecard</h3>
+        <span className="text-[12px] text-muted">Counted from clinical evidence, not referral status</span>
+      </div>
+      <div className="mt-3 grid gap-4 md:grid-cols-2">
+        {g.targets.map((t: any) => {
+          const st = t.status ? STATUS[t.status] : null;
+          return (
+            <div key={t.id} className="rounded border border-rule bg-sheet p-3">
+              <p className="text-[14px] text-ink-2">{t.label}</p>
+              <div className="mt-1 flex items-baseline gap-3">
+                <p className="serif text-[34px] font-semibold leading-[40px] tnum">{t.rate == null ? "–" : pct(t.rate)}</p>
+                {st && <Tag tone={st.tone}>{st.text}</Tag>}
+              </div>
+              <div className="relative mt-2 h-2 rounded-full bg-sheet-2" role="img" aria-label={`${t.rate == null ? "no data" : pct(t.rate)} against a target of ${pct(t.acceptable)} acceptable and ${pct(t.desirable)} desirable`}>
+                <div className={cx("h-2 rounded-full", st?.tone === "done" ? "bg-done" : st?.tone === "attn" ? "bg-attn" : "bg-stop")} style={{ width: `${Math.round((t.rate ?? 0) * 100)}%` }} />
+                <span className="absolute -top-1 h-4 w-px bg-ink" style={{ left: `${t.acceptable * 100}%` }} aria-hidden />
+              </div>
+              <p className="mt-2 text-[13px] text-muted tnum">
+                {t.met} of {t.due} · target {pct(t.acceptable)} acceptable, above {pct(t.desirable)} desirable
+                {t.pending ? ` · ${t.pending} still inside the ${t.window_working_days}-working-day window` : ""}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-[12px] text-muted">{g.source}, Appendix 2. Working days are Monday to Friday; public holidays are not counted.</p>
+    </Card>
+  );
+}
+
 function Measures() {
   const [filter, setFilter] = useState("");
   const m = useMetrics(filter);
@@ -74,6 +118,7 @@ function Measures() {
                 <p className="serif mt-1 text-[40px] font-semibold leading-[44px] tnum">{x.median_days_result_to_procedure ?? "–"}</p>
               </div>
             </div>
+            <Guideline blocks={x.guideline} />
             <div className="grid gap-6 lg:grid-cols-2">
               {Object.entries<any>(x.by_pathway).map(([id, p]) => (
                 <Card key={id} className="p-4">
@@ -158,7 +203,7 @@ function Usage() {
 }
 
 function Benchmark() {
-  const rows = [["Reminders only", "0%", "–", "–"], ["Malaffi status only", "70.1%", "14.4", "125"], ["Tasleem", "98.5%", "4.0", "0"]];
+  const rows = [["Reminders only", "0.0%", "–", "–"], ["Malaffi status only", "81.8%", "16.5", "160"], ["Tasleem", "99.9%", "1.9", "0"]];
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2"><Card className="p-4"><BenchmarkChart /></Card><StatTiles /></div>
@@ -168,8 +213,8 @@ function Benchmark() {
           <tbody className="divide-y divide-rule">{rows.map((r) => <tr key={r[0]} className={cx(r[0] === "Tasleem" && "font-semibold")}>{r.map((v, i) => <td key={i} className={cx("px-4 py-3", i > 0 && "mono")}>{v}</td>)}</tr>)}</tbody>
         </table>
       </Card>
-      <p className="text-[14px] text-ink-2">Clean journeys falsely alerted: <span className="mono">0.0%</span>. Staff alerts per 100 patients: <span className="mono">38.5</span> for status only vs <span className="mono">66.4</span> for Tasleem: more alerts, each naming one person and one action; they are the stalls status-only monitoring misses.</p>
-      <p className="text-[13px] text-muted">Synthetic cohort of 1,000 patients, three seeds. This tests the software, not patient outcomes; that needs a clinical pilot. <a className="text-biro underline underline-offset-2" href={EVIDENCE_URL} target="_blank" rel="noreferrer">Read the evidence</a></p>
+      <p className="text-[14px] text-ink-2">Clean journeys falsely alerted: <span className="mono">0.0%</span> for status only vs <span className="mono">0.2%</span> for Tasleem. Staff alerts per 100 patients: <span className="mono">38.5</span> vs <span className="mono">53.5</span>: more alerts, each naming one person and one action; they are the stalls status-only monitoring misses.</p>
+      <p className="text-[13px] text-muted">Synthetic cohort of 2,000 patients with a published failure mix (Martin 2017), three seeds. This tests the software, not patient outcomes; that needs a clinical pilot. <a className="text-biro underline underline-offset-2" href={EVIDENCE_URL} target="_blank" rel="noreferrer">Read the evidence</a></p>
     </div>
   );
 }

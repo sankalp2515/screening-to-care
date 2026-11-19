@@ -6,7 +6,7 @@ import threading
 import time
 from collections import Counter
 from collections.abc import Callable, Iterable
-from datetime import datetime
+from datetime import UTC, date, datetime, timedelta
 from statistics import median
 from typing import Any
 
@@ -39,6 +39,7 @@ BARRIER_LABELS: dict[BarrierCode, dict[str, str]] = {
     BarrierCode.COST_OR_INSURANCE: {"en": "Cost or insurance", "ar": "التكلفة أو التأمين"},
     BarrierCode.TIME_OR_WORK: {"en": "Work or no time", "ar": "العمل أو ضيق الوقت"},
     BarrierCode.LANGUAGE: {"en": "I need an interpreter", "ar": "أحتاج إلى مترجم"},
+    BarrierCode.FEMALE_CLINICIAN: {"en": "I would prefer a female doctor", "ar": "أفضّل أن تُجري الفحص طبيبة"},
     BarrierCode.WANTS_CALLBACK: {"en": "Please call me", "ar": "أريد أن يتصل بي أحد"},
     BarrierCode.DONE_ELSEWHERE: {"en": "I had the test somewhere else", "ar": "أجريت الفحص في مكان آخر"},
     BarrierCode.OTHER: {"en": "Something else", "ar": "سبب آخر"},
@@ -278,6 +279,10 @@ class MetricsService:
         false_done: list[str] = []
         total = open_ = admin_done = verified_done = distress = ownerless = 0
         days_to_procedure: list[float] = []
+        now = datetime.now(UTC)
+        # pathway -> target -> [met, due, pending]
+        guide: dict[str, dict[str, list[int]]] = {
+            p.id: {t.id: [0, 0, 0] for t in p.guideline.targets} for p in pathways.values() if p.guideline}
 
         for doc in self._load():
             s = CaseState.model_validate(doc)
@@ -316,6 +321,23 @@ class MetricsService:
             proc = p.checks.procedure_stage
             if proc and proc in s.stages:
                 days_to_procedure.append((s.stages[proc].reached_at - s.opened_at).total_seconds() / 86400)
+            if p.guideline:
+                for t in p.guideline.targets:
+                    tally = guide[p.id][t.id]
+                    if t.from_stage is None:
+                        tally[1] += 1
+                        tally[0] += t.stage in s.stages
+                        continue
+                    if t.from_stage not in s.stages:
+                        continue
+                    start = s.stages[t.from_stage].reached_at
+                    if t.stage in s.stages:
+                        tally[1] += 1
+                        tally[0] += working_days_between(start, s.stages[t.stage].reached_at) <= t.working_days
+                    elif working_days_between(start, now) > t.working_days:
+                        tally[1] += 1  # window closed without the step: a miss
+                    else:
+                        tally[2] += 1  # still inside the window
 
         by_pathway = {
             p.id: {"name": p.name, "cases": cases_by_pathway[p.id],
@@ -337,4 +359,33 @@ class MetricsService:
             "median_days_result_to_procedure": round(median(days_to_procedure), 1) if days_to_procedure else None,
             "open_distress": distress,
             "open_cases_without_owner": ownerless,
+            "guideline": [
+                {"pathway_id": p.id, "source": p.guideline.source,
+                 "targets": [_target_row(t, *guide[p.id][t.id]) for t in p.guideline.targets]}
+                for p in pathways.values() if p.guideline
+            ],
         }
+
+
+def working_days_between(start: datetime, end: datetime) -> int:
+    """UAE working days (Monday to Friday since 2022) after `start`'s date, up to and including `end`'s date.
+    Public holidays are not modelled, so this slightly favours the provider."""
+    d0, d1 = to_utc(start).date(), to_utc(end).date()
+    if d1 <= d0:
+        return 0
+    full, rem = divmod((d1 - d0).days, 7)
+    return full * 5 + sum(1 for i in range(1, rem + 1) if _weekday(d0, full * 7 + i) < 5)
+
+
+def _weekday(d: date, plus_days: int) -> int:
+    return (d + timedelta(days=plus_days)).weekday()
+
+
+def _target_row(t: Any, met: int, due: int, pending: int) -> dict[str, Any]:
+    rate = met / due if due else None
+    status = None if rate is None else ("below" if rate < t.acceptable else
+                                        "desirable" if rate > t.desirable else "acceptable")
+    return {"id": t.id, "label": t.label, "met": met, "due": due, "pending": pending,
+            "rate": round(rate, 3) if rate is not None else None,
+            "acceptable": t.acceptable, "desirable": t.desirable, "status": status,
+            "window_working_days": t.working_days}

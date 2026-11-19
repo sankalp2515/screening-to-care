@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Compass, Smartphone } from "lucide-react";
 import { resetDemo } from "../lib/demo";
-import { usePeople } from "../lib/api";
+import { MODE, caseIdForPatient, request, usePeople } from "../lib/api";
+import type { ApiError } from "../lib/types";
 import { usePersona } from "../lib/persona";
 import { initials, label, ROLE_LABELS, shortName } from "../lib/labels";
 import { Wordmark } from "../components/Wordmark";
-import { Button, Dialog, useToast } from "../components/ui";
+import { Button, Dialog, toastError, useToast } from "../components/ui";
 
 const LINES: Record<string, string> = {
   "dr-fatima": "Owns Rajesh's false “completed” and Noura's missed appointment",
@@ -28,9 +29,22 @@ export default function DemoPicker() {
   const qc = useQueryClient();
   const toast = useToast();
   const [confirm, setConfirm] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const people = usePeople();
   const dir = people.data ?? { staff: [], patients: [] };
   const pick = (id: string, to: string) => { setPersona(id); nav(to); };
+  // The tour opens straight on the headline case: Rajesh, "completed" in Malaffi with no colonoscopy.
+  const startTour = async () => {
+    setPersona("dr-fatima");
+    setTour({ open: true, step: 0 });
+    const id = await caseIdForPatient("p-rajesh", "dr-fatima").catch(() => null);
+    nav(id ? `/app/cases/${id}` : "/app/work");
+  };
+  // The landing page's main button links here with ?tour=1, so the tour starts in one click.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("tour") === "1") void startTour();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const staffOrder = ["dr-fatima", "nav-aisha", "dr-salma", "dr-hessa", "coord-sara", "dr-omar", "dr-lina"];
   const staff = [...dir.staff].sort((a: { id: string }, b: { id: string }) => staffOrder.indexOf(a.id) - staffOrder.indexOf(b.id));
   const patients = [...dir.patients].sort((a: { id: string }, b: { id: string }) => Number(!LINES[a.id]) - Number(!LINES[b.id]));
@@ -53,7 +67,7 @@ export default function DemoPicker() {
         <h1 className="text-[40px] font-semibold leading-[46px]">Try <em className="font-medium">Tasleem</em></h1>
         <p className="mt-2 text-[17px] text-ink-2">Choose who you are. Everything here is synthetic.</p>
 
-        <button type="button" onClick={() => { setPersona("dr-fatima"); setTour({ open: true, step: 0 }); nav("/app/work"); }}
+        <button type="button" onClick={() => void startTour()}
           className="press-wide mt-8 flex w-full items-center gap-5 rounded border-2 border-biro bg-biro-wash p-5 text-start hover:bg-[#E3E9FB]">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-biro text-white"><Compass size={22} aria-hidden /></span>
           <span className="flex-1">
@@ -75,10 +89,20 @@ export default function DemoPicker() {
           <Link to="/" className="inline-flex h-10 items-center px-2 text-[14px] font-semibold text-ink-2 hover:underline">Back to site</Link>
         </div>
       </main>
-      <Dialog open={confirm} onOpenChange={setConfirm} title="Reset the demo?" description="Every change you made in this browser goes back to the recorded starting point.">
+      <Dialog open={confirm} onOpenChange={setConfirm} title="Reset the demo?"
+        description={MODE === "live"
+          ? "The live demo is shared. This puts every synthetic case back to its starting point for everyone using it."
+          : "Every change you made in this browser goes back to the recorded starting point."}>
         <div className="flex justify-end gap-2">
           <Button variant="quiet" onClick={() => setConfirm(false)}>Cancel</Button>
-          <Button variant="danger" onClick={() => { resetDemo(); qc.clear(); setConfirm(false); toast({ tone: "done", text: "Demo reset to the recorded starting point." }); }}>Reset demo</Button>
+          <Button variant="danger" disabled={resetting} onClick={async () => {
+            setResetting(true);
+            try {
+              if (MODE === "live") await request("core", "POST", "/v1/admin/reset-demo", {}, "coord-sara");
+              resetDemo(); qc.clear(); setConfirm(false);
+              toast({ tone: "done", text: "Demo reset to the starting point." });
+            } catch (e) { toastError(toast, e as ApiError); } finally { setResetting(false); }
+          }}>Reset demo</Button>
         </div>
       </Dialog>
     </div>

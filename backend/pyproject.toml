@@ -28,6 +28,8 @@ redis = ["redis>=5.0"]
 # Upper bound: the adapter was written against the 0.x SDK surface (beta.messages.parse + output_format).
 agent = ["anthropic>=0.105,<1"]
 dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.4"]
+# Only for redrawing docs/evidence/benchmark.png; the benchmark numbers do not need it.
+bench = ["matplotlib>=3.8"]
 
 [tool.setuptools.packages.find]
 # One repository, several deployable services: tasleem (case-core API + scheduler), tasleem_notifier,

@@ -27,7 +27,18 @@ export function installBundle(bundle: any) {
   session.unreachableRun = false;
 }
 
+/** The false-done case this browser created, so "GI centre sends the report" can name it (the live API needs its id). */
+const FD_KEY = "tasleem.falseDoneCase";
+export function rememberFalseDone(caseId?: string) {
+  session.falseDoneRun = true;
+  try { if (caseId) sessionStorage.setItem(FD_KEY, caseId); } catch { /* private mode: the session flag still works */ }
+}
+export function falseDoneCase(): string | null {
+  try { return sessionStorage.getItem(FD_KEY); } catch { return null; }
+}
+
 export function resetDemo() {
+  try { sessionStorage.removeItem(FD_KEY); } catch { /* ignore */ }
   if (!original) return;
   state = structuredClone(original);
   session.falseDoneRun = false;
