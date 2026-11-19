@@ -3,11 +3,14 @@ falls back to deterministic templates, so the agent works fully offline and neve
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
 import re
+import threading
 import time
+from collections import OrderedDict
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Protocol, TypeVar
@@ -91,8 +94,18 @@ PRESETS: dict[str, dict[str, str]] = {
                "model": "meta/llama-3.3-70b-instruct"},
     "openrouter": {"base_url": "https://openrouter.ai/api/v1", "key_env": "OPENROUTER_API_KEY",
                    "model": "meta-llama/llama-3.3-70b-instruct:free"},
+    # Azure OpenAI v1 API: base URL https://<resource>.openai.azure.com/openai/v1, model = the deployment name.
+    "azure_openai": {"base_url": "", "key_env": "AZURE_OPENAI_API_KEY", "model": "gpt-5-mini"},
     "openai_compat": {"base_url": "", "key_env": "AGENT_LLM_API_KEY", "model": ""},
 }
+
+# Reasoning models reject `temperature` and `max_tokens`; they take `max_completion_tokens` (which also
+# covers their hidden reasoning) and `reasoning_effort` instead.
+_REASONING_MODEL = re.compile(r"^(?:[\w.-]+/)?(?:gpt-5|o\d)", re.IGNORECASE)
+
+
+def is_reasoning_model(model: str) -> bool:
+    return bool(_REASONING_MODEL.match(model))
 
 # Replies that mean the configuration is wrong (key, model name, URL), not a one-off failure.
 CONFIG_ERRORS = frozenset({400, 401, 403, 404, 422})
@@ -119,12 +132,14 @@ class OpenAICompatProvider:
     def __init__(self, base_url: str, api_key: str, model: str, *, name: str = "openai_compat",
                  timeout: float = 20.0, max_retries: int = 2, max_wait: float = 20.0,
                  transport: httpx.BaseTransport | None = None,
-                 sleep: Callable[[float], None] = time.sleep) -> None:
+                 sleep: Callable[[float], None] = time.sleep, reasoning_effort: str = "low") -> None:
         if not base_url or not api_key or not model:
             raise ValueError("base_url, api_key and model are all required")
         self.client = httpx.Client(base_url=base_url.rstrip("/"), timeout=timeout, transport=transport,
                                    headers={"Authorization": f"Bearer {api_key}"})
         self.model = model
+        self.reasoning = is_reasoning_model(model)
+        self.reasoning_effort = reasoning_effort
         self.max_retries = max_retries
         self.max_wait = max_wait
         self._sleep = sleep
@@ -160,9 +175,16 @@ class OpenAICompatProvider:
     def structured(self, system: str, user: str, schema: type[T]) -> T | None:
         sys_prompt = (f"{system}\n\nReply with one JSON object only, no prose, matching this JSON Schema:\n"
                       f"{json.dumps(schema.model_json_schema())}")
-        body: dict[str, Any] = {"model": self.model, "temperature": 0, "max_tokens": 2000,
+        body: dict[str, Any] = {"model": self.model,
                                 "messages": [{"role": "system", "content": sys_prompt},
                                              {"role": "user", "content": user}]}
+        if self.reasoning:
+            body["max_completion_tokens"] = 6000
+            if self.reasoning_effort:
+                body["reasoning_effort"] = self.reasoning_effort
+        else:
+            body["temperature"] = 0
+            body["max_tokens"] = 2000
         if self._json_mode:
             body["response_format"] = {"type": "json_object"}
         r = self._post(body)
@@ -193,6 +215,69 @@ class OpenAICompatProvider:
             return None
 
 
+class CachedProvider:
+    """Remembers each successful model reply, so one case state costs one model call however often it is viewed.
+
+    Every prompt is built only from the case's recorded facts or an approved template, so the key changes
+    exactly when the case changes; a cached reply is never stale. Failures are not cached, so the next view
+    tries again. After a rate-limit reply (HTTP 429) the model is skipped for `cooldown` seconds and the
+    caller uses templates at once instead of waiting. Memory only, bounded, gone on restart: nothing is
+    written to disk. A cached reply still goes through the same validators as a fresh one.
+    """
+
+    def __init__(self, inner: LLMProvider, max_entries: int = 512, cooldown: float = 60.0,
+                 clock: Callable[[], float] = time.monotonic) -> None:
+        self.inner = inner
+        self.name = inner.name
+        self.max_entries = max_entries
+        self.cooldown = cooldown
+        self._clock = clock
+        self._cache: OrderedDict[str, BaseModel] = OrderedDict()
+        self._lock = threading.Lock()
+        self._paused_until = 0.0
+        self.hits = 0
+        self.calls = 0
+
+    @staticmethod
+    def _key(system: str, user: str, schema: type[BaseModel]) -> str:
+        return hashlib.sha256(f"{schema.__name__}\0{system}\0{user}".encode()).hexdigest()
+
+    def structured(self, system: str, user: str, schema: type[T]) -> T | None:
+        key = self._key(system, user, schema)
+        with self._lock:
+            hit = self._cache.get(key)
+            if hit is not None:
+                self._cache.move_to_end(key)
+                self.hits += 1
+                return hit.model_copy(deep=True)  # type: ignore[return-value]
+            if self._clock() < self._paused_until:
+                return None
+            self.calls += 1
+        out = self.inner.structured(system, user, schema)
+        with self._lock:
+            if out is None:
+                if getattr(self.inner, "last_status", None) == 429:
+                    self._paused_until = self._clock() + self.cooldown
+                    log.warning("LLM rate limited; templates for the next %.0f s", self.cooldown)
+                return None
+            self._cache[key] = out.model_copy(deep=True)
+            while len(self._cache) > self.max_entries:
+                self._cache.popitem(last=False)
+        return out
+
+    def stats(self) -> dict[str, Any]:
+        with self._lock:
+            return {"entries": len(self._cache), "hits": self.hits, "model_calls": self.calls,
+                    "paused": self._clock() < self._paused_until}
+
+
+def with_cache(llm: LLMProvider, max_entries: int, cooldown: float) -> LLMProvider:
+    """Wrap a real model in the cache. Offline templates and a disabled cache (0 entries) pass through."""
+    if isinstance(llm, OfflineProvider) or max_entries <= 0:
+        return llm
+    return CachedProvider(llm, max_entries=max_entries, cooldown=cooldown)
+
+
 def _env(name: str, dotenv: str | Path = ".env") -> str:
     """A key from the environment, else from a local .env file (git- and docker-ignored)."""
     if os.environ.get(name):
@@ -209,24 +294,24 @@ def _env(name: str, dotenv: str | Path = ".env") -> str:
 
 
 def make_openai_compat(kind: str, model: str = "", timeout: float = 20.0, base_url: str = "",
-                       api_key: str = "") -> OpenAICompatProvider:
+                       api_key: str = "", reasoning_effort: str = "low") -> OpenAICompatProvider:
     preset = PRESETS[kind]
     key = api_key or _env(preset["key_env"]) or _env("AGENT_LLM_API_KEY")
     if not key:
         raise ValueError(f"no API key: set {preset['key_env']}")
     return OpenAICompatProvider(base_url or preset["base_url"], key, model or preset["model"], name=kind,
-                                timeout=timeout)
+                                timeout=timeout, reasoning_effort=reasoning_effort)
 
 
 def make_provider(kind: str, model: str, timeout: float, *, base_url: str = "",
-                  api_key: str = "") -> LLMProvider:
+                  api_key: str = "", reasoning_effort: str = "low") -> LLMProvider:
     """Build the configured provider. A misconfigured model provider never stops the agent: it logs the
     reason and runs on templates."""
     try:
         if kind == "claude":
             return ClaudeProvider(model=model or "claude-opus-5-5", timeout=timeout)
         if kind in PRESETS:
-            return make_openai_compat(kind, model, timeout, base_url, api_key)
+            return make_openai_compat(kind, model, timeout, base_url, api_key, reasoning_effort)
     except (ImportError, ValueError) as exc:
         log.warning("LLM provider %s not available (%s); using templates", kind, exc)
     return OfflineProvider()

@@ -1,0 +1,9 @@
+# HTTPS with an automatic Let's Encrypt certificate; plain HTTP redirects to HTTPS.
+{$SITE_HOST} {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+	reverse_proxy web:8080
+}

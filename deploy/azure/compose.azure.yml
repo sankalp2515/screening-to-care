@@ -1,0 +1,81 @@
+# Azure overlay for docker-compose.yml. Synthetic data only.
+#   docker compose -f docker-compose.yml -f deploy/azure/compose.azure.yml --env-file /opt/tasleem/secrets.env up -d
+# What changes against the local stack:
+#   - Postgres is Azure Database for PostgreSQL (managed, encrypted, daily backups); the local db container is off.
+#   - No service port is published. Caddy is the only way in: HTTPS on 443 (80 only redirects), in front of the
+#     web gateway, which proxies /api/<service>/ to the services on the private Docker network.
+#   - Every secret comes from Azure Key Vault through the server's managed identity (fetch-secrets.sh), never
+#     from this repository: database URLs, the per-service integration keys, the Azure OpenAI key.
+#   - The agent drafts with Azure OpenAI (gpt-5-mini). Templates still take over on any model failure.
+# Needs Docker Compose 2.24+ for !reset.
+
+x-core-env: &azure-core-env
+  TASLEEM_DATABASE_URL: ${CORE_DB_URL:?run fetch-secrets.sh}
+  TASLEEM_REDIS_URL: redis://redis:6379/0
+  TASLEEM_DEMO_MODE: "true"            # role picker for judges: guest access is a submission requirement
+  TASLEEM_AUTO_CREATE_SCHEMA: "false"
+  TASLEEM_INTEGRATION_KEYS: ${CORE_INTEGRATION_KEYS:?run fetch-secrets.sh}
+  TASLEEM_RATE_LIMIT_PER_SECOND: "50"
+  TASLEEM_RATE_LIMIT_BURST: "200"
+
+services:
+  db:
+    profiles: ["local-db"]   # never started on Azure
+  migrate:
+    environment: *azure-core-env
+    depends_on: !reset {}
+  api:
+    environment:
+      <<: *azure-core-env
+      TASLEEM_SEED_ON_START: "true"
+      TASLEEM_SCHEDULER_INTERVAL_SECONDS: "0"
+    ports: !reset []
+    restart: unless-stopped
+  scheduler:
+    environment: *azure-core-env
+    restart: unless-stopped
+  notifier:
+    environment:
+      NOTIFIER_DATABASE_URL: ${NOTIFIER_DB_URL:?run fetch-secrets.sh}
+      NOTIFIER_CORE_INTEGRATION_KEY: ${NOTIFIER_KEY:?run fetch-secrets.sh}
+    ports: !reset []
+    restart: unless-stopped
+  agent:
+    environment:
+      AGENT_DATABASE_URL: ${AGENT_DB_URL:?run fetch-secrets.sh}
+      AGENT_LLM_PROVIDER: azure_openai
+      AGENT_LLM_MODEL: ${AZURE_OPENAI_DEPLOYMENT:-gpt-5-mini}
+      AGENT_LLM_BASE_URL: ${AZURE_OPENAI_BASE_URL:?run fetch-secrets.sh}
+      AGENT_LLM_REASONING_EFFORT: minimal
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:?run fetch-secrets.sh}
+      AGENT_RATE_LIMIT_PER_SECOND: "5"
+      AGENT_RATE_LIMIT_BURST: "30"
+    env_file: !reset []
+    ports: !reset []
+    restart: unless-stopped
+  connector:
+    environment:
+      CONNECTOR_CORE_INTEGRATION_KEY: ${CONNECTOR_KEY:?run fetch-secrets.sh}
+    ports: !reset []
+    restart: unless-stopped
+  redis:
+    restart: unless-stopped
+  web:
+    ports: !reset []
+    restart: unless-stopped
+  caddy:
+    image: caddy:2.10-alpine
+    depends_on:
+      web: {condition: service_healthy}
+    ports: ["80:80", "443:443"]
+    environment:
+      SITE_HOST: ${SITE_HOST:?set SITE_HOST}
+    volumes:
+      - ./deploy/azure/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+volumes:
+  caddy-data:
+  caddy-config:

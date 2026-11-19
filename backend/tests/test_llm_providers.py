@@ -129,7 +129,7 @@ def test_malformed_envelope_falls_back():
 
 def test_presets_and_factory(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)  # never read the developer's real backend/.env
-    assert set(PRESETS) == {"groq", "gemini", "nvidia", "openrouter", "openai_compat"}
+    assert set(PRESETS) == {"groq", "gemini", "nvidia", "openrouter", "azure_openai", "openai_compat"}
     for name in ("groq", "gemini", "nvidia", "openrouter"):
         assert PRESETS[name]["base_url"].startswith("https://")
     for env in ("GROQ_API_KEY", "GEMINI_API_KEY", "NVIDIA_API_KEY", "OPENROUTER_API_KEY", "AGENT_LLM_API_KEY"):
@@ -198,3 +198,66 @@ def test_key_is_read_from_a_dotenv_file(tmp_path, monkeypatch):
     assert _env("MISSING", f) == "" and _env("GROQ_API_KEY", tmp_path / "nope") == ""
     monkeypatch.setenv("GROQ_API_KEY", "from-shell")
     assert _env("GROQ_API_KEY", f) == "from-shell"
+
+
+# --- Reasoning models (gpt-5 family on Azure OpenAI): different request parameters -------------------
+
+
+@pytest.mark.parametrize("model,reasoning", [
+    ("gpt-5-mini", True), ("GPT-5", True), ("openai/gpt-5-nano", True), ("o4-mini", True), ("o3", True),
+    ("gpt-4o-mini", False), ("openai/gpt-oss-120b", False), ("meta/llama-3.3-70b-instruct", False),
+    ("gemini-3.5-flash", False), ("", False),
+])
+def test_reasoning_models_are_recognised_by_name(model, reasoning):
+    from tasleem_agent.providers import is_reasoning_model
+
+    assert is_reasoning_model(model) is reasoning
+
+
+def test_reasoning_model_request_drops_temperature_and_uses_completion_tokens():
+    seen: list[httpx.Request] = []
+
+    def h(r):
+        seen.append(r)
+        return httpx.Response(200, json=_reply('{"code": "COST_OR_INSURANCE", "confidence": 0.8}'))
+
+    p = OpenAICompatProvider("https://res.openai.azure.com/openai/v1", SECRET, "gpt-5-mini", name="azure_openai",
+                             transport=httpx.MockTransport(h), reasoning_effort="minimal")
+    want = BarrierSuggestion(code="COST_OR_INSURANCE", confidence=0.8)
+    assert suggest_barrier("I cannot afford the copay", p) == want
+    body = json.loads(seen[0].content)
+    assert "temperature" not in body and "max_tokens" not in body
+    assert body["max_completion_tokens"] >= 2000 and body["reasoning_effort"] == "minimal"
+    assert body["response_format"] == {"type": "json_object"}
+    assert str(seen[0].url) == "https://res.openai.azure.com/openai/v1/chat/completions"
+    assert p.name == "azure_openai:gpt-5-mini"
+
+
+def test_non_reasoning_model_request_is_unchanged():
+    p, seen, _ = _provider(lambda r, n: httpx.Response(200, json=_reply('{"code": "FEAR", "confidence": 0.6}')))
+    suggest_barrier("I am scared of the test", p)
+    body = json.loads(seen[0].content)
+    assert body["temperature"] == 0 and body["max_tokens"] == 2000
+    assert "reasoning_effort" not in body and "max_completion_tokens" not in body
+
+
+def test_azure_openai_preset_needs_base_url_and_reads_its_own_key(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    for env in ("AZURE_OPENAI_API_KEY", "AGENT_LLM_API_KEY"):
+        monkeypatch.delenv(env, raising=False)
+    assert isinstance(make_provider("azure_openai", "", 5, base_url="https://r.openai.azure.com/openai/v1"),
+                      OfflineProvider)  # no key: templates
+    monkeypatch.setenv("AZURE_OPENAI_API_KEY", SECRET)
+    assert isinstance(make_provider("azure_openai", "", 5), OfflineProvider)  # no base URL: templates
+    p = make_provider("azure_openai", "", 5, base_url="https://r.openai.azure.com/openai/v1", reasoning_effort="low")
+    assert isinstance(p, OpenAICompatProvider) and p.name == "azure_openai:gpt-5-mini"
+    assert p.reasoning and p.reasoning_effort == "low"
+
+
+def test_agent_settings_accept_azure_openai(monkeypatch):
+    from tasleem_agent.app import AgentSettings
+
+    monkeypatch.setenv("AGENT_LLM_PROVIDER", "azure_openai")
+    monkeypatch.setenv("AGENT_LLM_REASONING_EFFORT", "minimal")
+    s = AgentSettings(_env_file=None)
+    assert s.llm_provider == "azure_openai" and s.llm_reasoning_effort == "minimal"

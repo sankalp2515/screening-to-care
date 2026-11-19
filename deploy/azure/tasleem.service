@@ -1,0 +1,19 @@
+# /etc/systemd/system/tasleem.service: start the stack at boot, after fresh secrets from Key Vault.
+[Unit]
+Description=Tasleem prototype stack
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/tasleem/app
+EnvironmentFile=/opt/tasleem/vault.env
+ExecStartPre=/opt/tasleem/app/deploy/azure/fetch-secrets.sh
+ExecStart=/usr/bin/docker compose -p tasleem -f docker-compose.yml -f deploy/azure/compose.azure.yml --env-file /opt/tasleem/secrets.env up -d --remove-orphans
+ExecStop=/usr/bin/docker compose -p tasleem -f docker-compose.yml -f deploy/azure/compose.azure.yml --env-file /opt/tasleem/secrets.env down
+TimeoutStartSec=1200
+
+[Install]
+WantedBy=multi-user.target

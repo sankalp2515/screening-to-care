@@ -210,3 +210,30 @@ Known flaky test (not changed): `test_workflow.py::test_outbox_notifies_named_pe
 | P7 | **Escalation gives the power to reassign** | Dr. Hessa (clinic lead), a stall escalated to her; offers the case to dr-salma | allowed; owner unchanged until dr-salma accepts (R2); a clinician with no escalation is still refused | **failed before the fix** (R2_NOT_OWNER: the lead could see a stuck case but not move it); pass after | domain/engine.py `offer_handoff` |
 | P8 | Next step offers only real actions | handoff waiting (HANDOFF_NOT_ACCEPTED) | text names accept or decline, not "withdraw" (no such command) | changed | domain/actions.py |
 | P9 | Whole simulation, LLM agents (groq `openai/gpt-oss-120b`, free tier) | 11 personas × 2 rounds × up to 3 steps, shared world | every check passes | before the fixes: 31 of 36 (5 failures, P1–P3); after: **42 of 42**; 0 server errors; 0 lost turns | bench/personas.py |
+
+## AI helper reply cache (18 Nov)
+Why: the free Groq tier allows 8,000 tokens a minute and 200,000 a day, and every open of the Assistant tab asks for a brief and a patient draft (about 3,500 tokens each). Without a cache, roughly 25–30 views a day would use up the model. The cache changes cost only, never content: a cached reply passes the same validators as a fresh one.
+
+| # | Case | Input | Expected | Actual | Component |
+|---|---|---|---|---|---|
+| C1 | Same case state viewed twice | the same prompt twice | one model call; the second reply is a copy the caller cannot alter | pass | tasleem_agent/providers.py `CachedProvider` |
+| C2 | The case changed | a new fact (or another output type) | a new model call | pass | `CachedProvider._key` |
+| C3 | Model failed | no reply, then a reply | the failure is not cached; the next view asks again | pass | `CachedProvider` |
+| C4 | Rate limited (HTTP 429) | a 429, then another view within 60 s | templates at once with no model call and no wait; the model is used again after the cooldown | pass | `CachedProvider` cooldown |
+| C5 | Memory bound | 3 prompts, limit 2 | 2 entries kept (oldest dropped) | pass | `CachedProvider` |
+| C6 | No model or cache off | offline templates; `AGENT_LLM_CACHE_ENTRIES=0` | not wrapped | pass | `with_cache` |
+| C7 | Assistant opened twice, then the patient reports a barrier | Yousef's case, `GET /assist` ×2, barrier, `GET /assist` | 1 brief call for the first two opens, still labelled AI; a 2nd brief call after the barrier; `/healthz` shows the hits | pass | tasleem_agent/app.py |
+
+## Azure OpenAI and the live Azure deployment (19 Nov)
+Why: the AI helper moves from the Groq free tier to Azure OpenAI (`gpt-5-mini`, a reasoning model) on the team's Azure credit. Reasoning models reject `temperature` and `max_tokens`, so without this change every call would fail and the helper would silently fall back to templates.
+
+| # | Case | Input | Expected | Actual | Component |
+|---|---|---|---|---|---|
+| Z1 | Which models are reasoning models | `gpt-5-mini`, `GPT-5`, `openai/gpt-5-nano`, `o4-mini`, `o3` vs `gpt-4o-mini`, `openai/gpt-oss-120b`, Llama, Gemini, empty | first five yes, the rest no | pass (10 cases) | tasleem_agent/providers.py `is_reasoning_model` |
+| Z2 | Request to a reasoning model | barrier text to `gpt-5-mini`, effort `minimal` | no `temperature` or `max_tokens`; `max_completion_tokens` and `reasoning_effort` sent; JSON mode kept; reply validated | pass | `OpenAICompatProvider.structured` |
+| Z3 | Request to any other model | same text to a non-reasoning model | unchanged: `temperature` 0, `max_tokens` 2000, no reasoning fields | pass | `OpenAICompatProvider.structured` |
+| Z4 | `azure_openai` preset | no key; key but no base URL; key and base URL | templates; templates; provider `azure_openai:gpt-5-mini` | pass | `make_provider` |
+| Z5 | Settings | `AGENT_LLM_PROVIDER=azure_openai`, `AGENT_LLM_REASONING_EFFORT=minimal` | accepted | pass | tasleem_agent/app.py `AgentSettings` |
+| Z6 | Live model, real prompts (manual) | Yousef's seeded case, `GET /assist`; Arabic barrier text | brief and patient draft from the model, both pass the validators and the message policy; barrier `NO_ESCORT` | pass: 3.2 s at effort `minimal`, 7.2 s at `low`; `NO_ESCORT` 0.92 | Azure OpenAI Sweden Central, `gpt-5-mini` |
+| Z7 | Live Azure stack (manual) | `python -m tasleem.smoke --stack` against https://tasleem.swedencentral.cloudapp.azure.com/api/* | every check passes | **32 of 32** in 26 s; data then reset to the clean seed | deploy/azure |
+| Z8 | Exposure (manual) | ports 8000, 8020, 8080, 5432 from the internet; plain HTTP | closed; HTTP redirects to HTTPS | closed ×4; 308 to HTTPS | NSG, Caddy, Postgres firewall |

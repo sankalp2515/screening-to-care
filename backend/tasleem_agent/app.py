@@ -32,7 +32,7 @@ from tasleem_common.ratelimit import RateLimiter
 
 from .assist import draft_outreach, facts, make_brief, translate
 from .classify import suggest_barrier
-from .providers import LLMProvider, make_provider
+from .providers import CachedProvider, LLMProvider, make_provider, with_cache
 
 
 class AgentSettings(BaseSettings):
@@ -42,11 +42,19 @@ class AgentSettings(BaseSettings):
     database_url: str = "sqlite:///./agent.db"
     # offline (default) | claude (ANTHROPIC_API_KEY) | groq (GROQ_API_KEY) | gemini (GEMINI_API_KEY)
     # | nvidia (NVIDIA_API_KEY) | openai_compat (AGENT_LLM_BASE_URL + AGENT_LLM_API_KEY)
-    llm_provider: Literal["offline", "claude", "groq", "gemini", "nvidia", "openrouter", "openai_compat"] = "offline"
-    llm_model: str = ""  # empty: the provider's default model
+    # | azure_openai (AGENT_LLM_BASE_URL = https://<resource>.openai.azure.com/openai/v1 + AZURE_OPENAI_API_KEY)
+    llm_provider: Literal["offline", "claude", "groq", "gemini", "nvidia", "openrouter", "azure_openai",
+                          "openai_compat"] = "offline"
+    llm_model: str = ""  # empty: the provider's default model (Azure: the deployment name)
     llm_base_url: str = ""
     llm_api_key: SecretStr = SecretStr("")
     llm_timeout_seconds: float = 20.0
+    # Reasoning models only (gpt-5*, o*): minimal | low | medium | high. Short drafting tasks need little.
+    llm_reasoning_effort: str = "low"
+    # Same case state, same reply: free model tiers allow few calls a day. 0 turns the cache off.
+    llm_cache_entries: int = 512
+    # After a rate-limit reply, skip the model for this long and use templates at once.
+    llm_cooldown_seconds: float = 60.0
     # Drafting calls can cost money: a tighter limit than case-core.
     rate_limit_per_second: float = 2.0
     rate_limit_burst: int = 10
@@ -99,9 +107,11 @@ def create_app(settings: AgentSettings | None = None, core: ServiceClient | None
     Base.metadata.create_all(engine)
     sessions = sessionmaker(bind=engine, expire_on_commit=False)
     core = core or ServiceClient(settings.core_url, timeout=5.0, retries=1)
-    llm = llm or make_provider(settings.llm_provider, settings.llm_model, settings.llm_timeout_seconds,
-                               base_url=settings.llm_base_url,
-                               api_key=settings.llm_api_key.get_secret_value())
+    llm = llm or with_cache(make_provider(settings.llm_provider, settings.llm_model, settings.llm_timeout_seconds,
+                                          base_url=settings.llm_base_url,
+                                          api_key=settings.llm_api_key.get_secret_value(),
+                                          reasoning_effort=settings.llm_reasoning_effort),
+                            settings.llm_cache_entries, settings.llm_cooldown_seconds)
     limiter = RateLimiter(settings.rate_limit_per_second, settings.rate_limit_burst)
 
     app = FastAPI(title="Tasleem Agent", version="0.2.0",
@@ -174,8 +184,11 @@ def create_app(settings: AgentSettings | None = None, core: ServiceClient | None
         return d
 
     @app.get("/healthz")
-    def healthz() -> dict[str, str]:
-        return {"status": "ok", "llm": llm.name}
+    def healthz() -> dict[str, Any]:
+        out: dict[str, Any] = {"status": "ok", "llm": llm.name}
+        if isinstance(llm, CachedProvider):
+            out["llm_cache"] = llm.stats()
+        return out
 
     @app.get("/readyz")
     def readyz() -> dict[str, str]:
