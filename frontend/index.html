@@ -9,10 +9,30 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@700&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" />
   </head>
   <body>
-    <div id="root"></div>
+    <!-- First frame, in the HTML itself: visible at once while the app's code downloads; React replaces it on mount. -->
+    <div id="root">
+      <style>
+        .boot { min-height: 100dvh; display: grid; place-items: center; background: oklch(97.6% 0.011 88); color: oklch(21% 0.025 170); font: 500 15px/1.4 "Instrument Sans", system-ui, sans-serif; }
+        .boot-in { display: grid; gap: 18px; justify-items: center; }
+        .boot-mark { display: flex; align-items: center; gap: 10px; font: 700 26px/1 "Schibsted Grotesk", system-ui, sans-serif; letter-spacing: -0.03em; }
+        .boot-tray { display: grid; grid-template-columns: repeat(9, 18px); gap: 5px; padding: 8px; border-radius: 14px; background: oklch(93% 0.036 160 / 0.7); box-shadow: inset 0 1.5px 0 #fff; transform: rotate(-6deg); }
+        .boot-tray span { height: 34px; border-radius: 6px; background: oklch(99% 0.006 160 / 0.8); box-shadow: inset 0 0 0 1px oklch(86.5% 0.022 140); animation: boot 1.2s ease-in-out infinite; }
+        .boot-tray span:nth-child(n) { animation-delay: calc(var(--i) * 90ms); }
+        @keyframes boot { 0%, 100% { background: oklch(99% 0.006 160 / 0.8); } 50% { background: oklch(88% 0.08 160); } }
+        @media (prefers-reduced-motion: reduce) { .boot-tray span { animation: none; } }
+        .boot-note { color: oklch(49% 0.024 165); font-size: 14px; }
+      </style>
+      <div class="boot" role="status" aria-live="polite">
+        <div class="boot-in">
+          <div class="boot-mark"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="oklch(50% 0.13 160)"/><path d="M9 16.5l4.5 4.5L23 11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Tasleem</div>
+          <div class="boot-tray" aria-hidden="true"><span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"></span><span style="--i:3"></span><span style="--i:4"></span><span style="--i:5"></span><span style="--i:6"></span><span style="--i:7"></span><span style="--i:8"></span></div>
+          <p class="boot-note">Loading Tasleem…</p>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

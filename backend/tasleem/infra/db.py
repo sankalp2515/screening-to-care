@@ -46,6 +46,10 @@ class PractitionerRow(Base):
     role: Mapped[str] = mapped_column(String(40))
     org_id: Mapped[str] = mapped_column(ForeignKey("organizations.id"))
     lead_id: Mapped[str | None] = mapped_column(ForeignKey("practitioners.id"), nullable=True)
+    # Cover while away (TSL-160): until `away_until`, this person's work list and new escalations go to `cover_id`.
+    # Ownership does not move (R1 names the owner); the cover acts on their behalf.
+    away_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    cover_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
 
 class PatientRow(Base):

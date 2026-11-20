@@ -119,3 +119,25 @@ def test_scenarios_cover_the_loop(client):
     assert bp["pathway"]["id"] == "hypertension-screening" and bp["owner"]["id"] == "dr-fatima"
 
     assert client.post("/v1/demo/scenarios/nope").status_code == 404
+
+
+def test_obesity_pathway_is_configuration_only(client):
+    """TSL-187: a fourth IFHAS finding from one YAML file. A screening BMI of 30 or more opens a case with the
+    family physician as owner; every patient message in every pathway passes the message policy."""
+    from datetime import UTC, datetime
+
+    from tasleem.domain.messaging import check_patient_text
+    from tasleem.domain.pathways import PathwayRegistry
+    from tasleem.seed import LOINC, _cc, _iso
+
+    now = datetime.now(UTC)
+    bmi = {"resourceType": "Observation", "id": "obs-bmi-khalfan", "status": "final",
+           "subject": {"reference": "Patient/p-khalfan"}, "code": _cc(LOINC, "39156-5"),
+           "effectiveDateTime": _iso(now), "valueQuantity": {"value": 33.4, "unit": "kg/m2"}}
+    res = client.post("/v1/ingest/fhir", json=bmi).json()["results"][0]
+    opened = next(e for e in res["effects"] if e["effect"] == "opened")
+    assert opened["pathway_id"] == "obesity-screening" and opened["owner_id"]
+    for p in PathwayRegistry.from_dir("pathways").all():
+        for stage, texts in p.patient_messages.items():
+            for lang, text in texts.items():
+                assert check_patient_text(text) == [], (p.id, stage, lang, text)

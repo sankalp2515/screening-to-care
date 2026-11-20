@@ -236,17 +236,26 @@ def test_close_completed_case_and_reset_demo(client):
     people = client.get("/v1/directory/people").json()
     assert {p["id"] for p in people["staff"]} >= {"dr-fatima", "nav-aisha", "coord-sara"}
     out = client.post("/v1/admin/reset-demo").json()
-    assert out["seeded"] is True and out["cases"] == 12
+    assert out["seeded"] is True and out["cases"] == 14
 
 
 def test_working_days_follow_the_uae_week():
     from tasleem.services.views import working_days_between
+    NONE = frozenset()  # the week arithmetic alone; holidays have their own test
     fri = datetime(2026, 11, 20, 9, tzinfo=UTC)  # Friday
-    assert working_days_between(fri, fri) == 0
-    assert working_days_between(fri, fri + timedelta(days=1)) == 0   # Saturday
-    assert working_days_between(fri, fri + timedelta(days=3)) == 1   # Monday
-    assert working_days_between(fri, fri + timedelta(days=7)) == 5   # next Friday
-    assert working_days_between(fri, fri + timedelta(days=45)) == 31  # six weeks on, then Monday
+    assert working_days_between(fri, fri, holidays=NONE) == 0
+    assert working_days_between(fri, fri + timedelta(days=1), holidays=NONE) == 0   # Saturday
+    assert working_days_between(fri, fri + timedelta(days=3), holidays=NONE) == 1   # Monday
+    assert working_days_between(fri, fri + timedelta(days=7), holidays=NONE) == 5   # next Friday
+    assert working_days_between(fri, fri + timedelta(days=45), holidays=NONE) == 31  # six weeks on, then Monday
+
+
+def test_working_days_skip_uae_public_holidays():
+    """TSL-164: National Day week. Mon 30 Nov to Fri 4 Dec 2026 has 5 weekdays, of which 1-3 Dec are holidays."""
+    from tasleem.services.views import working_days_between
+    sun = datetime(2026, 11, 29, 9, tzinfo=UTC)
+    assert working_days_between(sun, sun + timedelta(days=5)) == 2
+    assert working_days_between(sun, sun + timedelta(days=5), holidays=frozenset()) == 5
 
 
 def test_programme_reports_the_national_guideline_on_verified_evidence(client):
@@ -265,3 +274,126 @@ def test_programme_reports_the_national_guideline_on_verified_evidence(client):
     assert window["met"] <= window["due"] and window["met"] + window["pending"] <= funnel["REFERRED"]
     # Other pathways carry no guideline block, so nothing is invented for them.
     assert [x["pathway_id"] for x in m["guideline"]] == ["fit-positive-colonoscopy"]
+
+
+def test_cover_while_away_routes_work_but_keeps_the_owner(client):
+    """TSL-160: an owner on leave must not leave cases waiting on an absent person. Their work list and new
+    escalations go to a named cover; ownership does not move (R1), and nothing about the case changes."""
+    rajesh = _case(client, "p-rajesh")["id"]
+    assert client.get(f"/v1/cases/{rajesh}", headers=as_("dr-salma")).status_code == 404  # another clinic
+    until = (datetime.now(UTC) + timedelta(days=5)).isoformat()
+    r = client.put("/v1/me/absence", headers=FP, json={"until": until, "cover_id": "dr-salma"})
+    assert r.status_code == 200 and r.json()["cover_id"] == "dr-salma"
+    work = client.get("/v1/me/work", headers=as_("dr-salma")).json()
+    assert [c["id"] for c in work["covering"]] == ["dr-fatima"]
+    ids = {i["id"] for s in work["sections"] for i in s["items"]}
+    assert rajesh in ids
+    detail = client.get(f"/v1/cases/{rajesh}", headers=as_("dr-salma")).json()
+    assert detail["owner"]["id"] == "dr-fatima"                      # R1: the owner is unchanged
+    assert detail["owner"]["away"]["cover"]["id"] == "dr-salma"      # and everyone sees who covers
+    # Coming back ends the cover.
+    client.put("/v1/me/absence", headers=FP, json={"until": None})
+    assert client.get("/v1/me/work", headers=as_("dr-salma")).json()["covering"] == []
+    assert client.get(f"/v1/cases/{rajesh}", headers=as_("dr-salma")).status_code == 404
+
+
+def test_cover_must_be_a_present_colleague(client):
+    until = (datetime.now(UTC) + timedelta(days=3)).isoformat()
+    past = (datetime.now(UTC) - timedelta(days=1)).isoformat()
+    for body in ({"until": until, "cover_id": "dr-fatima"}, {"until": until, "cover_id": "nobody"},
+                 {"until": past, "cover_id": "dr-salma"}):
+        assert client.put("/v1/me/absence", headers=FP, json=body).status_code in (400, 422)
+    client.put("/v1/me/absence", headers=as_("dr-salma"), json={"until": until, "cover_id": "dr-hessa"})
+    r = client.put("/v1/me/absence", headers=FP, json={"until": until, "cover_id": "dr-salma"})
+    assert r.status_code in (400, 422) and "away too" in r.text
+
+
+def test_escalations_resolve_to_the_cover(client):
+    """R4 with absences: the resolver names the cover, following at most three links and never a circle."""
+    from tasleem.services.directory import Directory
+    ctx = client.app.state.ctx
+    session = ctx.sessions()
+    d = Directory(session, ctx.cache)
+    until = datetime.now(UTC) + timedelta(days=2)
+    d.set_absence("dr-fatima", until, "dr-salma")
+    d.set_absence("dr-salma", until, "dr-fatima")  # a circle must not loop
+    assert d.acting_for("dr-fatima") in ("dr-salma", "dr-fatima")
+    d.set_absence("dr-salma", None, None)
+    assert d.acting_for("dr-fatima") == "dr-salma"
+    d.set_absence("dr-fatima", None, None)
+    assert d.acting_for("dr-fatima") == "dr-fatima"
+    session.close()
+
+
+def test_unmatched_messages_wait_for_a_person_and_are_never_dropped(client):
+    """TSL-161: a positive FIT for a record number nobody knows is stored and queued; a coordinator matches it to a
+    patient (the case then opens with a named owner, R1) or dismisses it. Each decision is recorded."""
+    assert client.get("/v1/integration/unmatched", headers=FP).status_code == 403  # coordinator only
+    q = client.get("/v1/integration/unmatched", headers=ALL).json()
+    item = next(i for i in q["items"] if i["patient_ref"] == "mrn-skmc-88213")
+    assert item["signals"][0]["kind"] == "LAB_RESULT"
+    before = {c["id"] for c in client.get("/v1/cases?status=all&limit=200", headers=ALL).json()["items"]}
+    r = client.post(f"/v1/integration/unmatched/{item['id']}/resolve", headers=ALL,
+                    json={"action": "match", "patient_id": "p-khalfan"}).json()
+    assert r["status"] == "matched" and r["resolution"]["by"] == "coord-sara"
+    assert any(e["effect"] == "opened" for e in r["effects"])
+    after = client.get("/v1/cases?status=all&limit=200", headers=ALL).json()["items"]
+    new = [c for c in after if c["id"] not in before]
+    assert len(new) == 1 and new[0]["owner"]["id"]
+    assert all(i["id"] != item["id"] for i in client.get("/v1/integration/unmatched", headers=ALL).json()["items"])
+    # Resolving twice, or matching to a patient who does not exist, is refused.
+    assert client.post(f"/v1/integration/unmatched/{item['id']}/resolve", headers=ALL,
+                       json={"action": "dismiss"}).status_code == 404
+
+
+def test_a_repeat_fit_never_cancels_the_colonoscopy(client):
+    """TSL-163: a negative FIT after a positive one adds a rule-based warning naming the UAE guideline; the case
+    stays open, keeps its owner and still needs colonoscopy evidence to close (R3)."""
+    from tasleem.seed import fit
+    cid = _case(client, "p-noura")["id"]
+    before = client.get(f"/v1/cases/{cid}", headers=ALL).json()
+    later = datetime.now(UTC).isoformat()
+    neg = fit("p-noura", "obs-repeat-neg-noura", datetime.now(UTC), positive=False)
+    r = client.post("/v1/ingest/fhir", json=neg)
+    assert r.status_code in (200, 201, 202), r.text
+    after = client.get(f"/v1/cases/{cid}", headers=ALL).json()
+    assert any("does not cancel the colonoscopy" in w for w in after["warnings"])
+    assert after["status"] == before["status"] == "open" and after["owner"]["id"] == before["owner"]["id"]
+    assert after["progress"] == before["progress"]
+    close = client.post(f"/v1/cases/{cid}/close", headers=FP, json={"outcome": "COMPLETED_WITH_REPORT"})
+    assert close.status_code == 409 and close.json()["error"]["code"].startswith("R3"), later
+
+
+def test_referral_options_put_a_female_endoscopist_first_when_asked(client):
+    """TSL-165: once a patient asks for a female doctor, in-network centres with a female endoscopist come first."""
+    cid = _case(client, "p-noura")["id"]
+    plain = client.get(f"/v1/cases/{cid}/referral-options", headers=FP).json()
+    assert plain["prefer_female"] is False
+    client.post(f"/v1/cases/{cid}/barriers", headers=as_("p-noura"), json={"codes": ["FEMALE_CLINICIAN"]})
+    asked = client.get(f"/v1/cases/{cid}/referral-options", headers=FP).json()
+    assert asked["prefer_female"] is True and asked["options"][0]["female_endoscopist"] is True
+
+
+def test_programme_csv_export_is_pseudonymous(client):
+    """TSL-182: the programme lead can take the numbers to their own reports; no patient names leave Tasleem."""
+    assert client.get("/v1/program/export.csv", headers=FP).status_code == 403
+    r = client.get("/v1/program/export.csv", headers=ALL)
+    assert r.status_code == 200 and r.headers["content-type"].startswith("text/csv")
+    lines = r.text.strip().splitlines()
+    assert lines[0].startswith("case_id,patient_ref,pathway") and len(lines) > 5
+    assert "Rajesh" not in r.text and "Noura" not in r.text
+    assert any(",yes," in ln for ln in lines[1:])  # the false "done" is visible in the export too
+
+
+def test_offline_demo_bundle_matches_the_api_shape(client):
+    """TSL-180: the no-backend demo replays a recorded bundle. If the API adds or drops a field, the bundle must be
+    re-recorded (`python -m tasleem.demo_bundle`), or the offline demo silently shows an old product."""
+    import json
+    from pathlib import Path
+
+    bundle = json.loads((Path(__file__).parents[2] / "frontend/demo/demo-bundle.json").read_text(encoding="utf-8"))
+    recorded = next(iter(next(iter(bundle["cases"].values()))["detail_by_persona"].values()))
+    live = client.get(f"/v1/cases/{_case(client, 'p-rajesh')['id']}", headers=FP).json()
+    assert set(live) == set(recorded), {"api_only": set(live) - set(recorded), "bundle_only": set(recorded) - set(live)}
+    assert {o["code"] for o in bundle["patient_cases"]["p-noura"]["ar"]["items"][0]["barrier_options"]} >= {
+        "FEMALE_CLINICIAN"}

@@ -83,6 +83,10 @@ class StallReason(StrEnum):
     HANDOFF_NOT_ACCEPTED = "HANDOFF_NOT_ACCEPTED"
     REFERRAL_REJECTED = "REFERRAL_REJECTED"
     CONSULT_UNANSWERED = "CONSULT_UNANSWERED"
+    # Evidence Reader: a report arrived, but what it says has not been confirmed, or it says the loop is not closed.
+    REPORT_NOT_REVIEWED = "REPORT_NOT_REVIEWED"
+    PROCEDURE_INCOMPLETE = "PROCEDURE_INCOMPLETE"
+    PATHOLOGY_OUTSTANDING = "PATHOLOGY_OUTSTANDING"
 
 
 class Outcome(StrEnum):
@@ -138,6 +142,8 @@ class EventType(StrEnum):
     CONSENT_RECORDED = "CONSENT_RECORDED"
     PATIENT_MESSAGE_SENT = "PATIENT_MESSAGE_SENT"
     DELIVERY_FAILED = "DELIVERY_FAILED"
+    REPORT_TEXT_RECEIVED = "REPORT_TEXT_RECEIVED"
+    REPORT_REVIEWED = "REPORT_REVIEWED"
     CASE_CLOSED = "CASE_CLOSED"
 
 
@@ -169,6 +175,7 @@ class Signal(BaseModel):
     admin_status: AdminStatus | None = None
     service: str | None = None
     reason: str | None = None
+    text: str | None = None  # free text of a report (DiagnosticReport.conclusion), read by the Evidence Reader
 
 
 # --------------------------------------------------------------------------------------------------
@@ -238,6 +245,24 @@ class Consult(BaseModel):
     answered_at: datetime | None = None
 
 
+class ReportReview(BaseModel):
+    """A free-text report and, once a clinician has checked it, the findings they confirmed (Evidence Reader)."""
+
+    id: str  # "rpt-<n>"
+    ref: str
+    text: str
+    received_at: datetime
+    findings: dict[str, Any] | None = None  # confirmed values only; None until reviewed
+    reviewed_by: str | None = None
+    reviewed_at: datetime | None = None
+    suggested_by: str | None = None  # reader that proposed the values (model id or keyword reader)
+    corrected: list[str] = Field(default_factory=list)  # fields the clinician changed from the suggestion
+
+    @property
+    def reviewed(self) -> bool:
+        return self.findings is not None
+
+
 class DeliveryAlert(BaseModel):
     """A patient message that no channel could deliver. A human must take over (navigator call)."""
 
@@ -277,6 +302,7 @@ class CaseState(BaseModel):
     delivery_alerts: dict[str, DeliveryAlert] = Field(default_factory=dict)
     escalation_count: int = 0
     warnings: list[str] = Field(default_factory=list)
+    reports: dict[str, ReportReview] = Field(default_factory=dict)
     consent_at: datetime | None = None
     outcome: Outcome | None = None
     outcome_evidence_ref: str | None = None
@@ -303,3 +329,18 @@ class CaseState(BaseModel):
 
     def reached(self, stage: str) -> bool:
         return stage in self.stages
+
+    @property
+    def unreviewed_reports(self) -> list[ReportReview]:
+        return [r for r in self.reports.values() if not r.reviewed]
+
+    @property
+    def confirmed_findings(self) -> dict[str, Any]:
+        """Findings confirmed across every reviewed report; a later report overrides what it states (for example a
+        pathology report clearing "pathology pending"), and leaves alone what it does not mention."""
+        out: dict[str, Any] = {}
+        for r in sorted((r for r in self.reports.values() if r.reviewed), key=lambda r: r.received_at):
+            for k, v in (r.findings or {}).items():
+                if v is not None:
+                    out[k] = v
+        return out

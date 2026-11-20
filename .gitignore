@@ -27,3 +27,8 @@ docs/evidence/REVIEW.md
 .claude/
 .taste-skill/
 *.tsbuildinfo
+
+# Local SQLite scratch files and the Hallmark design tool's working folder (screenshots, lint records)
+*.db-shm
+*.db-wal
+.hallmark/

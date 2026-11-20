@@ -1,28 +1,32 @@
 @import "tailwindcss";
+@import "./styles/dose-tokens.css";
+@import "./styles/organiser.css";
 
-/* Sheet and biro tokens (DESIGN.md section 2). 60% paper, 30% ink, 10% biro. */
+/* App tokens, mapped onto the Dose system (src/styles/dose-tokens.css, Hallmark theme Dose). The names are the
+   app's own (paper, sheet, ink, biro...) so every screen re-skins from here; values come only from Dose tokens. */
 :root {
-  --paper: #F6F4EE;
-  --sheet: #FFFFFF;
-  --sheet-2: #FAF8F3;
-  --rule: #E7E2D7;
-  --rule-strong: #D5CFC2;
-  --ink: #14171F;
-  --ink-2: #3A3E47;
-  --muted: #6B6F78;
-  --biro: #1A4BE0;
-  --biro-ink: #1238B0;
-  --biro-wash: #EEF1FC;
-  --done: #1E7A4C;
-  --done-wash: #ECF6F0;
-  --attn: #B54708;
-  --attn-wash: #FEF4EC;
-  --stop: #B42318;
-  --stop-wash: #FEF3F2;
-  --ai: #C11574;
-  --ai-wash: #FDF2F8;
-  --hatch: repeating-linear-gradient(135deg, #A29D91 0 3px, #D5CFC2 3px 7px);
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --paper: var(--color-paper);
+  --sheet: oklch(99.3% 0.006 88);
+  --sheet-2: var(--color-paper-2);
+  --rule: var(--color-rule);
+  --rule-strong: oklch(78% 0.026 150);
+  --ink: var(--color-ink);
+  --ink-2: var(--color-ink-2);
+  --muted: var(--color-muted);
+  --biro: var(--color-accent);
+  --biro-ink: var(--color-accent-deep);
+  --biro-wash: var(--color-paper-3);
+  --done: var(--color-accent-deep);
+  --done-wash: color-mix(in oklab, var(--color-accent-soft) 45%, var(--color-paper));
+  /* Stalls and overdue steps: a warm graphite, never alarm amber (Dose); a symptom is the one red. */
+  --attn: oklch(42% 0.05 70);
+  --attn-wash: oklch(95.5% 0.02 84);
+  --stop: oklch(48% 0.17 27);
+  --stop-wash: oklch(96% 0.025 27);
+  /* AI provenance: plum, distinct from the one green so an AI suggestion never reads as a confirmed fact. */
+  --ai: oklch(46% 0.13 340);
+  --ai-wash: oklch(96.5% 0.02 340);
+  --hatch: repeating-linear-gradient(135deg, var(--rule-strong) 0 3px, var(--color-paper-3) 3px 7px);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   color-scheme: light;
 }
@@ -47,33 +51,56 @@
   --color-stop-wash: var(--stop-wash);
   --color-ai: var(--ai);
   --color-ai-wash: var(--ai-wash);
-  --font-serif: "Source Serif 4", Georgia, serif;
-  --font-sans: "Libre Franklin", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --font-arabic: "IBM Plex Sans Arabic", "Libre Franklin", sans-serif;
-  --radius-sm: 2px;
-  --radius: 4px;
-  --radius-md: 4px;
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-outlier);
+  --font-arabic: "IBM Plex Sans Arabic", var(--font-body);
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-md: 14px;
 }
 
 @layer base {
-html, body { background: var(--paper); color: var(--ink); }
+html, body { background: var(--paper); color: var(--ink); overflow-x: clip; }
+body { background-image: var(--grain); }
 body {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 22px;
+  font-size: 16px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 [lang="ar"], [dir="rtl"] { font-family: var(--font-arabic); }
-h1, h2, .serif { font-family: var(--font-serif); letter-spacing: -0.01em; }
+h1, h2, h3, .serif { font-family: var(--font-display); font-weight: 700; letter-spacing: var(--tracking-display); font-synthesis: none; text-wrap: balance; overflow-wrap: break-word; min-width: 0; }
 .mono, code, kbd { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .tnum { font-variant-numeric: tabular-nums; }
 
-:focus-visible { outline: 2px solid var(--biro); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 ::selection { background: var(--biro-wash); }
 }
+
+/* Dose plastic for app surfaces that carry a day's work (the shift brief, the tour start): a pale tint, a glint
+   along the top, a deeper shade at the foot. Tints never carry meaning. */
+.plastic { --t: var(--p-5); border-radius: var(--radius-md); background: linear-gradient(color-mix(in oklab, var(--glint) 34%, transparent), transparent 18%), color-mix(in oklab, var(--t) 50%, var(--paper));
+  box-shadow: inset 0 1.5px 0 var(--glint), inset 0 -28px 40px -34px color-mix(in oklab, var(--t) 45%, var(--ink)), 0 10px 24px -18px color-mix(in oklab, var(--t) 80%, transparent); }
+.plastic--sat { --t: var(--p-8); }
+.plastic > .row-slip { background: var(--grain), var(--sheet); border-radius: var(--radius); box-shadow: 0 1px 2px color-mix(in oklab, var(--ink) 10%, transparent); }
+
+/* Dose moulded controls: a glint along the top, a 2px rim below, sinks 2px on press. */
+.mould {
+  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--rule-strong), 0 2px 0 var(--rule-strong);
+  transition: transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), background-color var(--dur-short) var(--ease-out);
+}
+.mould:hover:not(:disabled) { background-color: var(--sheet-2); }
+.mould:active:not(:disabled) { transform: translateY(2px); box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--rule-strong), 0 0 0 var(--rule-strong); }
+.mould-primary {
+  background: linear-gradient(var(--color-accent), var(--color-accent-deep)); color: var(--color-accent-ink);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--glint) 35%, transparent), 0 0 0 1px var(--color-accent-deep), 0 2px 0 var(--color-accent-deep);
+}
+.mould-primary:hover:not(:disabled) { background: linear-gradient(var(--color-accent-deep), var(--color-accent-deep)); }
+.mould-primary:active:not(:disabled) { box-shadow: inset 0 1px 0 color-mix(in oklab, var(--glint) 35%, transparent), 0 0 0 1px var(--color-accent-deep), 0 0 0 var(--color-accent-deep); }
+@media (prefers-reduced-motion: reduce) { .mould:active:not(:disabled) { transform: none; } }
 
 /* Press feedback (DESIGN.md 8.2). Exact properties only, never transition: all. */
 .press {
@@ -90,6 +117,9 @@ h1, h2, .serif { font-family: var(--font-serif); letter-spacing: -0.01em; }
   transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
   @starting-style { opacity: 0; transform: translateY(4px); }
 }
+
+/* Menus anchored to a trigger grow from it (origin set on the element). */
+.menu-pop { transition: opacity 150ms var(--ease-out), scale 150ms var(--ease-out); @starting-style { opacity: 0; scale: 0.97; } }
 
 /* Dialog entrance. */
 .dlg {
@@ -114,6 +144,13 @@ h1, h2, .serif { font-family: var(--font-serif); letter-spacing: -0.01em; }
 .enter-2 { animation-delay: 120ms; }
 .enter-3 { animation-delay: 180ms; }
 
+/* Hero product moment: the card tells the story in three beats, once (status says done, evidence stops,
+   a person is named). Delays are short so a reader is never kept waiting; reduced motion shows the end state. */
+.beat { animation: enter 360ms var(--ease-out) both; }
+.beat-1 { animation-delay: 700ms; }
+.beat-2 { animation-delay: 1300ms; }
+.beat-3 { animation-delay: 1900ms; }
+
 .hatch { background: var(--hatch); }
 .skeleton { background: var(--sheet-2); border-radius: 4px; }
 
@@ -125,7 +162,8 @@ h1, h2, .serif { font-family: var(--font-serif); letter-spacing: -0.01em; }
   .enter { animation: enter-fade 200ms ease both; }
   @keyframes enter-fade { from { opacity: 0; } to { opacity: 1; } }
   .reveal, .toast { @starting-style { transform: none; } }
-  .dlg { @starting-style { scale: 1; } }
+  .dlg, .menu-pop { @starting-style { scale: 1; } }
+  .beat { animation: none; }
 }
 @media (hover: hover) and (pointer: fine) {
   .row-hover:hover { background: var(--sheet-2); }

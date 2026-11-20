@@ -7,6 +7,7 @@ import { bundle, demoSession, falseDoneCase, rememberFalseDone } from "../lib/de
 import { usePersona } from "../lib/persona";
 import { shortName } from "../lib/labels";
 import { Button, Card, ErrorState, JourneyBar, Skeleton, StallChip, Tag, cx, inputCls, toastError, useToast } from "../components/ui";
+import WhatsAppVision from "../components/WhatsAppVision";
 
 /** Synthetic lab result (positive FIT) used when no recorded sample is loaded, e.g. in live mode. */
 const SAMPLE_HL7 = [
@@ -80,7 +81,7 @@ export default function Simulator() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <header>
-        <h1 className="text-[32px] font-semibold leading-[38px]">Send real-world events and <em className="font-medium">watch</em> Tasleem react.</h1>
+        <h1 className="text-[32px] font-semibold leading-[38px]">Send real-world events and watch Tasleem react.</h1>
         <p className="mt-1 text-ink-2">Each scenario replays recorded Malaffi, lab and Sahatna events through the real rules. Synthetic patients only.</p>
       </header>
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
@@ -88,7 +89,7 @@ export default function Simulator() {
           {sc.isLoading ? <Skeleton className="h-80" /> : sc.error ? <ErrorState error={sc.error} /> : sc.data!.items.map((s) => {
             const locked = s.id === "report-arrives" && !sess.falseDoneRun && !fdCase;
             return (
-              <Card key={s.id} className={cx("flex items-start gap-4 p-4", run?.sid === s.id && "border-biro")}>
+              <Card key={s.id} data-scenario={s.id} className={cx("flex items-start gap-4 p-4", run?.sid === s.id && "border-biro")}>
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">{s.title.replace(" (needs case_id)", "")}</p>
                   <p className="mt-0.5 text-[14px] text-ink-2">{s.why}</p>
@@ -130,6 +131,8 @@ export default function Simulator() {
           )}
         </div>
       </div>
+
+      <WhatsAppVision />
 
       <Card className="p-4">
         <h2 className="text-[22px] font-semibold leading-7">HL7 v2 from the lab</h2>

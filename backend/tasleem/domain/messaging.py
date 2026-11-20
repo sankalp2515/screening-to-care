@@ -24,7 +24,7 @@ _RESULT_TERMS_EN = ("cancer", "malignan", "tumour", "tumor", "carcinoma", "polyp
                     "abnormal", "normal result", "diagnos", "biopsy result", "your result is", "your results are",
                     "diabetes", "diabetic", "hypertension", "high blood pressure", "lesion", "metasta")
 _RESULT_TERMS_AR = ("سرطان", "ورم", "خبيث", "إيجابي", "ايجابي", "سلبي", "غير طبيعي", "تشخيص", "سكري",
-                    "ضغط الدم المرتفع", "زوائد")
+                    "ضغط الدم المرتفع", "زوائد", "نتيجتك", "نتائجك")
 # Advice the care team must give in person, not by text.
 _ADVICE_TERMS = ("stop taking", "increase your dose", "you are fine", "nothing to worry", "no need to come",
                  "you don't need", "you do not need", "لا داعي للقلق", "لا تحتاج")

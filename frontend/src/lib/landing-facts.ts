@@ -13,8 +13,8 @@ export const BENCH = {
   statusDays: "14.4",
   falseDoneStatus: "125",
   falseDoneTasleem: "0",
-  tests: "241",
-  hardCases: "64 of 67",
+  tests: "279",
+  hardCases: "72 of 75",
 } as const;
 
 /** Real-world-fit run, published failure mix (docs/evidence/REAL_WORLD_FIT.md, seed 2026). */

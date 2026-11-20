@@ -1,0 +1,10 @@
+# /etc/systemd/system/tasleem-audit-anchor.timer: once a day at 00:05 UTC.
+[Unit]
+Description=Daily Tasleem audit anchor
+
+[Timer]
+OnCalendar=*-*-* 00:05:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target

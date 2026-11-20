@@ -88,3 +88,23 @@ export function dateOnly(iso: string | null | undefined, lang = "en"): string {
   if (!iso) return "";
   return new Date(iso).toLocaleString(lang === "ar" ? "ar-AE" : "en-GB", { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit", timeZone: "Asia/Dubai" });
 }
+
+/** A record reference as a person would say it ("Colonoscopy report"), the id kept for the title tooltip. */
+const SOURCE_LABELS: Record<string, string> = {
+  Communication: "Sahatna message", Encounter: "Clinic visit record", ServiceRequest: "Referral in Malaffi",
+  Task: "GI centre response", Appointment: "Booking", Procedure: "Procedure record", DiagnosticReport: "Colonoscopy report",
+  Observation: "Lab result", CarePlan: "Care plan", Patient: "Patient record",
+};
+export const sourceLabel = (ref: string | null | undefined): string => (ref ? SOURCE_LABELS[ref.split("/")[0]] ?? "Record" : "");
+
+/** A model or reader id as a reviewer would read it. */
+export const modelLabel = (m: string | null | undefined): string => {
+  const s = m ?? "";
+  if (/gpt-5-mini/.test(s)) return "GPT-5 mini (Azure OpenAI)";
+  if (s === "keyword-reader-v1") return "Keyword reader";
+  if (s === "keyword-v1") return "Keyword matcher";
+  return s.replace(/^[a-z_]+:/, "");
+};
+
+/** "1 day", "3 days". */
+export const plural = (n: number, one: string, many = `${one}s`): string => `${n} ${n === 1 ? one : many}`;

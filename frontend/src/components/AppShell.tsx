@@ -2,18 +2,20 @@ import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { BarChart3, ChevronDown, Inbox, List, Menu, Radio, Smartphone, X, Compass, ArrowLeft } from "lucide-react";
-import { MODE, useDirectory, useMe, useWork } from "../lib/api";
+import { MODE, useDirectory, useMe, usePeople, useWork } from "../lib/api";
 import { usePersona } from "../lib/persona";
 import { initials, label, ROLE_LABELS, shortName } from "../lib/labels";
 import { cx, Tag } from "./ui";
 import { Wordmark } from "./Wordmark";
 import Tour from "./Tour";
+import CoverDialog from "./CoverDialog";
 
 function PersonaSwitcher() {
   const { persona, setPersona } = usePersona();
   const me = useMe();
   const dir = useDirectory();
   const [open, setOpen] = useState(false);
+  const [coverOpen, setCoverOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
   useEffect(() => {
@@ -33,8 +35,12 @@ function PersonaSwitcher() {
         <ChevronDown size={16} className="text-muted" aria-hidden />
       </button>
       {open && (
-        <div role="menu" className="reveal absolute end-0 top-12 z-30 w-72 rounded border border-rule-strong bg-sheet p-1">
-          <p className="px-3 pb-1 pt-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-muted">Switch person (synthetic)</p>
+        <div role="menu" className="menu-pop origin-top-right absolute end-0 top-12 z-30 w-72 rounded border border-rule-strong bg-sheet p-1">
+          {me.data?.role && me.data.role !== "program_coordinator" && (
+            <button role="menuitem" type="button" onClick={() => { setOpen(false); setCoverOpen(true); }}
+              className="press-wide flex w-full items-center rounded px-3 py-2 text-start text-[14px] font-medium hover:bg-sheet-2">Cover while I am away…</button>
+          )}
+          <p className="px-3 pb-1 pt-2 text-[13px] font-medium text-muted">Switch person (synthetic)</p>
           {dir.data?.staff.map((s) => (
             <button key={s.id} role="menuitem" type="button" onClick={() => { setPersona(s.id); setOpen(false); nav("/app/work"); }}
               className={cx("press-wide flex w-full items-center gap-3 rounded px-3 py-2 text-start hover:bg-sheet-2", s.id === persona && "bg-biro-wash")}>
@@ -44,12 +50,16 @@ function PersonaSwitcher() {
           ))}
         </div>
       )}
+      <CoverDialog open={coverOpen} onOpenChange={setCoverOpen} />
     </div>
   );
 }
 
 export default function AppShell() {
   const work = useWork();
+  // The id-to-name directory loads before any screen renders, so no screen ever shows a raw id like "dr-salma"
+  // (names are read synchronously by shortName and would not update after a late load).
+  const people = usePeople();
   const { tour, setTour, setPersona } = usePersona();
   const [mobileOpen, setMobileOpen] = useState(false);
   const loc = useLocation();
@@ -107,7 +117,7 @@ export default function AppShell() {
             <PersonaSwitcher />
           </div>
         </header>
-        <main id="main" className="px-4 py-6 lg:px-8 lg:py-8"><Outlet /></main>
+        <main id="main" className="px-4 py-6 lg:px-8 lg:py-8">{people.isLoading ? <div className="mx-auto max-w-6xl space-y-4" aria-busy="true"><div className="skeleton h-10 w-1/2 animate-pulse" /><div className="skeleton h-40 animate-pulse" /></div> : <Outlet />}</main>
       </div>
       <Tour />
     </div>

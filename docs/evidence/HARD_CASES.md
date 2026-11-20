@@ -1,13 +1,13 @@
 # Hard cases
 
-Run: `python -m tasleem.bench.hardcases` (19 Nov 2026). **64 of 67 match the expected result.** Expected results were written before running; misses stay in the table with the reason.
+Run: `python -m tasleem.bench.hardcases` (19 Nov 2026). **72 of 75 match the expected result.** Expected results were written before running; misses stay in the table with the reason.
 
 | Category | Passed |
 |---|---|
 | ingest | 23 / 23 |
 | safety | 10 / 10 |
-| barrier | 13 / 15 |
-| distress | 18 / 19 |
+| barrier | 16 / 19 |
+| distress | 23 / 23 |
 
 Labels for barrier and distress texts were written by the team, not by independent clinicians. That is a limit; an independent labelled set is the first thing to add in a pilot.
 
@@ -54,29 +54,37 @@ Labels for barrier and distress texts were written by the team, not by independe
 | H39 | barrier | ما في احد يوصلني | NO_ESCORT | NO_ESCORT | pass |  |
 | H40 | barrier | I can't get a taxi that early | TRANSPORT | TRANSPORT | pass |  |
 | H41 | barrier | Is this covered by my insurance? | COST_OR_INSURANCE | COST_OR_INSURANCE | pass |  |
-| H42 | barrier | My manager won't give me the day off | TIME_OR_WORK | none | **miss** | Cue words absent ('manager', 'day off'); human confirms the code anyway |
+| H42 | barrier | My manager won't give me the day off | TIME_OR_WORK | TIME_OR_WORK | pass | Missed until 19 Nov; fixed by TSL-186 ('manager', 'day off') |
 | H43 | barrier | I need an Urdu interpreter | LANGUAGE | LANGUAGE | pass |  |
 | H44 | barrier | Can someone call me please | WANTS_CALLBACK | WANTS_CALLBACK | pass |  |
-| H45 | barrier | I did it in India last month | DONE_ELSEWHERE | none | **miss** | No cue ('in India'); human confirms the code anyway |
+| H45 | barrier | I did it in India last month | DONE_ELSEWHERE | DONE_ELSEWHERE | pass | Missed until 19 Nov; fixed by TSL-186 ('did it in') |
 | H46 | barrier | ok thanks | none | none | pass |  |
 | H47 | barrier | I'll think about it | none | none | pass |  |
 | H48 | barrier | My kids are sick this week | none | none | pass | Arguably TIME_OR_WORK; abstaining sends it to a human, which is safe |
-| H49 | distress | I saw blood when I went to the toilet | flag | flag | pass |  |
-| H50 | distress | Black stool for two days | flag | flag | pass |  |
-| H51 | distress | فيه دم مع البراز | flag | flag | pass |  |
-| H52 | distress | صار عندي نزيف | flag | flag | pass |  |
-| H53 | distress | I fainted this morning | flag | flag | pass |  |
-| H54 | distress | I feel hopeless about all of this | flag | flag | pass |  |
-| H55 | distress | انا منهار | flag | flag | pass |  |
-| H56 | distress | The pain is unbearable | flag | flag | pass | Missed in v0.1 (no cue word); fixed in v0.2 by the pain-severity rule |
-| H57 | distress | I had a blood test last week | flag | flag | pass | Over-flag by design: high recall; a clinician sees it and clears it |
-| H58 | distress | No bleeding, just nervous | no flag | flag | **miss** | Negation not handled: over-flag, safe direction |
-| H59 | distress | عدم الحضور بسبب الدوام | no flag | no flag | pass |  |
-| H60 | distress | Booked for Spain trip, can we move it? | no flag | no flag | pass |  |
-| H61 | distress | The pain is getting worse and worse | flag | flag | pass |  |
-| H62 | distress | I have terrible stomach pain since yesterday | flag | flag | pass |  |
-| H63 | distress | Worst pain I have ever had | flag | flag | pass |  |
-| H64 | distress | الالم ما يتحمل | flag | flag | pass |  |
-| H65 | distress | وجع شديد في بطني | flag | flag | pass |  |
-| H66 | distress | Mild pain after the injection, nothing else | no flag | no flag | pass |  |
-| H67 | distress | I'm worried the procedure will cause pain | no flag | no flag | pass |  |
+| H49 | barrier | My supervisor said I can't take time off that week | TIME_OR_WORK | none | **miss** |  |
+| H50 | barrier | I had the colonoscopy done in Cairo in August | DONE_ELSEWHERE | none | **miss** |  |
+| H51 | barrier | مديري ما يعطيني اجازه | TIME_OR_WORK | TIME_OR_WORK | pass |  |
+| H52 | barrier | I'd feel more comfortable if a woman did the test | FEMALE_CLINICIAN | none | **miss** |  |
+| H53 | distress | I saw blood when I went to the toilet | flag | flag | pass |  |
+| H54 | distress | Black stool for two days | flag | flag | pass |  |
+| H55 | distress | فيه دم مع البراز | flag | flag | pass |  |
+| H56 | distress | صار عندي نزيف | flag | flag | pass |  |
+| H57 | distress | I fainted this morning | flag | flag | pass |  |
+| H58 | distress | I feel hopeless about all of this | flag | flag | pass |  |
+| H59 | distress | انا منهار | flag | flag | pass |  |
+| H60 | distress | The pain is unbearable | flag | flag | pass | Missed in v0.1 (no cue word); fixed in v0.2 by the pain-severity rule |
+| H61 | distress | I had a blood test last week | flag | flag | pass | Over-flag by design: high recall; a clinician sees it and clears it |
+| H62 | distress | No bleeding, just nervous | no flag | no flag | pass | Over-flagged until 19 Nov; fixed by TSL-186 (narrow denial rule) |
+| H63 | distress | عدم الحضور بسبب الدوام | no flag | no flag | pass |  |
+| H64 | distress | Booked for Spain trip, can we move it? | no flag | no flag | pass |  |
+| H65 | distress | The pain is getting worse and worse | flag | flag | pass |  |
+| H66 | distress | I have terrible stomach pain since yesterday | flag | flag | pass |  |
+| H67 | distress | Worst pain I have ever had | flag | flag | pass |  |
+| H68 | distress | الالم ما يتحمل | flag | flag | pass |  |
+| H69 | distress | وجع شديد في بطني | flag | flag | pass |  |
+| H70 | distress | Mild pain after the injection, nothing else | no flag | no flag | pass |  |
+| H71 | distress | I'm worried the procedure will cause pain | no flag | no flag | pass |  |
+| H72 | distress | No pain and no bleeding, I just forgot the date | no flag | no flag | pass |  |
+| H73 | distress | There is still blood in my stool | flag | flag | pass |  |
+| H74 | distress | Not bleeding anymore but I'm very scared | flag | flag | pass |  |
+| H75 | distress | بدون نزيف، بس خايف شوي | no flag | no flag | pass |  |

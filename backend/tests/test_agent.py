@@ -156,3 +156,63 @@ def test_barrier_suggestion_offline_defers_to_keywords(core):
     with _agent(core) as a:
         r = a.post("/v1/barrier-suggestion", headers=AISHA, json={"text": "I am scared of the sedation"}).json()
     assert r["available"] is False
+
+
+# ---- Evidence Reader: model reading must quote the report verbatim ----------------------------------------------
+class ReaderLLM:
+    name = "fake-reader"
+
+    def __init__(self, reading) -> None:
+        self.reading = reading
+
+    def structured(self, system, user, schema):
+        from tasleem_agent.report_reading import ReportReading
+        return self.reading if schema is ReportReading else None
+
+
+def test_report_reading_keeps_verbatim_quotes_and_drops_invented_ones(core):
+    from tasleem_agent.report_reading import BoolReading, ReportReading, TextReading
+    cid = _case(core, "p-khalid")
+    rid = core.get(f"/v1/cases/{cid}", headers=FATIMA).json()["reports"][0]["id"]
+    reading = ReportReading(
+        completed=BoolReading(value=False, quote="Examination limited to the sigmoid colon: the scope could not be passed beyond 40 cm because of solid faecal residue."),
+        prep_adequate=BoolReading(value=True, quote="Bowel preparation was excellent."),  # not in the report
+        follow_up=TextReading(value="3 months", quote=None),  # a value with no quote
+    )
+    with _agent(core, ReaderLLM(reading)) as a:
+        r = a.post(f"/v1/cases/{cid}/reports/{rid}/reading", headers=FATIMA).json()
+    assert r["available"] is True and r["reader"] == "fake-reader" and r["requires_confirmation"] is True
+    assert r["fields"]["completed"]["value"] is False
+    assert r["fields"]["prep_adequate"]["value"] is None and r["fields"]["follow_up"]["value"] is None
+    assert set(r["dropped"]) == {"prep_adequate", "follow_up"}
+    # Nothing changed on the case: the reading is a suggestion until a clinician confirms it in case-core.
+    assert core.get(f"/v1/cases/{cid}", headers=FATIMA).json()["reports"][0]["reviewed"] is False
+
+
+def test_report_reading_without_a_model_returns_the_keyword_reading(core):
+    cid = _case(core, "p-khalid")
+    rid = core.get(f"/v1/cases/{cid}", headers=FATIMA).json()["reports"][0]["id"]
+    with _agent(core) as a:
+        r = a.post(f"/v1/cases/{cid}/reports/{rid}/reading", headers=FATIMA).json()
+    assert r["available"] is False and r["reader"] == "keyword-reader-v1"
+    assert r["fields"]["prep_adequate"]["value"] is False and r["fields"]["completed"]["value"] is None
+
+
+def test_report_reading_respects_case_scoping(core):
+    cid = _case(core, "p-khalid")  # Dr Fatima's clinic
+    with _agent(core) as a:
+        assert a.post(f"/v1/cases/{cid}/reports/rpt-1/reading", headers=SALMA).status_code == 404
+
+
+def test_rebook_draft_after_an_incomplete_report_is_confirmed(core):
+    cid = _case(core, "p-khalid")
+    rpt = core.get(f"/v1/cases/{cid}", headers=FATIMA).json()["reports"][0]
+    with _agent(core) as a:
+        assert a.post(f"/v1/cases/{cid}/reports/{rpt['id']}/rebook-draft", headers=FATIMA).status_code == 409  # not confirmed
+        vals = {k: v["value"] for k, v in rpt["keyword_reading"]["fields"].items()}
+        vals.update(completed=False, follow_up="3 months", next_step="Re-scope after an extended two-day preparation")
+        core.post(f"/v1/cases/{cid}/reports/{rpt['id']}/review", headers=FATIMA,
+                  json={"findings": vals, "suggested_by": "keyword-reader-v1", "suggestion": vals})
+        r = a.post(f"/v1/cases/{cid}/reports/{rpt['id']}/rebook-draft", headers=FATIMA).json()
+    assert r["requires_approval"] is True and r["source"] == "template"
+    assert "Khalid M." in r["text"] and "3 months" in r["text"] and "incomplete" in r["text"]

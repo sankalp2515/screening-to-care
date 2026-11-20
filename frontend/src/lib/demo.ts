@@ -59,7 +59,7 @@ const LINK = /(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|ae|io|ly)\b)/i;
 const RESULT_TERMS_EN = ["cancer", "malignan", "tumour", "tumor", "carcinoma", "polyp", "positive", "negative",
   "abnormal", "normal result", "diagnos", "biopsy result", "your result is", "your results are",
   "diabetes", "diabetic", "hypertension", "high blood pressure", "lesion", "metasta"];
-const RESULT_TERMS_AR = ["سرطان", "ورم", "خبيث", "إيجابي", "ايجابي", "سلبي", "غير طبيعي", "تشخيص", "سكري", "ضغط الدم المرتفع", "زوائد"];
+const RESULT_TERMS_AR = ["سرطان", "ورم", "خبيث", "إيجابي", "ايجابي", "سلبي", "غير طبيعي", "تشخيص", "سكري", "ضغط الدم المرتفع", "زوائد", "نتيجتك", "نتائجك"];
 const ADVICE_TERMS = ["stop taking", "increase your dose", "you are fine", "nothing to worry", "no need to come",
   "you don't need", "you do not need", "لا داعي للقلق", "لا تحتاج"];
 export function messagePolicy(text: string): { ok: boolean; violations: { code: string; detail: string }[] } {
@@ -220,7 +220,8 @@ export function demoRequest(service: Service, method: string, rawPath: string, b
         if (lang && !org && state.programme.metrics_by_filter[`language=${lang}`]) return ok(state.programme.metrics_by_filter[`language=${lang}`]);
         return ok(state.programme.metrics);
       }
-      if (path === "/v1/program/usage") return ok(state.programme.usage);
+      if (path.split("?")[0] === "/v1/program/usage") return ok(state.programme.usage);
+      if (path === "/v1/program/ai-oversight") return state.programme.ai_oversight ? ok(state.programme.ai_oversight) : notFound();
       if (path === "/v1/demo/scenarios") return ok(state.scenarios.list);
     }
     if (service === "agent" && (m = path.match(/^\/v1\/cases\/([^/]+)\/assist$/))) {

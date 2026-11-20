@@ -123,8 +123,8 @@ def test_clinic_lead_can_reassign_a_case_escalated_to_them(client: TestClient) -
     """Dr. Hessa's AI user saw stuck cases escalated to her and was refused the handoff (R2_NOT_OWNER)."""
     items = [i for i in client.get("/v1/me/work", headers=H("dr-hessa")).json()["sections"]
              if i["kind"] == "escalated"][0]["items"]
-    cid = next(i["id"] for i in items
-               if any((s.get("escalated_to") or {}).get("id") == "dr-hessa"
+    cid = next(i["id"] for i in items if i["owner"]["id"] != "dr-salma"
+               and any((s.get("escalated_to") or {}).get("id") == "dr-hessa"
                       for s in client.get(f"/v1/cases/{i['id']}", headers=H("dr-hessa")).json()["stalls"]))
     before = client.get(f"/v1/cases/{cid}", headers=H("dr-hessa")).json()
     assert before["actions"]["offer_handoff"]["allowed"] is True

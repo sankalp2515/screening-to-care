@@ -52,6 +52,10 @@ class Checks(BaseModel):
     handoff_accept_days: float = 2
     consult_answer_days: float = 2
     reescalate_after_days: float = 3
+    # Evidence Reader: free-text reports must be read and confirmed by a clinician before they count (opt-in).
+    report_review: bool = False
+    report_review_days: float = 2
+    pathology_result_days: float = 21
 
 
 class Playbook(BaseModel):
@@ -121,6 +125,8 @@ class Pathway(BaseModel):
     patient_messages: dict[str, dict[str, str]] = Field(default_factory=dict)
     prep_check: list[PrepQuestion] = Field(default_factory=list)
     guideline: Guideline | None = None
+    # Clinician-approved text shown when the trigger test is repeated on an open case (TSL-163).
+    repeat_trigger_warning: dict[str, str] | None = None
 
     @model_validator(mode="after")
     def _validate(self) -> Pathway:

@@ -10,13 +10,14 @@ export { cx };
 
 type BtnVariant = "primary" | "secondary" | "quiet" | "danger";
 export function Button({ variant = "secondary", className, size = "md", ...p }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: BtnVariant; size?: "md" | "sm" | "lg" }) {
-  const base = "press inline-flex items-center justify-center gap-2 rounded font-semibold whitespace-nowrap disabled:cursor-not-allowed";
-  const sizes = { sm: "h-8 px-3 text-[13px]", md: "h-10 px-4 text-sm", lg: "h-12 px-5 text-[15px]" }[size];
+  const base = "inline-flex items-center justify-center gap-2 rounded font-medium whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-55";
+  const sizes = { sm: "h-8 px-3 text-[13px]", md: "h-10 px-4 text-[15px]", lg: "h-12 px-5 text-[16px]" }[size];
+  // Dose moulded plastic: the primary is green plastic, the rest clear; each sinks on press (index.css .mould).
   const v = {
-    primary: "bg-biro text-white hover:bg-biro-ink disabled:bg-rule-strong disabled:text-muted",
-    secondary: "bg-sheet text-ink border border-rule-strong hover:bg-sheet-2 disabled:text-muted disabled:bg-sheet-2",
-    quiet: "text-ink-2 hover:underline underline-offset-4 disabled:text-muted px-2",
-    danger: "bg-sheet text-stop border border-rule-strong hover:bg-stop-wash disabled:text-muted",
+    primary: "mould mould-primary",
+    secondary: "mould bg-sheet text-ink",
+    quiet: "press text-ink-2 hover:underline underline-offset-4 disabled:text-muted px-2",
+    danger: "mould bg-sheet text-stop",
   }[variant];
   return <button type="button" {...p} className={cx(base, sizes, v, className)} />;
 }
@@ -33,10 +34,10 @@ export function Tag({ tone = "muted", children, className, outline }: { tone?: T
 
 /** Source-of-truth labels: every fact on screen says where it came from. */
 export function Source({ kind, children }: { kind: "fact" | "rule" | "ai" | "human"; children?: ReactNode }) {
-  if (kind === "fact") return <span className="inline-flex items-center gap-1.5"><Tag tone="muted">FACT</Tag>{children && <span className="mono text-[12px] text-muted">{children}</span>}</span>;
-  if (kind === "rule") return <span className="inline-flex items-center gap-1.5"><span className="rounded-sm border border-rule-strong px-1.5 py-0.5 text-[12px] font-semibold leading-4 text-ink-2">RULE</span>{children && <span className="mono text-[12px] text-muted">{children}</span>}</span>;
-  if (kind === "ai") return <span className="inline-flex items-center gap-1.5"><Tag tone="ai"><Sparkles size={12} aria-hidden />AI DRAFT</Tag><span className="text-[12px] text-ai">{children ?? "A person must confirm this"}</span></span>;
-  return <span className="inline-flex items-center gap-1.5"><Tag tone="ink">HUMAN</Tag>{children && <span className="text-[12px] text-muted">{children}</span>}</span>;
+  if (kind === "fact") return <span className="inline-flex items-center gap-1.5"><Tag tone="muted">Fact</Tag>{children && <span className="mono text-[12px] text-muted">{children}</span>}</span>;
+  if (kind === "rule") return <span className="inline-flex items-center gap-1.5"><span className="rounded-sm border border-rule-strong px-1.5 py-0.5 text-[12px] font-semibold leading-4 text-ink-2">Rule</span>{children && <span className="mono text-[12px] text-muted">{children}</span>}</span>;
+  if (kind === "ai") return <span className="inline-flex items-center gap-1.5"><Tag tone="ai"><Sparkles size={12} aria-hidden />AI draft</Tag><span className="text-[12px] text-ai">{children ?? "A person must confirm this"}</span></span>;
+  return <span className="inline-flex items-center gap-1.5"><Tag tone="ink">Signed</Tag>{children && <span className="text-[12px] text-muted">{children}</span>}</span>;
 }
 
 export function Card({ children, className, as: As = "section", ...rest }: { children: ReactNode; className?: string; as?: "section" | "div" | "article"; [k: string]: unknown }) {
@@ -44,7 +45,7 @@ export function Card({ children, className, as: As = "section", ...rest }: { chi
 }
 
 export function Overline({ children, className }: { children: ReactNode; className?: string }) {
-  return <p className={cx("text-[12px] font-semibold uppercase tracking-[0.06em] text-muted", className)}>{children}</p>;
+  return <p className={cx("text-[13px] font-medium text-muted", className)}>{children}</p>;
 }
 
 export function Skeleton({ className }: { className?: string }) { return <div aria-hidden className={cx("skeleton animate-pulse", className)} />; }
@@ -75,7 +76,7 @@ export function LangTag({ lang }: { lang: string }) {
 
 export function StallChip({ label, level }: { label: string; level: number }) {
   const tone: Tone = level >= 3 ? "stop" : "attn";
-  return <Tag tone={tone} className={level === 2 ? "ring-1 ring-inset ring-current" : undefined}>{label}<span className="mono font-medium opacity-80">L{level}</span></Tag>;
+  return <Tag tone={tone} className={level === 2 ? "ring-1 ring-inset ring-current" : undefined}>{label}<span className="mono font-medium">L{level}</span></Tag>;
 }
 
 /** The journey bar (DESIGN.md 5.5): reported (hatched) vs verified (done), gap outlined in attn. */

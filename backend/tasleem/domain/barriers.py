@@ -70,6 +70,7 @@ BARRIER_LEXICON: dict[BarrierCode, list[str]] = {
     BarrierCode.COST_OR_INSURANCE: ["cost", "pay", "expensive", "insurance", "not covered", "money", "afford",
                                     "تكلفه", "تامين", "غالي", "فلوس", "مو مغطي"],
     BarrierCode.TIME_OR_WORK: ["work", "shift", "busy", "no time", "leave", "boss", "travel", "travelling",
+                               "manager", "day off",
                                "دوام", "شغل", "مشغول", "ما عندي وقت", "اجازه", "مسافر"],
     BarrierCode.LANGUAGE: ["language", "translator", "interpreter", "english", "arabic", "urdu", "hindi",
                            "tagalog", "لغه", "مترجم"],
@@ -78,7 +79,7 @@ BARRIER_LEXICON: dict[BarrierCode, list[str]] = {
                                    "طبيبة", "دكتورة", "احراج", "محرج", "استحي", "طبيب رجل"],
     BarrierCode.WANTS_CALLBACK: ["call me", "callback", "call back", "phone me", "talk to someone",
                                  "speak to", "اتصل", "كلمني", "اتصلوا"],
-    BarrierCode.DONE_ELSEWHERE: ["already done", "already did", "did it at", "another hospital",
+    BarrierCode.DONE_ELSEWHERE: ["already done", "already did", "did it at", "did it in", "another hospital",
                                  "other hospital", "other clinic", "abroad", "back home", "سويته",
                                  "مستشفى ثاني", "مستشفي ثاني", "سويت الفحص"],
 }
@@ -128,9 +129,27 @@ class KeywordBarrierClassifier:
         return Suggestion(code=best, confidence=confidence, model=self.name)
 
 
+# A symptom the patient explicitly denies ("no bleeding", "without blood", "ما في نزيف") is not a red flag.
+# Deliberately narrow: "not bleeding much" or "no more bleeding?" still flag, because a missed red flag costs
+# far more than a clinician clearing a false one.
+_DENIAL_EN = ("no", "without")
+_DENIAL_AR = ("ما في", "مافي", "بدون", "لا يوجد", "ما فيه", "مافيه")
+
+
+def _denied(t: str, term: str) -> bool:
+    """True when every occurrence of `term` in `t` is directly preceded by a denial word."""
+    term_n = normalize(term)
+    if _has_latin(term_n):
+        occ = list(re.finditer(rf"(?<![a-z]){re.escape(term_n)}(?![a-z])", t))
+        return bool(occ) and all(re.search(rf"(?:^|\W)(?:{'|'.join(_DENIAL_EN)})\s+$", t[:m.start()]) for m in occ)
+    occ = list(re.finditer(re.escape(term_n), t))
+    denials = [normalize(d) for d in _DENIAL_AR]
+    return bool(occ) and all(any(t[:m.start()].rstrip().endswith(d) for d in denials) for m in occ)
+
+
 def detect_distress(text: str) -> list[str]:
     t = normalize(text)
-    hits = [term for term in DISTRESS_LEXICON if _matches(t, term)]
+    hits = [term for term in DISTRESS_LEXICON if _matches(t, term) and not _denied(t, term)]
     if _PAIN_SEVERITY_EN.search(t) or _PAIN_SEVERITY_AR.search(t) or _matches(t, "unbearable"):
         hits.append("pain:severe")
     return hits

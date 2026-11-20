@@ -6,9 +6,12 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { bundle, demoRequest, demoSession, falseDoneCase, installBundle, messagePolicy, rememberFalseDone, resetDemo } from "../lib/demo";
 
 const RAW = JSON.parse(readFileSync(resolve(__dirname, "../../demo/demo-bundle.json"), "utf-8"));
-const RAJESH = "case_767b1946ee9e";
-const SUNITA = "case_643f99b63ca1";
-const NOURA = "case_02f77758731b";
+// Case ids change every time the bundle is re-recorded (TSL-180), so look them up by patient.
+const idOf = (pid: string): string => Object.entries<any>(RAW.cases)
+  .find(([, e]) => (Object.values<any>(e.detail_by_persona)[0])?.patient?.id === pid)![0];
+const RAJESH = idOf("p-rajesh");
+const SUNITA = idOf("p-sunita");
+const NOURA = idOf("p-noura");
 
 beforeEach(() => installBundle(RAW));
 
@@ -27,6 +30,7 @@ describe("message policy (IFHAS: no results or advice by message)", () => {
   });
   it("blocks Arabic result words, advice and links", () => {
     expect(messagePolicy("الفحص إيجابي").violations[0].code).toBe("RESULT_DISCLOSURE");
+    expect(messagePolicy("نتائجك لدى طبيبك").violations[0].code).toBe("RESULT_DISCLOSURE");
     expect(messagePolicy("There is nothing to worry about").violations[0].code).toBe("CLINICAL_ADVICE");
     expect(messagePolicy("Your blood pressure was 150/95").violations[0].code).toBe("RESULT_VALUE");
     expect(messagePolicy("Your visit is at 9:30 on 21 Nov").ok).toBe(true);
@@ -51,7 +55,8 @@ describe("R3: a case closes only on evidence or a signed decision", () => {
     expect(r.data.error.code).toBe("R3_CONTACT_ATTEMPTS");
   });
   it("only a clinician clears a distress flag", () => {
-    const path = `/v1/cases/${SUNITA}/distress/dis_12aad4fbe543/resolve`;
+    const dis = (Object.values<any>(RAW.cases[SUNITA].detail_by_persona)[0]).distress[0].id;
+    const path = `/v1/cases/${SUNITA}/distress/${dis}/resolve`;
     const coord = demoRequest("core", "POST", path, { note: "Called" }, "coord-sara");
     expect(coord.status).toBe(409);
     expect(coord.data.error.code).toBe("R3_SIGNATURE_REQUIRED");
@@ -102,7 +107,10 @@ describe("live simulator", () => {
   it("the notifier does nothing until a patient is unreachable, then asks Aisha to call", () => {
     expect(demoRequest("notifier", "POST", "/v1/run-once", {}, "dr-fatima").data.pulled).toBe(0);
     const u = demoRequest("core", "POST", "/v1/demo/scenarios/unreachable-patient", {}, "dr-fatima");
-    expect(demoRequest("notifier", "POST", "/v1/run-once", {}, "dr-fatima").data.pulled).toBe(1);
+    // On the live stack the notifier's worker may already have pulled the message; what matters is that the run
+    // gave up on every channel and reported the patient unreached.
+    const run = demoRequest("notifier", "POST", "/v1/run-once", {}, "dr-fatima").data;
+    expect(run.pulled + run.reported_unreached).toBeGreaterThan(0);
     const c = demoRequest("core", "GET", `/v1/cases/${u.data.case_id}`, undefined, "nav-aisha").data;
     expect(c.next_step.reason).toBe("PATIENT_NOT_REACHED");
     const trail = demoRequest("notifier", "GET", `/v1/notifications?case_id=${u.data.case_id}`, undefined, "nav-aisha").data;
@@ -181,5 +189,24 @@ describe("simulator: report-arrives names the false-done case (live API needs it
     resetDemo();
     expect(falseDoneCase()).toBeNull();
     expect(demoSession().falseDoneRun).toBe(false);
+  });
+});
+
+describe("WhatsApp vision (TSL-184): the nudge must pass the same message policy as Sahatna", () => {
+  it("carries no result, advice or link in either language", async () => {
+    const { NUDGE } = await import("../components/WhatsAppVision");
+    expect(messagePolicy(NUDGE.en).ok).toBe(true);
+    expect(messagePolicy(NUDGE.ar).ok).toBe(true);
+  });
+});
+
+describe("patient conveniences (TSL-183): the calendar file carries no clinical content", () => {
+  it("names a hospital appointment, sets a day-before reminder, and never says colonoscopy or result", async () => {
+    const { calendarFile } = await import("../components/PatientExtras");
+    const f = calendarFile("case_x", "2026-11-23T08:00:00Z", "en");
+    expect(f).toContain("DTSTART:20261123T080000Z");
+    expect(f).toContain("TRIGGER:-P1D");
+    expect(f.toLowerCase()).not.toMatch(/colonoscop|result|cancer|positive/);
+    expect(messagePolicy(f.split("SUMMARY:")[1].split("\r\n")[0]).ok).toBe(true);
   });
 });

@@ -123,7 +123,8 @@ def parse_resource(r: dict[str, Any], now: datetime, message_id: str | None = No
     if rt == "DiagnosticReport":
         if not final:
             return skip(f"report status {status}")
-        return sig(SignalKind.REPORT_FINAL, codes=_codes(r.get("code")))
+        text = r.get("conclusion") or None
+        return sig(SignalKind.REPORT_FINAL, codes=_codes(r.get("code")), text=text)
     if rt == "ServiceRequest":
         if status != "active":
             return skip(f"service request status {status}")

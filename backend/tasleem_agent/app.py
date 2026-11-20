@@ -4,6 +4,7 @@
   POST /v1/cases/{id}/brief           cited case brief for the clinician
   POST /v1/cases/{id}/outreach-draft  plain-language patient message draft (policy-checked)
   POST /v1/translate                  patient reply translated for staff (LLM only; else unavailable)
+  POST /v1/cases/{id}/reports/{rid}/reading  Evidence Reader: report findings with verbatim quotes (suggest-only)
   POST /v1/barrier-suggestion         LLM barrier code suggestion (TSL-110; off unless it beats keywords)
   GET  /v1/drafts/{id}                what the agent drafted, for audit
 
@@ -32,6 +33,7 @@ from tasleem_common.ratelimit import RateLimiter
 
 from .assist import draft_outreach, facts, make_brief, translate
 from .classify import suggest_barrier
+from .report_reading import draft_rebook, read_with_model
 from .providers import CachedProvider, LLMProvider, make_provider, with_cache
 
 
@@ -235,6 +237,40 @@ def create_app(settings: AgentSettings | None = None, core: ServiceClient | None
     @app.post("/v1/cases/{case_id}/outreach-draft")
     def outreach(case_id: str, body: DraftIn | None = None, who: dict[str, str] = Depends(caller)) -> dict[str, Any]:
         return outreach_for(case_id, core_get(f"/v1/cases/{case_id}", who), (body or DraftIn()).language, who)
+
+    @app.post("/v1/cases/{case_id}/reports/{report_id}/reading")
+    def report_reading(case_id: str, report_id: str, who: dict[str, str] = Depends(caller)) -> dict[str, Any]:
+        """Evidence Reader. The clinician confirms or corrects this in case-core; nothing here changes the case."""
+        case = core_get(f"/v1/cases/{case_id}", who)
+        rpt = next((r for r in case.get("reports") or [] if r.get("id") == report_id), None)
+        if rpt is None:
+            raise HTTPException(404, {"code": "NOT_FOUND", "message": "No such report on this case."})
+        reading = read_with_model(rpt["text"], llm)
+        if reading is None:
+            kw = rpt.get("keyword_reading") or {}
+            return {"available": False, "reader": kw.get("reader"), "fields": kw.get("fields"),
+                    "why": "No model answered; case-core's keyword reader applies.", "requires_confirmation": True}
+        out = {"available": True, "reader": llm.name, **reading, "provenance": "ai_suggestion",
+               "requires_confirmation": True}
+        out["draft_id"] = record(case_id, "report_reading", who, "llm", llm.name, out)
+        return out
+
+    @app.post("/v1/cases/{case_id}/reports/{report_id}/rebook-draft")
+    def rebook_draft(case_id: str, report_id: str, who: dict[str, str] = Depends(caller)) -> dict[str, Any]:
+        """After a physician confirms an incomplete colonoscopy, draft the rebook request to the GI centre from the
+        report. Suggest-only: it opens in the e-consult form for the physician to edit and send."""
+        case = core_get(f"/v1/cases/{case_id}", who)
+        rpt = next((r for r in case.get("reports") or [] if r.get("id") == report_id), None)
+        if rpt is None or not rpt.get("reviewed"):
+            raise HTTPException(409, {"code": "REPORT_NOT_CONFIRMED", "message": "Confirm the report's findings first."})
+        f = rpt.get("findings") or {}
+        if f.get("completed") is not False and f.get("prep_adequate") is not False:
+            raise HTTPException(409, {"code": "NOTHING_TO_REBOOK", "message": "The confirmed report does not call for a repeat."})
+        name = str(case["patient"]["name"]).split(" (")[0]
+        d = draft_rebook(name, rpt["text"], f, llm)
+        out = {**d, "provenance": "ai_suggestion" if d["source"] == "llm" else "template", "requires_approval": True}
+        out["draft_id"] = record(case_id, "rebook", who, d["source"], d["model"], out)
+        return out
 
     @app.post("/v1/translate")
     def translate_reply(body: TranslateIn, who: dict[str, str] = Depends(caller)) -> dict[str, Any]:

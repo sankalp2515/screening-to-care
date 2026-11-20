@@ -35,6 +35,7 @@ def _case(c: TestClient, pid: str) -> dict:
     ("Your test was positive.", "RESULT_DISCLOSURE"),
     ("We found a polyp.", "RESULT_DISCLOSURE"),
     ("نتيجة الفحص إيجابي", "RESULT_DISCLOSURE"),
+    ("نتائجك لدى طبيبك وسيتواصل معك", "RESULT_DISCLOSURE"),
     ("You are fine, nothing to worry about.", "CLINICAL_ADVICE"),
     ("Book here: www.example.com/book", "LINK"),
     ("", "EMPTY"),

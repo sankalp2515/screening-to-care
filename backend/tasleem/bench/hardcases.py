@@ -309,9 +309,17 @@ BARRIER_CASES = [
     ("I'll think about it", "none"),
     ("My kids are sick this week", "none"),
 ]
+# Held-out set written on 19 Nov 2026 *before* the TSL-186 lexicon and negation changes, so the fix is judged
+# on phrasings it was not tuned on. Misses stay in the table.
+BARRIER_CASES += [
+    ("My supervisor said I can't take time off that week", "TIME_OR_WORK"),
+    ("I had the colonoscopy done in Cairo in August", "DONE_ELSEWHERE"),
+    ("مديري ما يعطيني اجازه", "TIME_OR_WORK"),
+    ("I'd feel more comfortable if a woman did the test", "FEMALE_CLINICIAN"),
+]
 BARRIER_NOTES = {
-    "My manager won't give me the day off": "Cue words absent ('manager', 'day off'); human confirms the code anyway",
-    "I did it in India last month": "No cue ('in India'); human confirms the code anyway",
+    "My manager won't give me the day off": "Missed until 19 Nov; fixed by TSL-186 ('manager', 'day off')",
+    "I did it in India last month": "Missed until 19 Nov; fixed by TSL-186 ('did it in')",
     "My kids are sick this week": "Arguably TIME_OR_WORK; abstaining sends it to a human, which is safe",
 }
 DISTRESS_CASES = [
@@ -339,10 +347,17 @@ DISTRESS_CASES += [
     ("Mild pain after the injection, nothing else", "no flag"),
     ("I'm worried the procedure will cause pain", "no flag"),
 ]
+# Held-out set written on 19 Nov 2026 before the TSL-186 negation rule.
+DISTRESS_CASES += [
+    ("No pain and no bleeding, I just forgot the date", "no flag"),
+    ("There is still blood in my stool", "flag"),
+    ("Not bleeding anymore but I'm very scared", "flag"),
+    ("بدون نزيف، بس خايف شوي", "no flag"),
+]
 DISTRESS_NOTES = {
     "The pain is unbearable": "Missed in v0.1 (no cue word); fixed in v0.2 by the pain-severity rule",
     "I had a blood test last week": "Over-flag by design: high recall; a clinician sees it and clears it",
-    "No bleeding, just nervous": "Negation not handled: over-flag, safe direction",
+    "No bleeding, just nervous": "Over-flagged until 19 Nov; fixed by TSL-186 (narrow denial rule)",
 }
 
 

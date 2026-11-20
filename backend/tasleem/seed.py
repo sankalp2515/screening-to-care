@@ -30,7 +30,9 @@ ORGS = [
          insurance_networks=["Thiqa", "Enhanced", "Basic"]),
     dict(id="org-samar", name="Samar Family Clinic (demo)", kind="primary_care", services=[],
          insurance_networks=["Enhanced", "Basic"]),
-    dict(id="org-falaj", name="Falaj GI Centre (demo)", kind="gi_centre", services=["colonoscopy"],
+    # "female_endoscopist": a female endoscopist is on the list, for patients who ask for one (TSL-165).
+    dict(id="org-falaj", name="Falaj GI Centre (demo)", kind="gi_centre",
+         services=["colonoscopy", "female_endoscopist"],
          insurance_networks=["Thiqa", "Enhanced"]),
     dict(id="org-dana", name="Dana Endoscopy Clinic (demo)", kind="gi_centre", services=["colonoscopy"],
          insurance_networks=["Basic", "Enhanced"]),
@@ -73,6 +75,10 @@ PATIENTS = [
          family_physician_id="dr-fatima", birth_year=1980),
     dict(id="p-khalfan", display_name="Khalfan B. (51)", preferred_language="ar", insurance_network="Thiqa",
          family_physician_id="dr-salma", birth_year=1975),
+    dict(id="p-khalid", display_name="Khalid M. (57)", preferred_language="en", insurance_network="Thiqa",
+         family_physician_id="dr-fatima", birth_year=1969),
+    dict(id="p-mariam", display_name="Mariam S. (62)", preferred_language="ar", insurance_network="Thiqa",
+         family_physician_id="dr-salma", birth_year=1964),
     dict(id="p-john", display_name="John D. (59)", preferred_language="en", insurance_network="Enhanced",
          family_physician_id=None, birth_year=1967),
 ]
@@ -141,9 +147,23 @@ def procedure(pid: str, rid: str, t: datetime) -> dict:
             "code": _cc(SNOMED, "73761001"), "performedDateTime": _iso(t)}
 
 
-def report(pid: str, rid: str, t: datetime) -> dict:
-    return {"resourceType": "DiagnosticReport", "id": rid, "status": "final",
-            "subject": {"reference": f"Patient/{pid}"}, "code": _cc(LOINC, "18746-8"), "issued": _iso(t)}
+def report(pid: str, rid: str, t: datetime, text: str | None = None) -> dict:
+    r = {"resourceType": "DiagnosticReport", "id": rid, "status": "final",
+         "subject": {"reference": f"Patient/{pid}"}, "code": _cc(LOINC, "18746-8"), "issued": _iso(t)}
+    if text:
+        r["conclusion"] = text  # free text, read by the Evidence Reader
+    return r
+
+
+# Synthetic report texts (no real patient wording).
+# Written the way real reports are: no "incomplete", no "caecum", no "repeat". Keyword rules read one finding
+# of six from it (the Boston score); the model reads all six, each with its sentence.
+KHALID_REPORT = ("Indication: positive FIT. Examination limited to the sigmoid colon: the scope could not be passed "
+                 "beyond 40 cm because of solid faecal residue. Boston score 3 (1-1-1). No lesions seen in the "
+                 "segments examined. Re-scope in 3 months after an extended two-day preparation.")
+MARIAM_REPORT = ("Indication: positive FIT. Caecum reached and identified by the appendiceal orifice. "
+                 "Bowel preparation BBPS 8 (3-3-2). Two polyps removed by cold snare, 6 mm and 9 mm. "
+                 "Histology pending. Repeat colonoscopy in 3 years if adenomas are confirmed.")
 
 
 def careplan(pid: str, rid: str, t: datetime) -> dict:
@@ -188,6 +208,18 @@ def _case_of(svc: Any, pid: str, pathway_id: str | None = None) -> str:
         if pathway_id is None or c.pathway_id == pathway_id:
             return c.id
     raise LookupError(pid)
+
+
+def _confirm_reading(svc: Any, pid: str, clinician: str, t: datetime) -> None:
+    """A clinician accepts the keyword reader's reading of the patient's first report unchanged."""
+    from .domain.report_reader import READER_ID, reading_dict
+
+    cid = _case_of(svc, pid)
+    st = svc.cases.get(cid)
+    r = next(iter(st.reports.values()))
+    fields = {k: v["value"] for k, v in reading_dict(r.text).items()}
+    svc.cases.review_report(cid, Actor(id=clinician, type=ActorType.CLINICIAN), r.id, fields, t,
+                            suggested_by=READER_ID, suggestion=fields)
 
 
 def _staff(pid: str, t: ActorType) -> Actor:
@@ -251,8 +283,34 @@ def build_timeline(now: datetime) -> list[tuple[datetime, Any]]:
     items.append((n(25), bp("p-khalfan", "obs-bp-p-khalfan", n(25), 162)))
     items.append((n(23), comm("p-khalfan", "com-inv-p-khalfan", n(23), PURPOSE_INVITE)))
 
+    # 13. Khalid: Malaffi says COMPLETED and a report arrived, but the report says the colonoscopy was incomplete
+    #     with inadequate preparation. The Evidence Reader reads it; Dr Fatima has not confirmed it yet.
+    items += fit_journey("p-khalid", n(20), "PROCEDURE_DONE")
+    items.append((n(1), report("p-khalid", "dr-p-khalid", n(1), KHALID_REPORT)))
+    items.append((n(1), ref("p-khalid", 4, n(1), AdminStatus.COMPLETED)))
+
+    # 14. Mariam: complete colonoscopy, two polyps removed, histology pending. Dr Salma confirmed the reading
+    #     25 days ago; the pathology has still not arrived, so the case stays open and escalates.
+    items += fit_journey("p-mariam", n(45), "PROCEDURE_DONE")
+    items.append((n(26), report("p-mariam", "dr-p-mariam", n(26), MARIAM_REPORT)))
+    items.append((n(25), lambda svc, t: _confirm_reading(svc, "p-mariam", "dr-salma", t)))
+
+    # Noura agreed to be contacted by Sahatna before any outreach (judge finding, 20 Nov: the switch showed off).
+    items.append((n(29), lambda svc, t: svc.cases.record_consent(
+        _case_of(svc, "p-noura"), Actor(id="p-noura", type=ActorType.PATIENT), t)))
+
     # 12. John: no registered family physician → coordinator owns the case, with a warning (R1).
     items += fit_journey("p-john", n(3), "PATIENT_INVITED")
+
+    # Dr. Fatima asks a GI specialist about Ahmed after his referral was rejected. Dr. Omar is away this week
+    # (set in seed()), so the question waits in Dr. Lina's list as his named cover (TSL-160).
+    items.append((n(2), lambda svc, t: svc.cases.request_consult(
+        _case_of(svc, "p-ahmed"), fatima, "dr-omar",
+        "His referral was rejected by the GI centre. Could he be seen at Falaj, and does he need a new referral?", t)))
+
+    # A lab sends a positive FIT under a hospital record number Tasleem cannot match to anyone. It is stored,
+    # never dropped, and waits in the coordinator's unmatched queue for a person to match or dismiss (TSL-161).
+    items.append((n(1), fit("mrn-skmc-88213", "obs-unmatched-88213", n(1))))
 
     # Navigator logs a call attempt on Ahmed's case.
     items.append((n(5), lambda svc, t: svc.cases.log_contact(_case_of(svc, "p-ahmed"), aisha, "phone",
@@ -300,6 +358,8 @@ def seed(ctx: Any, now: datetime | None = None) -> dict[str, Any]:
             tick(svc.cases, ticks[ti])
             ti += 1
         result = tick(svc.cases, now)
+        # Dr. Omar is on leave this week with Dr. Lina as his named cover (TSL-160).
+        svc.directory.set_absence("dr-omar", now + timedelta(days=6), "dr-lina")
         n_cases = len(svc.cases.repo.all_rows())
     ctx.cache.clear()
     return {"seeded": True, "messages": ingested, "commands": commands, "cases": n_cases, "final_tick": result}

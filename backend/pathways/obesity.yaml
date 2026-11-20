@@ -1,0 +1,58 @@
+# Pathway D (configuration only, TSL-187): screening BMI in the obesity range -> review -> agreed plan.
+# ADPHC named obesity among the IFHAS findings to prioritise (V3). As with blood pressure and HbA1c, this file is
+# the whole change: no code. Thresholds and deadlines are PLACEHOLDERS for the programme's clinical lead to set.
+id: obesity-screening
+version: 1
+name: Screening BMI in the obesity range to agreed plan
+priority: medium
+referral_service: null
+
+trigger:
+  signal: LAB_RESULT
+  codes: ["39156-5"]                      # LOINC body mass index
+  value_gte: 30                           # kg/m2; placeholder screening threshold
+
+stages:
+  - {id: PATIENT_INVITED, label: Patient invited for a healthy-weight review, signals: [PATIENT_INVITED], sla_days: 7}
+  - {id: RESULT_DISCUSSED, label: Reviewed with family physician, signals: [RESULT_DISCUSSED], sla_days: 21}
+  - {id: CARE_PLAN_AGREED, label: Plan agreed (lifestyle, dietitian or specialist), signals: [CARE_PLAN_ACTIVE], sla_days: 21}
+  - {id: OUTCOME_COMMUNICATED, label: Plan shared with patient, signals: [OUTCOME_COMMUNICATED], sla_days: 7}
+
+checks:
+  communicated_stage: OUTCOME_COMMUNICATED
+  handoff_accept_days: 2
+  consult_answer_days: 3
+  reescalate_after_days: 7
+
+escalation_ladder: [owner, clinic_lead, program_coordinator]
+
+playbooks:
+  FEAR: {assignee_role: navigator, action: "Explain what the review involves, without judgement, in the patient's language.", due_days: 3}
+  TIME_OR_WORK: {assignee_role: navigator, action: "Offer an evening slot or a remote first review.", due_days: 3}
+  COST_OR_INSURANCE: {assignee_role: coordinator, action: "Check coverage for dietitian and specialist visits.", due_days: 3}
+  LANGUAGE: {assignee_role: navigator, action: "Book an interpreter.", due_days: 2}
+  FEMALE_CLINICIAN: {assignee_role: navigator, action: "Offer a female physician or dietitian for the review.", due_days: 3}
+  WANTS_CALLBACK: {assignee_role: clinician, action: "Owner calls the patient back.", due_days: 2}
+  DONE_ELSEWHERE: {assignee_role: clinician, action: "Request the plan from the other provider.", due_days: 3}
+  OTHER: {assignee_role: navigator, action: "Call the patient to understand the barrier.", due_days: 2}
+
+closure:
+  completion_stages: [CARE_PLAN_AGREED, OUTCOME_COMMUNICATED]
+  min_contact_attempts_for_unreachable: 3
+
+patient_messages:
+  OPENED:
+    en: "Your doctor would like to see you for a short health review."
+    ar: "يرغب طبيبك في رؤيتك لمراجعة صحية قصيرة."
+  PATIENT_INVITED:
+    en: "Please book a short review with your family doctor."
+    ar: "يرجى حجز مراجعة قصيرة مع طبيب الأسرة."
+  RESULT_DISCUSSED:
+    en: "Your doctor will agree a plan with you."
+    ar: "سيتفق طبيبك معك على خطة."
+  CARE_PLAN_AGREED:
+    en: "Your plan is ready."
+    ar: "خطتك جاهزة."
+  OUTCOME_COMMUNICATED:
+    en: "Your follow-up is complete. Thank you."
+    ar: "اكتملت متابعتك. شكراً لك."

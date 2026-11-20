@@ -3,7 +3,7 @@
 
 export type Service = "core" | "agent" | "notifier" | "connector";
 
-export interface Person { id: string; name: string; role: string }
+export interface Person { id: string; name: string; role: string; away?: { until: string; cover: { id: string; name: string } | null } }
 export interface Me extends Person { actor_type: string; org_id?: string; sees_all_cases?: boolean; language?: string }
 
 export interface Progress {
@@ -15,6 +15,7 @@ export interface Progress {
 export interface StallChip { reason: string; label: string; level: number }
 
 export interface CaseRow {
+  next_action?: { reason: string; who: string; text: string } | null;
   id: string;
   patient: { id: string; name: string; language: string };
   pathway: { id: string; name: string };
@@ -32,9 +33,9 @@ export interface CaseRow {
 }
 
 export interface WorkSection { kind: string; label: string; count: number; items: CaseRow[] }
-export interface Work { person: string; needs_action: number; sections: WorkSection[] }
+export interface Work { person: string; needs_action: number; sections: WorkSection[]; covering?: { id: string; name: string; until: string }[] }
 
-export interface Stage { id: string; label: string; note: string | null; reached: boolean; reached_at: string | null; evidence_ref: string | null; provenance: string | null }
+export interface Stage { id: string; label: string; note: string | null; reached: boolean; status?: "verified" | "incomplete" | "pending"; reached_at: string | null; evidence_ref: string | null; provenance: string | null }
 export interface Stall extends StallChip { stage: string; detail: string; flagged_at: string; last_escalated_at: string | null; escalated_to: Person | null; provenance: string }
 export interface Barrier {
   id: string; reported_codes: string[]; text: string | null; reported_by: string; reported_at: string;
@@ -48,6 +49,15 @@ export interface Allowed { allowed: boolean; code?: string; message?: string }
 export interface CloseOption extends Allowed { outcome: string; requires: string[] }
 export interface TimelineEvent { seq: number; type: string; at: string; actor: string; provenance: string; payload: Record<string, any> }
 
+export interface ReportFieldReading { field: string; value: boolean | number | string | null; quote: string | null }
+export interface ReportReview {
+  id: string; ref: string; text: string; received_at: string; reviewed: boolean;
+  findings: Record<string, boolean | number | string | null> | null;
+  reviewed_by: string | null; reviewed_at: string | null; suggested_by: string | null; corrected: string[];
+  keyword_reading: { reader: string; fields: Record<string, ReportFieldReading> };
+  field_labels: Record<string, string>;
+}
+
 export interface Case {
   id: string; status: string; version: number;
   patient: { id: string; name: string; language: string; insurance_network?: string; birth_year?: number };
@@ -60,6 +70,7 @@ export interface Case {
   appointment_at: string | null; appointment_missed: boolean;
   stalls: Stall[]; barriers: Barrier[]; distress: Distress[]; consults: Consult[];
   contact_attempts: any[]; warnings: any[]; consent_at: string | null; outcome: any;
+  reports?: ReportReview[]; confirmed_findings?: Record<string, boolean | number | string | null>;
   days_since_progress: number | null;
   timeline: TimelineEvent[];
   next_step: { reason: string; who: string; text: string; provenance: string; person: { id: string; name: string } | null } | null;
@@ -67,6 +78,7 @@ export interface Case {
     offer_handoff: Allowed; accept_handoff: Allowed; reject_handoff: Allowed; log_contact: Allowed;
     request_consult: Allowed; message_patient: Allowed; close: CloseOption[];
     barriers: Record<string, any>; distress: Record<string, Allowed>; consults: Record<string, Allowed>;
+    reports?: Record<string, Allowed>;
   };
   notifications: any[];
 }

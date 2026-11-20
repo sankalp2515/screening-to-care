@@ -1,0 +1,11 @@
+# /etc/systemd/system/tasleem-audit-anchor.service: publish the audit root outside the database (TSL-173).
+# The JSON line lands in the systemd journal (and any log shipping from it), where a database rewrite cannot reach.
+[Unit]
+Description=Tasleem audit anchor
+After=tasleem.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/tasleem/app
+ExecStart=/usr/bin/docker compose -p tasleem -f docker-compose.yml -f deploy/azure/compose.azure.yml --env-file /opt/tasleem/secrets.env exec -T api python -m tasleem.audit_anchor

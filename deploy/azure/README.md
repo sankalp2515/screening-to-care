@@ -66,3 +66,17 @@ to `/opt/tasleem/app`, then rebuild and restart:
 sudo docker compose -p tasleem -f docker-compose.yml -f deploy/azure/compose.azure.yml --env-file /opt/tasleem/secrets.env build
 sudo systemctl restart tasleem
 ```
+
+## Daily audit anchor (TSL-173)
+
+Each case's audit chain is hash-linked. Once a day the server also publishes one root hash over every chain
+to the systemd journal, outside the database:
+
+```bash
+sudo cp deploy/azure/tasleem-audit-anchor.{service,timer} /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now tasleem-audit-anchor.timer
+journalctl -u tasleem-audit-anchor --since today      # {"kind": "tasleem.audit_anchor", "root": "..."}
+```
+
+To check that history has not been rewritten, compare a published root with
+`GET /api/core/v1/program/audit-anchor?as_of=<the same time>` (programme coordinator).

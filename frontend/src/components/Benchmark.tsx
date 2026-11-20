@@ -15,10 +15,10 @@ export function BenchmarkChart() {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={DATA} layout="vertical" margin={{ top: 0, right: 56, bottom: 0, left: 0 }} barCategoryGap={14}>
             <XAxis type="number" domain={[0, 100]} hide />
-            <YAxis type="category" dataKey="arm" width={140} tickLine={false} axisLine={false} tick={{ fill: "var(--ink-2)", fontSize: 13, fontFamily: "Libre Franklin" }} />
+            <YAxis type="category" dataKey="arm" width={140} tickLine={false} axisLine={false} tick={{ fill: "var(--ink-2)", fontSize: 13, fontFamily: "Instrument Sans, ui-sans-serif, sans-serif" }} />
             <Bar dataKey="v" radius={[0, 2, 2, 0]} background={{ fill: "var(--sheet-2)" }} isAnimationActive={false}>
               {DATA.map((d) => <Cell key={d.arm} fill={d.arm === "Tasleem" ? "var(--done)" : "var(--rule-strong)"} />)}
-              <LabelList dataKey="v" position="right" formatter={(v: number) => `${v}%`} style={{ fill: "var(--ink)", fontSize: 13, fontFamily: "IBM Plex Mono" }} />
+              <LabelList dataKey="v" position="right" formatter={(v: number) => `${v}%`} style={{ fill: "var(--ink)", fontSize: 13, fontFamily: "DM Mono, ui-monospace, monospace" }} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -30,8 +30,8 @@ export function BenchmarkChart() {
 export const TILES: [string, string][] = [
   ["0 vs 160", "journeys falsely counted as done, of 2,000 (Tasleem vs status only)"],
   ["1.9 vs 16.5 days", "median time from care stopping to an alert"],
-  ["241", "automated tests passing"],
-  ["64 of 67", "labelled hard cases handled"],
+  ["279", "automated tests passing"],
+  ["72 of 75", "labelled hard cases handled"],
 ];
 
 export function StatTiles() {

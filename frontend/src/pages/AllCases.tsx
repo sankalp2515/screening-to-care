@@ -45,7 +45,7 @@ export default function AllCases() {
       </div>
       {list.isLoading ? <Skeleton className="h-64" /> : list.error ? <ErrorState error={list.error} retry={() => list.refetch()} /> : (
         <Card>
-          <div className="hidden grid-cols-[minmax(180px,1.2fr)_minmax(160px,1fr)_minmax(0,1.4fr)] gap-x-6 border-b border-rule bg-sheet-2 px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-muted md:grid">
+          <div className="hidden grid-cols-[minmax(180px,1.2fr)_minmax(160px,1fr)_minmax(0,1.4fr)] gap-x-6 border-b border-rule bg-sheet-2 px-4 py-2 text-[13px] font-medium text-muted md:grid">
             <span>Patient</span><span>Reported vs verified</span><span>Stalls and owner</span>
           </div>
           {rows.length ? <ul className="divide-y divide-rule">{rows.map((r) => <CaseRowItem key={r.id} row={r} showPriority />)}</ul>

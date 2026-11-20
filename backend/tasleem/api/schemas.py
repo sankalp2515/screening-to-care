@@ -39,6 +39,15 @@ class ConsultIn(BaseModel):
     question: str = Field(max_length=4000)
 
 
+class ReportReviewIn(BaseModel):
+    """What the clinician confirms a report says. `suggestion` is what the reader proposed, so corrections are
+    measured (AI acceptance monitoring)."""
+
+    findings: dict[str, bool | int | str | None]
+    suggested_by: str | None = Field(default=None, max_length=80)
+    suggestion: dict[str, bool | int | str | None] | None = None
+
+
 class AnswerIn(BaseModel):
     answer: str = Field(max_length=4000)
 

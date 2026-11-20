@@ -4,13 +4,16 @@ from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, Header, Query
+from fastapi.responses import Response
+from pydantic import BaseModel, Field
 from sqlalchemy import text
 
-from ..domain.actions import available_actions, next_step
+from ..domain.actions import available_actions, next_step, viewer_step
+from ..domain.model import CaseState
 from ..domain.audit import verify
 from ..domain.errors import DomainError, NotFound
 from ..domain.messaging import check_patient_text
-from ..domain.model import Actor, ActorType, to_utc
+from ..domain.model import Actor, ActorType, BarrierCode, to_utc
 from ..services.fhir import ReferralStatusMessage
 from ..services.scheduler import tick
 from ..services.views import case_detail, patient_view, worklist_item
@@ -40,6 +43,7 @@ from .schemas import (
     PatientMessageIn,
     PrepAnswersIn,
     RejectIn,
+    ReportReviewIn,
     TextIn,
     TickIn,
 )
@@ -88,8 +92,14 @@ def _detail(svc: Services, ctx: AppContext, case_id: str, viewer: Actor | None =
             pid = svc.directory.person_for_role(st, who)
         person = svc.directory.person(pid)
         step["person"] = {"id": pid, "name": person.name if person else pid}
+    if viewer is not None:
+        mine = viewer_step(st, viewer.id, svc.cases.covers(viewer, now), lambda pid: _short(svc, pid))
+        if mine is not None:
+            mine["person"] = {"id": viewer.id, "name": _short(svc, viewer.id)}
+            step = mine
     out["next_step"] = step
-    out["actions"] = available_actions(st, p, viewer, now) if viewer is not None else None
+    out["actions"] = (available_actions(st, p, viewer, now, svc.cases.covers(viewer, now))
+                      if viewer is not None else None)
     out["notifications"] = [_notification(m) for m in svc.cases.repo.outbox(case_id=case_id, limit=200)]
     return out
 
@@ -235,6 +245,17 @@ def answer(case_id: str, consult_id: str, body: AnswerIn, actor: Actor = Depends
     return _detail(svc, ctx, case_id, actor)
 
 
+@cases.post("/{case_id}/reports/{report_id}/review")
+def review_report(case_id: str, report_id: str, body: ReportReviewIn, actor: Actor = Depends(require_staff),
+                  ctx: AppContext = Depends(get_ctx), svc: Services = Depends(get_services)) -> dict[str, Any]:
+    """Evidence Reader: a clinician confirms or corrects what a free-text report says. Rules act only on this."""
+    svc.cases.require_visible(case_id, actor)
+    svc.cases.review_report(case_id, actor, report_id, dict(body.findings), utcnow(),
+                            suggested_by=body.suggested_by,
+                            suggestion=dict(body.suggestion) if body.suggestion is not None else None)
+    return _detail(svc, ctx, case_id, actor)
+
+
 @cases.post("/{case_id}/patient-messages")
 def message_patient(case_id: str, body: PatientMessageIn, actor: Actor = Depends(require_staff),
                     ctx: AppContext = Depends(get_ctx), svc: Services = Depends(get_services)) -> dict[str, Any]:
@@ -258,7 +279,11 @@ def referral_options(case_id: str, actor: Actor = Depends(require_staff), ctx: A
                      svc: Services = Depends(get_services)) -> dict[str, Any]:
     st = svc.cases.require_visible(case_id, actor)
     p = ctx.registry.get(st.pathway_id)
-    return {"service": p.referral_service, "options": svc.directory.referral_options(st.patient_id, p.referral_service)}
+    prefer_female = any(BarrierCode.FEMALE_CLINICIAN in (b.reported_codes or []) or
+                        BarrierCode.FEMALE_CLINICIAN in (b.confirmed_code, b.suggested_code)
+                        for b in st.barriers.values())
+    return {"service": p.referral_service, "prefer_female": prefer_female,
+            "options": svc.directory.referral_options(st.patient_id, p.referral_service, prefer_female)}
 
 
 @cases.get("/{case_id}/audit")
@@ -284,16 +309,23 @@ def whoami(actor: Actor = Depends(current_actor), svc: Services = Depends(get_se
             "actor_type": actor.type.value, "language": pat.preferred_language if pat else "en"}
 
 
+def _short(svc: Services, pid: str) -> str:
+    """A person's display name without the role suffix ("Dr. Fatima"), never a raw id when the directory knows them."""
+    p = svc.directory.person(pid)
+    return p.name.split(" (")[0] if p else pid
+
+
 @me.get("/work")
 def my_work(actor: Actor = Depends(require_staff), ctx: AppContext = Depends(get_ctx),
             svc: Services = Depends(get_services)) -> dict[str, Any]:
     """Everything waiting on this person, grouped by why. One indexed query on case_assignments."""
-    rows = svc.cases.repo.assignments_for(actor.id)
+    rows = svc.cases.inbox_for(actor.id)
     by_kind: dict[str, list[Any]] = {}
     for a in rows:
         by_kind.setdefault(a.kind, []).append(a)
     cases_by_id = {r.id: r for r in svc.cases.repo.rows_by_ids(list({a.case_id for a in rows}))}
     now = utcnow()
+    covers = svc.cases.covers(actor, now)
     sections = []
     for kind in INBOX_ORDER:
         grouped: dict[str, list[Any]] = {}
@@ -304,13 +336,42 @@ def my_work(actor: Actor = Depends(require_staff), ctx: AppContext = Depends(get
             row = cases_by_id.get(case_id)
             if row is None or row.status != "open":
                 continue
-            items.append({**worklist_item(row, ctx.registry, svc.directory, now),
+            item = worklist_item(row, ctx.registry, svc.directory, now)
+            mine = viewer_step(CaseState.model_validate(row.state_json), actor.id, covers,
+                               lambda pid: _short(svc, pid))
+            if mine is not None:
+                item["next_action"] = {"reason": mine["reason"], "who": "you", "text": mine["text"]}
+            items.append({**item,
                           "why": {"kind": kind, "refs": [a.ref for a in rows_for_case],
                                   "since": min(a.since for a in rows_for_case)}})
         items.sort(key=lambda i: (-len(i["stalls"]), -i["escalation_level"], -i["days_since_progress"]))
         sections.append({"kind": kind, "label": INBOX_LABELS[kind], "count": len(items), "items": items})
     needs_action = sum(sec["count"] for sec in sections if sec["kind"] != "owner")
-    return {"person": actor.id, "needs_action": needs_action, "sections": sections}
+    covering = [{"id": p.id, "name": p.name, "until": p.away_until} for p in svc.directory.covering_for(actor.id)]
+    return {"person": actor.id, "needs_action": needs_action, "sections": sections, "covering": covering}
+
+
+class AbsenceIn(BaseModel):
+    until: datetime | None = None  # None ends the absence
+    cover_id: str | None = Field(default=None, max_length=64)
+
+
+@me.put("/absence")
+def set_my_absence(body: AbsenceIn, actor: Actor = Depends(require_staff),
+                   svc: Services = Depends(get_services)) -> dict[str, Any]:
+    """TSL-160: name a cover while away. Ownership stays with you (R1); your work list and new escalations go
+    to the cover until you are back (R4 still reaches a named person)."""
+    if body.until is not None:
+        if body.until <= utcnow():
+            raise DomainError("VALIDATION", "The end of the absence must be in the future.")
+        cover = svc.directory.person(body.cover_id or "")
+        if cover is None or cover.id == actor.id:
+            raise DomainError("VALIDATION", "Name a colleague in the directory as your cover.")
+        if cover.away():
+            raise DomainError("VALIDATION", f"{cover.name} is away too. Choose someone who is in.")
+    p = svc.directory.set_absence(actor.id, body.until, body.cover_id)
+    svc.cases.bump_write_version()
+    return {"id": p.id, "away_until": p.away_until, "cover_id": p.cover_id}
 
 
 # ---- patient companion --------------------------------------------------------------------------
@@ -368,7 +429,7 @@ PREP_REPLY = {
 
 
 @me.post("/cases/{case_id}/prep-check")
-def prep_check_answer(case_id: str, body: PrepAnswersIn, actor: Actor = Depends(require_patient),
+def prep_check_answer(case_id: str, body: PrepAnswersIn, lang: str | None = None, actor: Actor = Depends(require_patient),
                       ctx: AppContext = Depends(get_ctx), svc: Services = Depends(get_services)) -> dict[str, Any]:
     """A wrong or missing answer opens a barrier (PREP_UNCLEAR, or the question's own code) so a navigator
     goes through it with the patient. The patient is never told they 'failed'."""
@@ -379,7 +440,7 @@ def prep_check_answer(case_id: str, body: PrepAnswersIn, actor: Actor = Depends(
     if codes:
         _, barrier_id = svc.cases.report_barrier(case_id, actor, codes, None, utcnow())
     return {"all_correct": not wrong, "follow_up_needed": bool(wrong), "barrier_id": barrier_id,
-            "barrier_codes": [c.value for c in codes], "message": PREP_REPLY[bool(wrong)][_patient_lang(svc, actor)]}
+            "barrier_codes": [c.value for c in codes], "message": PREP_REPLY[bool(wrong)][_patient_lang(svc, actor, lang)]}
 
 
 # ---- policy -------------------------------------------------------------------------------------
@@ -396,6 +457,13 @@ def metrics(pathway: str | None = None, org: str | None = Query(default=None, ma
             language: str | None = Query(default=None, pattern="^(en|ar)$"), actor: Actor = Depends(require_staff),
             svc: Services = Depends(get_services)) -> dict[str, Any]:
     return svc.metrics.get(pathway, org, language)
+
+
+@program.get("/ai-oversight")
+def ai_oversight_view(actor: Actor = Depends(require_staff), svc: Services = Depends(get_services)) -> dict[str, Any]:
+    """A5: AI suggestions made, accepted and corrected by people, from the audit log (acceptance monitoring)."""
+    from ..services.ai_oversight import ai_oversight
+    return ai_oversight(svc.session)
 
 
 @program.get("/usage")
@@ -430,7 +498,9 @@ def system_tick(body: TickIn | None = None, ctx: AppContext = Depends(get_ctx),
 
 @system.get("/directory/people", dependencies=[Depends(require_demo)])
 def people(svc: Services = Depends(get_services)) -> dict[str, Any]:
-    staff = [{"id": p.id, "name": p.name, "role": p.role, "org_id": p.org_id} for p in svc.directory.people()]
+    staff = [{"id": p.id, "name": p.name, "role": p.role, "org_id": p.org_id,
+              "away_until": p.away_until if p.away() else None, "cover_id": p.cover_id if p.away() else None}
+             for p in svc.directory.people()]
     patients = [{"id": p.id, "name": p.display_name, "role": "patient", "language": p.preferred_language}
                 for p in svc.directory.patients()]
     return {"staff": staff, "patients": patients}
@@ -488,3 +558,77 @@ def demo_run(scenario: str, body: dict[str, Any] | None = Body(default=None), ct
     out = run(svc, scenario, utcnow(), body)
     out["case"] = _detail(svc, ctx, out["case_id"])
     return out
+
+
+# ---- unmatched-patient review queue (TSL-161) -------------------------------------------------------------
+class UnmatchedResolveIn(BaseModel):
+    action: str = Field(pattern="^(match|dismiss)$")
+    patient_id: str | None = Field(default=None, max_length=64)
+
+
+def _coordinator(actor: Actor) -> Actor:
+    if actor.type != ActorType.COORDINATOR:
+        raise DomainError("FORBIDDEN", "Programme coordinator only.")
+    return actor
+
+
+@integration.get("/unmatched")
+def unmatched(actor: Actor = Depends(require_staff), svc: Services = Depends(get_services)) -> dict[str, Any]:
+    """Messages for a patient Tasleem does not know. None is dropped: each waits here for a person."""
+    _coordinator(actor)
+    items = svc.ingest.unmatched()
+    return {"items": items, "count": len(items)}
+
+
+@integration.post("/unmatched/{row_id}/resolve")
+def resolve_unmatched(row_id: int, body: UnmatchedResolveIn, actor: Actor = Depends(require_staff),
+                      svc: Services = Depends(get_services)) -> dict[str, Any]:
+    _coordinator(actor)
+    return svc.ingest.resolve_unmatched(row_id, body.action, body.patient_id, actor, utcnow())
+
+
+# ---- programme export (TSL-182) ----------------------------------------------------------------------------
+@program.get("/export.csv")
+def export_csv(actor: Actor = Depends(require_staff), ctx: AppContext = Depends(get_ctx),
+               svc: Services = Depends(get_services)) -> Response:
+    """One row per case for the programme's own reporting. Pseudonymous ids only: no names, no results."""
+    import csv
+    import io
+
+    from ..domain.model import AdminStatus, CaseState
+
+    _coordinator(actor)
+    out = io.StringIO()
+    w = csv.writer(out)
+    w.writerow(["case_id", "patient_ref", "pathway", "clinic", "owner", "opened_at", "status",
+                "malaffi_status", "verified_step", "of_steps", "false_done", "open_stalls", "escalation_level",
+                "outcome", "days_to_procedure"])
+    for doc in svc.cases.repo.iter_states():
+        st = CaseState.model_validate(doc)
+        p = ctx.registry.get(st.pathway_id)
+        owner = svc.directory.person(st.owner_id)
+        reached = [s.id for s in p.stages if s.id in st.stages]
+        proc = p.checks.procedure_stage
+        days = (round((st.stages[proc].reached_at - st.opened_at).total_seconds() / 86400, 1)
+                if proc and proc in st.stages else "")
+        false_done = bool(st.admin_status == AdminStatus.COMPLETED and p.checks.evidence_stage
+                          and p.checks.evidence_stage not in st.stages)
+        w.writerow([st.id, st.patient_id, p.id, owner.org_id if owner else "", st.owner_id,
+                    st.opened_at.date().isoformat(), "open" if st.is_open else "closed",
+                    st.admin_status.value if st.admin_status else "", len(reached), len(p.stages),
+                    "yes" if false_done else "no", ";".join(sorted(str(getattr(r, "value", r)) for r in st.stalls)),
+                    max((s.level for s in st.stalls.values()), default=0),
+                    st.outcome.value if st.outcome else "", days])
+    return Response(out.getvalue(), media_type="text/csv",
+                    headers={"Content-Disposition": 'attachment; filename="tasleem-programme.csv"'})
+
+
+@program.get("/audit-anchor")
+def audit_anchor(as_of: datetime | None = None, actor: Actor = Depends(require_staff),
+                 svc: Services = Depends(get_services)) -> dict[str, Any]:
+    """TSL-173: the root over every case's audit chain as of a moment. Compare it with a root published earlier
+    outside the database: any rewritten history changes it."""
+    from ..audit_anchor import anchor
+
+    _coordinator(actor)
+    return anchor(svc.session, to_utc(as_of) if as_of else None)

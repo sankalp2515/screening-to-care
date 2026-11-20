@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 import urllib.error
 import urllib.request
@@ -20,8 +21,13 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-CORE, NOTIF, AGENT, CONN = (f"http://localhost:{p}" for p in (8000, 8010, 8020, 8030))
-OPS = {"X-Ops-Key": "local-ops-key"}
+# Defaults are the local Docker stack. TSL-180: set these to record from any stack, for example inside the
+# deployed compose network (http://api:8000, ...), where the notifier's ops key is already in the environment.
+CORE = os.environ.get("TASLEEM_CORE_URL", "http://localhost:8000")
+NOTIF = os.environ.get("TASLEEM_NOTIFIER_URL", "http://localhost:8010")
+AGENT = os.environ.get("TASLEEM_AGENT_URL", "http://localhost:8020")
+CONN = os.environ.get("TASLEEM_CONNECTOR_URL", "http://localhost:8030")
+OPS = {"X-Ops-Key": os.environ.get("NOTIFIER_OPS_KEY", "local-ops-key")}
 
 
 class Recorder:
@@ -122,6 +128,7 @@ def main(argv: list[str] | None = None) -> None:
              for lang in ("ar", "en")},
         "usage": r.get(CORE, f"/v1/program/usage?month={month}", "coord-sara"),
         "channels": r.get(NOTIF, "/v1/policy"),
+        "ai_oversight": r.get(CORE, "/v1/program/ai-oversight", "coord-sara"),
     }
     scenarios_list = r.get(CORE, "/v1/demo/scenarios")
 
@@ -150,6 +157,20 @@ def main(argv: list[str] | None = None) -> None:
         r.command("specialist answers e-consult", "core", "POST",
                   f"/v1/cases/{raj}/consults/{open_consult['id']}/answer", "dr-omar",
                   {"answer": "Not done here. The booking was cancelled by the patient; please re-refer."}, case_id=raj)
+
+    # Evidence Reader: the AI reads Khalid's free-text report, Dr Fatima confirms it, the rules keep the loop open.
+    kha = by_patient["p-khalid"]["id"]
+    khalid = detail("p-khalid", "dr-fatima")
+    for rpt in khalid.get("reports", []):
+        reading = r.command("AI reads the colonoscopy report", "agent", "POST",
+                            f"/v1/cases/{kha}/reports/{rpt['id']}/reading", "dr-fatima", {}, case_id=kha)
+        fields = (reading or {}).get("fields") or rpt["keyword_reading"]["fields"]
+        values = {k: v["value"] for k, v in fields.items()}
+        r.command("physician confirms the report findings", "core", "POST",
+                  f"/v1/cases/{kha}/reports/{rpt['id']}/review", "dr-fatima",
+                  {"findings": values, "suggested_by": (reading or {}).get("reader") or "keyword-reader-v1",
+                   "suggestion": values}, case_id=kha)
+        break
 
     nou = by_patient["p-noura"]["id"]
     noura = detail("p-noura", "nav-aisha")

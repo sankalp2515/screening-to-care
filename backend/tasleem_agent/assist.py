@@ -68,16 +68,23 @@ def facts(case: dict[str, Any]) -> list[Fact]:
     if case.get("appointment_missed"):
         seq = _first(tl, "APPOINTMENT_MISSED")
         out.append(Fact(id="missed", cites=[seq] if seq else [],
-                        text=f"The appointment was missed ({case['appointment_missed']})."))
+                        text="The appointment was missed" + (" (no-show)." if case["appointment_missed"] == "noshow"
+                                                              else " (cancelled).")))
+    symptom_ids = {d.get("barrier_id") for d in case.get("distress", []) if not d.get("resolved")}
+    labels = {"FEAR": "fear or worry", "NO_ESCORT": "no one to take them home", "PREP_UNCLEAR": "preparation unclear",
+              "TRANSPORT": "transport", "COST_OR_INSURANCE": "cost or insurance", "TIME_OR_WORK": "time off work",
+              "LANGUAGE": "language", "FEMALE_CLINICIAN": "asks for a female doctor",
+              "WANTS_CALLBACK": "asks for a call", "DONE_ELSEWHERE": "says it was done elsewhere", "OTHER": "other"}
     for b in case.get("barriers", []):
-        if b["status"] == "resolved":
-            continue
+        if b["status"] == "resolved" or b["id"] in symptom_ids:
+            continue  # a symptom is never described as a barrier (judge finding, 20 Nov)
         code = b.get("confirmed_code") or ", ".join(b.get("reported_codes") or []) or b.get("suggested_code")
         how = "confirmed by staff" if b.get("confirmed_code") else (
             "reported by the patient" if b.get("reported_codes") else "AI suggestion, not yet confirmed")
         seq = _first(tl, "BARRIER_REPORTED", barrier_id=b["id"])
+        words = ", ".join(labels.get(x.strip(), x.strip().lower()) for x in str(code).split(","))
         out.append(Fact(id=f"barrier:{b['id']}", cites=[seq] if seq else [],
-                        text=f"Barrier: {code} ({how})."))
+                        text=f"What got in the way: {words} ({how})."))
     for d in case.get("distress", []):
         if not d.get("resolved"):
             seq = _first(tl, "DISTRESS_FLAGGED", distress_id=d["id"])
@@ -165,14 +172,28 @@ def choose_template(case: dict[str, Any]) -> tuple[str | None, str]:
         return None, "The case is closed."
     if any(not d.get("resolved") for d in case.get("distress", [])):
         return None, "Open distress flag: a clinician must call the patient. No message is drafted."
-    if (case.get("next_step") or {}).get("reason") == "PATIENT_NOT_REACHED":
+    reason = (case.get("next_step") or {}).get("reason")
+    if reason == "PATIENT_NOT_REACHED":
         return None, "Messages are not reaching this patient. A navigator must call."
+    if reason in ("REPORT_TO_REVIEW", "REPORT_NOT_REVIEWED"):
+        return None, "A report has arrived. Confirm what it says first; the next message depends on it."
+    if reason == "PROCEDURE_INCOMPLETE":
+        return None, ("The colonoscopy must be rebooked. Arrange the new date with the GI centre, then explain it to "
+                      "the patient by phone or in person: a message must not describe the result.")
+    if reason in ("CLOSED_WITHOUT_EVIDENCE", "PATHOLOGY_PENDING", "PATHOLOGY_OUTSTANDING"):
+        # Judge finding, 20 Nov: Rajesh attended; the missing piece is the GI centre's report, not the patient.
+        return None, ("The patient has nothing to do right now: the gap is with the GI centre. "
+                      "Use E-consult to ask the GI centre for the report.")
     open_b = [b for b in case.get("barriers", []) if b["status"] != "resolved"]
     if open_b:
         b = open_b[-1]
         code = b.get("confirmed_code") or (b.get("reported_codes") or [None])[0] or b.get("suggested_code")
         if code in OUTREACH:
-            return code, f"Latest open barrier: {code}."
+            words = {"FEAR": "fear or worry", "NO_ESCORT": "no one to take them home", "PREP_UNCLEAR": "the preparation is unclear",
+                     "TRANSPORT": "transport", "COST_OR_INSURANCE": "cost or insurance", "TIME_OR_WORK": "time off work",
+                     "LANGUAGE": "language", "FEMALE_CLINICIAN": "asks for a female doctor", "WANTS_CALLBACK": "asks for a call",
+                     "DONE_ELSEWHERE": "says it was done elsewhere"}.get(code, "something else")
+            return code, f"Drafted for what the patient said got in the way: {words}."
     if case.get("appointment_missed"):
         return "MISSED", "The appointment was missed."
     return "GENERIC", "No barrier on file; general follow-up message."

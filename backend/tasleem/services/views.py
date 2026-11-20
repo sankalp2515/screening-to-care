@@ -10,8 +10,19 @@ from datetime import UTC, date, datetime, timedelta
 from statistics import median
 from typing import Any
 
+from ..domain.actions import next_step
 from ..domain.audit import StoredEvent
-from ..domain.model import CARE_COMPLETED_OUTCOMES, AdminStatus, BarrierCode, CaseState, StallReason, to_utc
+from ..domain.holidays import UAE_PUBLIC_HOLIDAYS
+from ..domain.model import (
+    CARE_COMPLETED_OUTCOMES,
+    AdminStatus,
+    BarrierCode,
+    CaseState,
+    ReportReview,
+    StallReason,
+    to_utc,
+)
+from ..domain.report_reader import FIELD_LABELS, READER_ID, reading_dict
 from ..domain.pathways import Pathway, PathwayRegistry
 from ..infra.cache import WRITE_VERSION_KEY, Cache
 from ..infra.db import CaseRow
@@ -29,6 +40,9 @@ STALL_LABELS = {
     StallReason.HANDOFF_NOT_ACCEPTED: "Handoff not accepted",
     StallReason.REFERRAL_REJECTED: "Referral rejected",
     StallReason.CONSULT_UNANSWERED: "E-consult unanswered",
+    StallReason.REPORT_NOT_REVIEWED: "Report not yet confirmed",
+    StallReason.PROCEDURE_INCOMPLETE: "Colonoscopy incomplete: rebook",
+    StallReason.PATHOLOGY_OUTSTANDING: "Pathology result overdue",
 }
 
 BARRIER_LABELS: dict[BarrierCode, dict[str, str]] = {
@@ -77,7 +91,11 @@ def _days_since(dt: datetime, now: datetime) -> float:
 
 def _name(directory: Directory, pid: str) -> dict[str, Any]:
     p = directory.person(pid)
-    return {"id": pid, "name": p.name if p else pid, "role": p.role if p else None}
+    out: dict[str, Any] = {"id": pid, "name": p.name if p else pid, "role": p.role if p else None}
+    if p is not None and p.away():
+        cover = directory.person(directory.acting_for(pid))
+        out["away"] = {"until": p.away_until, "cover": {"id": cover.id, "name": cover.name} if cover else None}
+    return out
 
 
 def worklist_item(row: CaseRow, registry: PathwayRegistry, directory: Directory, now: datetime) -> dict[str, Any]:
@@ -100,7 +118,17 @@ def worklist_item(row: CaseRow, registry: PathwayRegistry, directory: Directory,
         "open_barriers": sum(1 for b in st.barriers.values() if b.status != "resolved"),
         "distress_open": len(st.open_distress),
         "outcome": st.outcome.value if st.outcome else None,
+        "next_action": (lambda ns: {"reason": ns["reason"], "who": ns["who"], "text": ns["text"]} if ns else None)(
+            next_step(st, p)),
     }
+
+
+def _report_view(r: ReportReview) -> dict[str, Any]:
+    """A free-text report, the keyword reader's suggestion (always available, deterministic) and, once a
+    clinician has checked it, the confirmed findings. The agent service may offer a model reading on top."""
+    return {**r.model_dump(mode="json"), "reviewed": r.reviewed,
+            "keyword_reading": {"reader": READER_ID, "fields": reading_dict(r.text)},
+            "field_labels": FIELD_LABELS}
 
 
 def case_detail(st: CaseState, events: list[StoredEvent], registry: PathwayRegistry, directory: Directory,
@@ -108,9 +136,13 @@ def case_detail(st: CaseState, events: list[StoredEvent], registry: PathwayRegis
     p = registry.get(st.pathway_id)
     pat = directory.patient(st.patient_id)
     stages = []
+    f = st.confirmed_findings
+    # A procedure the report says did not finish is attempted, not verified (judge finding, 20 Nov: Khalid).
+    incomplete = p.checks.procedure_stage if (f.get("completed") is False or f.get("prep_adequate") is False) else None
     for sd in p.stages:
         ev = st.stages.get(sd.id)
         stages.append({"id": sd.id, "label": sd.label, "note": sd.note, "reached": ev is not None,
+                       "status": "incomplete" if ev is not None and sd.id == incomplete else ("verified" if ev else "pending"),
                        "reached_at": ev.reached_at if ev else None, "evidence_ref": ev.ref if ev else None,
                        "provenance": "fact" if ev else None})
     timeline = [{"seq": e.seq, "type": e.type, "at": e.occurred_at, "actor": e.actor_id,
@@ -140,6 +172,8 @@ def case_detail(st: CaseState, events: list[StoredEvent], registry: PathwayRegis
         "consults": [k.model_dump(mode="json") for k in st.consults.values()],
         "contact_attempts": st.contact_attempts,
         "warnings": st.warnings,
+        "reports": [_report_view(r) for r in st.reports.values()],
+        "confirmed_findings": st.confirmed_findings,
         "consent_at": st.consent_at,
         "outcome": ({"type": st.outcome.value, "evidence_ref": st.outcome_evidence_ref, "reason": st.outcome_reason,
                      "signed_by": st.closed_by, "closed_at": st.closed_at,
@@ -367,14 +401,15 @@ class MetricsService:
         }
 
 
-def working_days_between(start: datetime, end: datetime) -> int:
-    """UAE working days (Monday to Friday since 2022) after `start`'s date, up to and including `end`'s date.
-    Public holidays are not modelled, so this slightly favours the provider."""
+def working_days_between(start: datetime, end: datetime, holidays: frozenset[date] = UAE_PUBLIC_HOLIDAYS) -> int:
+    """UAE working days (Monday to Friday since 2022, minus federal public holidays) after `start`'s date, up to
+    and including `end`'s date. Islamic holidays use expected dates until the official announcement."""
     d0, d1 = to_utc(start).date(), to_utc(end).date()
     if d1 <= d0:
         return 0
     full, rem = divmod((d1 - d0).days, 7)
-    return full * 5 + sum(1 for i in range(1, rem + 1) if _weekday(d0, full * 7 + i) < 5)
+    days = full * 5 + sum(1 for i in range(1, rem + 1) if _weekday(d0, full * 7 + i) < 5)
+    return days - sum(1 for h in holidays if d0 < h <= d1 and h.weekday() < 5)
 
 
 def _weekday(d: date, plus_days: int) -> int:

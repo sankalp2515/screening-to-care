@@ -8,8 +8,8 @@ Malaffi tells you a referral exists. Tasleem tells you whether the colonoscopy r
 
 [![CI](https://github.com/sankalp2515/screening-to-care/actions/workflows/ci.yml/badge.svg)](https://github.com/sankalp2515/screening-to-care/actions/workflows/ci.yml)
 [![Live demo](https://img.shields.io/badge/live%20demo-no%20login-1A4BE0)](https://tasleem.swedencentral.cloudapp.azure.com)
-![Tests](https://img.shields.io/badge/tests-241%20backend%20%C2%B7%2024%20web-2E7D32)
-![Hard cases](https://img.shields.io/badge/hard%20cases-64%20of%2067-2E7D32)
+![Tests](https://img.shields.io/badge/tests-279%20backend%20%C2%B7%2026%20web%20%C2%B7%2025%20browser-2E7D32)
+![Hard cases](https://img.shields.io/badge/hard%20cases-72%20of%2075-2E7D32)
 ![Synthetic data](https://img.shields.io/badge/data-synthetic%20only-595959)
 ![FHIR R4](https://img.shields.io/badge/FHIR-R4-E44D26)
 ![HL7 v2](https://img.shields.io/badge/HL7-v2-806B63)
@@ -46,7 +46,7 @@ Since DoH Circular 210/2026, every referral flows through Malaffi as an HL7 REF 
 
 ## See it in 60 seconds
 
-No sign-up. Every patient is synthetic. Pick a role, or take the guided tour (seven steps, about three minutes).
+No sign-up. Every patient is synthetic. Pick a role, or take the guided tour (eight steps, about four minutes).
 
 | Role | Open as | What you will see |
 |---|---|---|
@@ -151,7 +151,14 @@ sequenceDiagram
   T->>F: Stall cleared on evidence, case can close
 ```
 
-**Rules decide, AI only drafts.** Every decision, score and timer is deterministic code. The AI agent writes cited case briefs and policy-checked patient drafts; a person confirms or sends. It has no write access to clinical state.
+**AI reads, rules decide, a person confirms.** Every decision, score and timer is deterministic code. The AI does the reading people cannot keep up with:
+
+- **Evidence Reader.** A colonoscopy report arriving is not the loop closing. The AI reads the free-text report (complete to the caecum? bowel prep adequate? polyps removed? pathology pending? next step? interval?) and quotes the sentence behind every value; a value whose quote is not in the report is dropped. A physician confirms in one click, and only then do the rules act: an incomplete or poorly prepared colonoscopy stays open as "rebook", and pending pathology keeps the case open until the result. Without a model, a deterministic reader takes over (83% on held-out reports, and every miss is a blank, never a wrong value).
+- **Reply reader.** Patients' free-text replies, often in Gulf Arabic, get an English gist and a suggested reason; a navigator confirms. Symptoms never enter this path: they go to a clinician.
+- **Drafts.** Patient messages are rewritten from approved templates and must pass a deterministic message policy before a person can send them.
+- **Oversight.** Programme › AI at work shows how often people accept or correct each AI job, from the audit log.
+
+The agent has no write access to clinical state.
 
 ### Six safety rules, enforced in code
 
@@ -171,7 +178,7 @@ sequenceDiagram
 | `tasleem` case-core API | 8000 | The only writer of clinical state: rules, audit chain, inboxes, outbox |
 | scheduler | none | Deadlines and escalations, as its own process |
 | `tasleem_notifier` | 8010 | Each person on their own channel: Sahatna, content-free SMS, EMR inbox, worklist, digest; quiet hours and fallbacks |
-| `tasleem_agent` | 8020 | Suggest-only AI on Azure OpenAI: cited briefs, policy-checked drafts |
+| `tasleem_agent` | 8020 | Suggest-only AI on Azure OpenAI: Evidence Reader, reply reader, cited briefs, policy-checked drafts |
 | `tasleem_connector` | 8030 | HL7 v2 ORU, REF and SIU from labs, GI centres and Malaffi, mapped to FHIR, with ACKs |
 | web | 8080 | React app and gateway: staff console, patient companion, landing page |
 
@@ -186,9 +193,10 @@ Software results on synthetic data, not patient outcomes. A clinical pilot measu
 | Stalled journeys that reach a named person | **99.9%** vs 81.8% for Malaffi status only | `python -m tasleem.bench.reality` · [report](docs/evidence/REAL_WORLD_FIT.md) |
 | Median days from care stopping to an alert | **1.9** vs 16.5 | same run, 2,000 patients, failure mix from Martin 2017 |
 | Journeys wrongly counted as done | **0** vs 160 | same run |
-| Labelled hard cases (missing, wrong, out-of-order, distress) | **64 of 67**, misses kept in the table | `python -m tasleem.bench.hardcases` · [cases](docs/evidence/HARD_CASES.md) |
-| Automated tests | **241** backend, **24** web | `pytest` · `npm test` |
+| Labelled hard cases (missing, wrong, out-of-order, distress) | **72 of 75**, misses kept in the table | `python -m tasleem.bench.hardcases` · [cases](docs/evidence/HARD_CASES.md) |
+| Automated tests | **279** backend, **26** web unit, **25** browser end to end (incl. WCAG) | `pytest` · `npm test` · `pytest e2e` |
 | End-to-end checks on the live Azure stack | **32 of 32** | `python -m tasleem.smoke --stack` |
+| Evidence Reader on 28 labelled synthetic reports | model (gpt-5-mini) **92.3%**, 2 wrong values; keyword fallback **83%** held out, 0 wrong | `python -m tasleem.bench.report_eval [--model]` |
 | AI users with jobs to be done | **42 of 42** checks | [persona simulation](docs/evidence/PERSONA_SIMULATION.md) |
 | Scale on PostgreSQL | 5,000 patients at **51.8 messages/s**, about 1,000× Abu Dhabi's average load | `python -m tasleem.loadtest` · [scale](docs/evidence/SCALE_POSTGRES.md) |
 
@@ -273,7 +281,8 @@ backend/
   tasleem_agent/        suggest-only AI: briefs, drafts, barrier suggestions
   tasleem_connector/    HL7 v2 in, FHIR out, ACKs
   pathways/             clinician-reviewable YAML: FIT to colonoscopy, HbA1c, blood pressure
-  tests/                241 tests: unit, API, invariants, security, end to end
+  tests/                279 tests: unit, API, invariants, security, end to end
+e2e/                    browser tests (Playwright): reviewer tour, simulator, reset, R3, policy, patient, WCAG
 frontend/               React 18, Vite, TypeScript, Tailwind: staff console, patient companion, landing
 deploy/azure/           Azure VM, Caddy (HTTPS), Key Vault secrets, systemd unit
 docs/                   product, architecture, engineering, evidence, API contracts, roadmap
@@ -281,7 +290,9 @@ docs/                   product, architecture, engineering, evidence, API contra
 
 ## Roadmap
 
-The prototype is honest about what is not built yet. Before a 90-day pilot: cover and delegation when an owner is away, an unmatched-patient review queue, a signed clinical safety case, a Malaffi sandbox feed, real Sahatna and SMS gateways, UAE Pass and Entra ID sign-in, UAE North hosting as code, and browser end-to-end tests of every persona. The full list, each item with a test for "done", is in **[docs/ROADMAP.md](docs/ROADMAP.md)**.
+Built in the challenge week and tested: cover while an owner is away, an unmatched-patient review queue, a repeat-FIT guard, female-endoscopist routing, a national guideline scorecard, a daily audit anchor, a WhatsApp nudge shown as a vision, and browser end-to-end and accessibility tests in CI.
+
+What a pilot still needs is honest about who it needs: a signed clinical safety case, a Malaffi sandbox feed, real Sahatna and SMS gateways, UAE Pass and Entra ID sign-in, a penetration test and UAE North hosting. Each item, with a test for "done", is in **[docs/ROADMAP.md](docs/ROADMAP.md)**.
 
 ## Contributing, security and licence
 

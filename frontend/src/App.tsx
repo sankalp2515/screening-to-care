@@ -13,6 +13,7 @@ const CaseView = lazy(() => import("./pages/CaseView"));
 const Programme = lazy(() => import("./pages/Programme"));
 const Simulator = lazy(() => import("./pages/Simulator"));
 const Patient = lazy(() => import("./pages/Patient"));
+const Pilot = lazy(() => import("./pages/Pilot"));
 
 /** A crash shows a message and a way back, never a blank page. */
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
@@ -74,7 +75,9 @@ export default function App() {
     <Suspense fallback={<div className="mx-auto mt-24 max-w-md space-y-3 px-4" aria-busy="true"><Skeleton className="h-6 w-2/3" /><Skeleton className="h-24" /></div>}>
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/pilot" element={<Suspense fallback={null}><Pilot /></Suspense>} />
       <Route path="/demo" element={<BundleGate><DemoPicker /></BundleGate>} />
+      <Route path="/signin" element={<BundleGate><DemoPicker /></BundleGate>} />
       <Route path="/app" element={<BundleGate><RequireStaff><AppShell /></RequireStaff></BundleGate>}>
         <Route index element={<Navigate to="work" replace />} />
         <Route path="work" element={<MyWork />} />

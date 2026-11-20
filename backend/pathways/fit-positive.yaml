@@ -46,8 +46,18 @@ checks:
   handoff_accept_days: 2
   consult_answer_days: 2
   reescalate_after_days: 3
+  # A colonoscopy report counts only once a clinician confirms what it says (complete? prep? pathology?).
+  report_review: true
+  report_review_days: 2
+  pathology_result_days: 21
 
 escalation_ladder: [owner, clinic_lead, program_coordinator]
+
+# A repeat FIT does not replace the colonoscopy. The UAE CRC guideline (2022) repeats a FIT only when the result
+# is unclear or spoilt; the Abu Dhabi SEHA study saw repeat tests after positives, "reflecting lack of trust".
+repeat_trigger_warning:
+  negative: "A negative repeat FIT after a positive one does not cancel the colonoscopy (UAE CRC guideline 2022: repeat only if the first result was unclear or spoilt)."
+  positive: "The FIT was repeated after a positive result. Repeat only if the first was unclear or spoilt; the colonoscopy is still needed (UAE CRC guideline 2022)."
 
 # National quality indicators, measured on verified clinical evidence rather than referral status.
 # UAE National Guideline for Colorectal Cancer Screening and Diagnosis, 3rd edition 2022, Appendix 2.
@@ -96,14 +106,14 @@ patient_messages:
     en: "Your colonoscopy is booked. Tell us if anything could stop you from going."
     ar: "تم حجز موعد تنظير القولون. أخبرنا إذا كان هناك ما قد يمنعك من الحضور."
   ATTENDED:
-    en: "Thank you for attending. Your follow-up is not finished yet: we are waiting for the report from the clinic, and your doctor will contact you about it. You do not need to do anything now."
-    ar: "شكراً لحضورك. لم تنته متابعتك بعد: ننتظر التقرير من العيادة، وسيتواصل معك طبيبك بشأنه. لا تحتاج إلى فعل أي شيء الآن."
+    en: "Thank you for attending. Your follow-up is not finished yet: we are waiting for the report from the clinic, and your doctor will contact you about it. There is nothing more to do for now."
+    ar: "شكراً لحضورك. لم تنته متابعتك بعد: ننتظر التقرير من العيادة، وسيتواصل معك طبيبك بشأنه. لا شيء مطلوب منك الآن."
   PROCEDURE_DONE:
     en: "Your test is done. Your doctor will share the results with you."
     ar: "تم إجراء الفحص. سيشاركك طبيبك النتائج."
   REPORT_RECEIVED:
-    en: "Your results are with your doctor, who will contact you."
-    ar: "نتائجك لدى طبيبك وسيتواصل معك."
+    en: "Your doctor has received the report from the clinic and will contact you."
+    ar: "وصل التقرير من العيادة إلى طبيبك، وسيتواصل معك."
   OUTCOME_COMMUNICATED:
     en: "Your follow-up is complete. Thank you."
     ar: "اكتملت متابعتك. شكراً لك."

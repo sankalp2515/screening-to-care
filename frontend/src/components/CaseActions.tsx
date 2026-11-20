@@ -9,7 +9,7 @@ import { Button, Dialog, Field, Source, Tag, cx, inputCls, toastError, useToast 
 
 function Blocked({ a }: { a: Allowed }) {
   if (a.allowed) return null;
-  return <p className="text-[12px] text-muted"><span className="mono">{a.code}</span> · {a.message}</p>;
+  return <p className="text-[12px] text-muted" title={a.code}>{a.message}</p>;
 }
 
 export function CloseDialog({ c, open, onOpenChange, meName, meRole }: { c: Case; open: boolean; onOpenChange: (o: boolean) => void; meName?: string; meRole?: string }) {
@@ -42,7 +42,7 @@ export function CloseDialog({ c, open, onOpenChange, meName, meRole }: { c: Case
             <span className="flex-1">
               <span className="flex flex-wrap items-center gap-2"><span className="font-semibold">{label(OUTCOME_LABELS, o.outcome)}</span>{["COMPLETED_WITH_REPORT", "COMPLETED_ELSEWHERE"].includes(o.outcome) && <Tag tone="done">Counts as care completed</Tag>}</span>
               {o.allowed ? <span className="block text-[13px] text-ink-2">{o.requires.length ? `Needs: ${o.requires.map((r) => (r === "evidence_ref" ? "an evidence reference" : "a clinical reason")).join(" and ")}` : "Evidence already on file."}</span>
-                : <span className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-stop"><Source kind="rule">{o.code}</Source><span>{o.message}</span></span>}
+                : <span className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-stop"><span title={o.code}><Source kind="rule" /></span><span>{o.message}</span></span>}
             </span>
           </label>
         ))}
@@ -51,7 +51,7 @@ export function CloseDialog({ c, open, onOpenChange, meName, meRole }: { c: Case
         <div className="reveal mt-4 rounded border border-attn bg-attn-wash p-3 text-[14px]">
           <p className="text-attn">The rules block this outcome. You can still try: the server will refuse it and say why.</p>
           <Button className="mt-2" size="sm" onClick={() => tryClose(opt.outcome, {})}>Try to close anyway</Button>
-          {err && <p role="alert" className="reveal mt-3 border-t border-attn pt-3 text-stop"><span className="mono me-2 text-[12px]">{err.code}</span>Refused by the server: {err.message}</p>}
+          {err && <p role="alert" className="reveal mt-3 border-t border-attn pt-3 text-stop"><span title={err.code}>Not allowed: {err.message}</span></p>}
         </div>
       )}
       {opt?.allowed && needs.length > 0 && (
@@ -68,7 +68,7 @@ export function CloseDialog({ c, open, onOpenChange, meName, meRole }: { c: Case
           )}
         </div>
       )}
-      {err && opt?.allowed && <p role="alert" className="reveal mt-4 rounded border border-stop bg-stop-wash p-3 text-[14px] text-stop"><span className="mono me-2 text-[12px]">{err.code}</span>{err.message}</p>}
+      {err && opt?.allowed && <p role="alert" className="reveal mt-4 rounded border border-stop bg-stop-wash p-3 text-[14px] text-stop"><span title={err.code}>{err.message}</span></p>}
       <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t border-rule pt-4">
         <div>
           <p className="text-[12px] text-muted">Signing as</p>
@@ -88,6 +88,19 @@ export function CloseDialog({ c, open, onOpenChange, meName, meRole }: { c: Case
 
 export default function CaseActions({ c, meId, meName, meRole, closeOpen, setCloseOpen }: { c: Case; meId: string; meName?: string; meRole?: string; closeOpen: boolean; setCloseOpen: (o: boolean) => void }) {
   const [dlg, setDlg] = useState<null | "contact" | "message" | "handoff" | "consult" | "referral" | "decline">(null);
+  const [more, setMore] = useState(false);
+  // The decision bar's primary button opens the matching dialog here (one source of truth for the dialogs).
+  useEffect(() => {
+    const on = (e: Event) => {
+      const d = (e as CustomEvent<string | { name: string; q?: string }>).detail;
+      const name = typeof d === "string" ? d : d.name;
+      if (name === "close") { setCloseOpen(true); return; }
+      setF(typeof d === "string" ? {} : { q: d.q ?? "" });
+      setDlg(name as typeof dlg);
+    };
+    window.addEventListener("tasleem:action", on);
+    return () => window.removeEventListener("tasleem:action", on);
+  }, [setCloseOpen]);
   const cmd = useCommand();
   const toast = useToast();
   const dir = useDirectory();
@@ -107,7 +120,7 @@ export default function CaseActions({ c, meId, meName, meRole, closeOpen, setClo
 
   return (
     <>
-      <div className="sticky bottom-0 z-10 -mx-4 border-t border-rule bg-paper/95 px-4 py-3 backdrop-blur lg:-mx-0 lg:rounded lg:border lg:px-3">
+      <div className="rounded border border-rule bg-sheet px-3 py-3" role="group" aria-label="Case actions">
         <div className="flex flex-wrap gap-2">
           {isTarget ? (
             <>
@@ -117,12 +130,15 @@ export default function CaseActions({ c, meId, meName, meRole, closeOpen, setClo
           ) : null}
           <Button disabled={!a.log_contact.allowed} onClick={() => open("contact")} title={a.log_contact.message}><Phone size={16} aria-hidden />Log contact</Button>
           <Button disabled={!a.message_patient.allowed} onClick={() => open("message")} title={a.message_patient.message}><MessageCircle size={16} aria-hidden />Message patient</Button>
-          <Button disabled={!a.offer_handoff.allowed} onClick={() => open("handoff")} title={a.offer_handoff.message}><ArrowRightLeft size={16} aria-hidden />Hand off</Button>
           <Button disabled={!a.request_consult.allowed} onClick={() => open("consult")} title={a.request_consult.message}><Stethoscope size={16} aria-hidden />E-consult</Button>
-          <Button onClick={() => open("referral")}><Building2 size={16} aria-hidden />Referral options</Button>
+          <Button variant="quiet" aria-expanded={more} onClick={() => setMore((m) => !m)}>{more ? "Less" : "More…"}</Button>
+          {more && <>
+            <Button className="reveal" disabled={!a.offer_handoff.allowed} onClick={() => open("handoff")} title={a.offer_handoff.message}><ArrowRightLeft size={16} aria-hidden />Hand off</Button>
+            <Button className="reveal" onClick={() => open("referral")}><Building2 size={16} aria-hidden />Referral options</Button>
+          </>}
           <Button variant="secondary" className="ms-auto border-ink" onClick={() => setCloseOpen(true)}><CheckCircle2 size={16} aria-hidden />Close case…</Button>
         </div>
-        {!a.offer_handoff.allowed && <Blocked a={a.offer_handoff} />}
+        {more && !a.offer_handoff.allowed && <Blocked a={a.offer_handoff} />}
       </div>
 
       <CloseDialog c={c} open={closeOpen} onOpenChange={setCloseOpen} meName={meName} meRole={meRole} />
@@ -163,11 +179,15 @@ export default function CaseActions({ c, meId, meName, meRole, closeOpen, setClo
       </Dialog>
 
       <Dialog open={dlg === "referral"} onOpenChange={(o) => !o && setDlg(null)} title="Referral options" description={`Services that accept the patient's ${c.patient.insurance_network ?? ""} network.`}>
+        {refs.data?.prefer_female && <p className="mb-3 rounded border border-biro bg-biro-wash px-3 py-2 text-[14px]">The patient asked for a female doctor. Centres with a female endoscopist are listed first.</p>}
         <ul className="space-y-2">
-          {(refs.data?.options ?? []).map((o: { org_id: string; name: string; in_network: boolean; networks: string[] }) => (
+          {(refs.data?.options ?? []).map((o: { org_id: string; name: string; in_network: boolean; networks: string[]; female_endoscopist?: boolean }) => (
             <li key={o.org_id} className="flex items-center justify-between gap-3 rounded border border-rule p-3">
               <span><span className="block font-semibold">{o.name}</span><span className="text-[13px] text-muted">Accepts {o.networks.join(", ")}</span></span>
-              {o.in_network ? <Tag tone="done">In network</Tag> : <Tag tone="attn">Out of network</Tag>}
+              <span className="flex flex-wrap justify-end gap-1.5">
+                {o.female_endoscopist && <Tag tone="biro">Female endoscopist</Tag>}
+                {o.in_network ? <Tag tone="done">In network</Tag> : <Tag tone="attn">Out of network</Tag>}
+              </span>
             </li>
           ))}
           {refs.data && !refs.data.options?.length && <li className="text-ink-2">No other services on record for this pathway.</li>}

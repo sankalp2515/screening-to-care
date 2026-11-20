@@ -138,11 +138,49 @@ def unreachable_patient(svc: Any, now: datetime, _: dict) -> dict[str, Any]:
                      "a navigator task: 'Patient not reached by message. Call the patient.'"}
 
 
+
+INCOMPLETE_REPORT = ("Indication: positive FIT. Incomplete colonoscopy: the scope could not be advanced beyond the "
+                     "splenic flexure because of poor bowel preparation, BBPS 1-1-0. No polyps seen in the examined "
+                     "segments. Recommend repeat colonoscopy with a two-day preparation in 6 weeks.")
+
+
+def incomplete_report(svc: Any, now: datetime, _: dict) -> dict[str, Any]:
+    pid = _new_patient(svc, lang="en", tag="ir")
+    d = lambda n: now - timedelta(days=n)  # noqa: E731
+    items = fit_journey(pid, d(22), "PROCEDURE_DONE", booked_for=d(5))
+    items.append((d(1), report(pid, f"dr-{pid}", d(1), INCOMPLETE_REPORT)))
+    items.append((d(1), ref(pid, 4, d(1), AdminStatus.COMPLETED)))
+    log = _send(svc, items)
+    cid = _case_id(svc, pid)
+    svc.cases.evaluate(cid, now)
+    return {"patient_id": pid, "case_id": cid, "feed": log,
+            "story": "Malaffi says COMPLETED and a report arrived, so most systems would stop here. The report says "
+                     "the colonoscopy was incomplete because of poor preparation. The Evidence Reader quotes those "
+                     "sentences; once the physician confirms them, the case stays open as 'Colonoscopy incomplete: "
+                     "rebook'."}
+
+
+def repeat_fit_negative(svc: Any, now: datetime, _: dict) -> dict[str, Any]:
+    pid = _new_patient(svc, tag="rf")
+    d = lambda n: now - timedelta(days=n)  # noqa: E731
+    items = fit_journey(pid, d(20), "REF_ACCEPTED")
+    items.append((d(1), fit(pid, f"obs-repeat-{pid}", d(1), positive=False)))
+    log = _send(svc, items)
+    cid = _case_id(svc, pid)
+    svc.cases.evaluate(cid, now)
+    return {"patient_id": pid, "case_id": cid, "feed": log,
+            "story": "A repeat FIT came back negative after the positive one. Tasleem keeps the case open, warns "
+                     "that a negative repeat does not cancel the colonoscopy (UAE CRC guideline 2022), and the "
+                     "owner stays the same."}
+
+
 SCENARIOS: dict[str, tuple[str, str, Callable[[Any, datetime, dict], dict[str, Any]]]] = {
     "false-done": ("Malaffi says completed, colonoscopy never happened",
                    "The headline failure Tasleem exists to catch.", false_done),
     "report-arrives": ("GI centre sends the report (needs case_id)",
                        "Resolves a false-done case on evidence.", report_arrives),
+    "incomplete-report": ("Report arrives, but says the colonoscopy was incomplete",
+                          "AI reads the report; a physician confirms; rules keep the loop open.", incomplete_report),
     "new-positive-fit": ("New positive FIT from the lab",
                          "Shows a case opening with a named owner and a Sahatna invitation.", new_positive_fit),
     "missed-colonoscopy": ("Patient misses the colonoscopy and replies",
@@ -151,6 +189,8 @@ SCENARIOS: dict[str, tuple[str, str, Callable[[Any, datetime, dict], dict[str, A
                          "Distress reaches a clinician the same minute.", distress_message),
     "raised-blood-pressure": ("Raised screening blood pressure",
                               "A second disease on configuration only.", raised_blood_pressure),
+    "repeat-fit-negative": ("A repeat FIT comes back negative",
+                            "A negative repeat never cancels the colonoscopy (UAE guideline).", repeat_fit_negative),
     "unreachable-patient": ("Patient cannot be reached by app or SMS",
                             "Channel fallback ends in a human call task (run the notifier).", unreachable_patient),
 }

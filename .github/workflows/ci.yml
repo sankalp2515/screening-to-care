@@ -63,6 +63,11 @@ jobs:
         run: docker compose up -d --build --wait
       - name: End-to-end smoke across services
         run: cd backend && python -m tasleem.smoke --stack
+      - name: Browser end-to-end tests (reviewer tour, simulator, reset, R3, message policy, patient, WCAG)
+        run: |
+          pip install "playwright==1.61.0" "pytest>=8"
+          python -m playwright install --with-deps chromium
+          cd e2e && E2E_BASE_URL=http://localhost:8080 python -m pytest -q
       - name: Logs on failure
         if: failure()
         run: docker compose logs --no-color | tail -400

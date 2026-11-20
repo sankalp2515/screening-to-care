@@ -426,6 +426,26 @@ Rationale: clinical case state is never cached, because a stale "not stalled" vi
 - **`demo.py`**: live scenarios for the simulator; they only send the messages a lab, hospital or patient would send.
 - **Pathway C** (`pathways/hypertension.yaml`): raised screening blood pressure, configuration only.
 
+## 6.2 AI pipeline (added 20 Nov): AI reads, rules decide, a person confirms
+
+```
+GI centre ──FHIR DiagnosticReport.conclusion──► case-core ingest ──► REPORT_TEXT_RECEIVED (report counts as "arrived", not "done")
+                                                    │
+                     agent /reports/{id}/reading ◄──┘ (model reading; every value must quote a sentence of the report verbatim,
+                     │                                 else that value is dropped; no model → case-core keyword reader)
+                     ▼
+        physician confirms or corrects (one click) ──► REPORT_REVIEWED {findings, suggested_by, corrected[]}
+                                                    │
+                     rules (checks.py §9, engine R3) ◄──┘ incomplete / poor prep → stall "rebook" + closure refused
+                                                          pathology pending → case stays open, escalates after 21 days
+                                                          corrected[] → AI oversight (Programme › AI at work)
+```
+
+The same split holds for the other AI jobs: patient replies (model gist and barrier suggestion → navigator confirms →
+playbook task), patient messages (model rewrites an approved template → deterministic message policy → person sends),
+and the case brief (model wording must cite audit events, else the extractive brief is shown). No AI output reaches a
+rule, a patient or a closure without a named person's action, and every confirmation is an audit event (R5, R6).
+
 ## 7. Scalability and reliability
 
 - **Stateless API**: horizontal pods behind the gateway; sessions in tokens.
@@ -450,6 +470,8 @@ Rationale: clinical case state is never cached, because a stale "not stalled" vi
 | Oversized or malformed payload | 413 before parsing; 422 with the field name for invalid FHIR | `test_robustness`, `test_api` I3 |
 | Database unreachable | `/readyz` fails, the load balancer stops routing; liveness stays up | `test_robustness::test_readiness_and_liveness_are_separate` |
 | AI helper down | Barrier stays unclassified and goes to the human queue (fail safe, never fail open) | design rule R5 |
+| Model invents a finding in a report | Its quote is not in the report, so the value is dropped before anyone sees it; the physician sees "not stated" | `test_agent::test_report_reading_keeps_verbatim_quotes_and_drops_invented_ones` |
+| Model unavailable while a report waits | case-core's deterministic keyword reader is shown instead; the report still cannot close the case until a physician confirms it | `test_agent::test_report_reading_without_a_model_returns_the_keyword_reading` |
 
 ### 7.2 Measured on a laptop
 

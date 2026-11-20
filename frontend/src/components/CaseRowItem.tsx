@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { AlertOctagon, MessageSquareText } from "lucide-react";
 import type { CaseRow } from "../lib/types";
-import { relTime, shortName } from "../lib/labels";
+import { plural, relTime, shortName } from "../lib/labels";
 import { JourneyBar, LangTag, StallChip, cx } from "./ui";
 
 const WHY: Record<string, string> = {
@@ -9,7 +9,7 @@ const WHY: Record<string, string> = {
   task: "Task due", distress: "Patient message needs a clinician", owner: "You own this case",
 };
 
-export default function CaseRowItem({ row, showPriority }: { row: CaseRow; showPriority?: boolean }) {
+export default function CaseRowItem({ row, showPriority, meId }: { row: CaseRow; showPriority?: boolean; meId?: string }) {
   const ar = row.patient.language === "ar";
   return (
     <li>
@@ -31,13 +31,17 @@ export default function CaseRowItem({ row, showPriority }: { row: CaseRow; showP
         </div>
         <div className="min-w-0 space-y-1.5">
           <div className="flex flex-wrap gap-1.5">
-            {row.stalls.length === 0 ? <span className="text-[13px] text-muted">{row.status === "closed" ? `Closed${row.outcome ? ": " + String(row.outcome).toLowerCase().replace(/_/g, " ") : ""}` : "On track"}</span>
+            {row.distress_open > 0 && <span className="rounded-[2px] border border-stop bg-stop-wash px-1.5 text-[12px] font-semibold text-stop">Symptom: clinician call</span>}
+            {row.stalls.length === 0 ? <span className="text-[13px] text-muted">{row.status === "closed" ? `Closed${row.outcome ? ": " + String(row.outcome).toLowerCase().replace(/_/g, " ") : ""}` : row.distress_open > 0 ? "" : row.next_action && row.next_action.who !== "system" ? "Needs a step" : "On track"}</span>
               : row.stalls.map((s) => <StallChip key={s.reason} label={s.label} level={s.level} />)}
           </div>
+          {row.status === "open" && row.next_action && row.next_action.who !== "system" && (
+            <p className="text-[13px] leading-[18px] text-ink-2"><span className="font-semibold text-ink">{meId && row.next_action.who === "owner" && row.owner.id !== meId ? `Next, for ${shortName(row.owner.name)}:` : "Next:"}</span> {row.next_action.text}</p>
+          )}
           <p className="text-[12px] text-muted" dir="ltr">
             <span lang={ar ? "en" : undefined}>Owner {shortName(row.owner.name)}</span>
-            {row.days_since_progress != null && <> · <span className="tnum">{Math.round(row.days_since_progress)}</span> days since progress</>}
-            {row.why && row.why.kind !== "owner" && <> · <span className="font-medium text-ink-2">{WHY[row.why.kind] ?? row.why.kind}</span> {relTime(row.why.since)}</>}
+            {row.days_since_progress != null && <> · <span className="tnum">{plural(Math.round(row.days_since_progress), "day")}</span> since progress</>}
+            {row.why && row.why.kind !== "owner" && <> · <span className="font-medium text-ink-2">{row.why.kind === "escalated" && meId && row.owner.id === meId ? "Overdue on your case" : WHY[row.why.kind] ?? row.why.kind}</span> {relTime(row.why.since)}</>}
           </p>
         </div>
       </Link>

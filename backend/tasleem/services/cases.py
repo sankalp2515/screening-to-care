@@ -79,12 +79,19 @@ class CaseService:
         me = self.directory.person(actor.id)
         return (self.directory.org_members(me.org_id) if me else [actor.id]), actor.id
 
+    def inbox_for(self, person_id: str) -> list:
+        """This person's assignments plus those of anyone they cover while away (TSL-160)."""
+        rows = list(self.repo.assignments_for(person_id))
+        for away in self.directory.covering_for(person_id):
+            rows += self.repo.assignments_for(away.id)
+        return rows
+
     def require_visible(self, case_id: str, actor: Actor) -> CaseState:
         st = self.get(case_id)
         scope = self.scope(actor)
         if scope is None or st.owner_id in scope[0]:
             return st
-        if any(a.case_id == case_id for a in self.repo.assignments_for(actor.id)):
+        if any(a.case_id == case_id for a in self.inbox_for(actor.id)):
             return st
         # Same answer as a missing case: do not reveal that the case exists.
         raise NotFound("case", case_id)
@@ -110,6 +117,9 @@ class CaseService:
 
     def trigger_repeated(self, case_id: str, s: Signal, actor: Actor, now: datetime) -> tuple[CaseState, int]:
         return self._run(case_id, lambda st, p: engine.trigger_repeated(st, s, actor), now, commit=False)
+
+    def add_warning(self, case_id: str, text: str, actor: Actor, now: datetime) -> tuple[CaseState, int]:
+        return self._run(case_id, lambda st, p: engine.add_warning(st, actor, now, text), now, commit=False)
 
     def evaluate(self, case_id: str, now: datetime) -> tuple[CaseState, int]:
         return self._run(case_id, lambda st, p: [], now)
@@ -159,8 +169,20 @@ class CaseService:
         st = self._run(case_id, lambda s, p: engine.request_consult(s, p, actor, cid, to_id, question, now), now)[0]
         return st, cid
 
+    def covers(self, actor: Actor, now: datetime) -> tuple[str, ...]:
+        """Ids of the people `actor` is covering for right now (they are away and named `actor`)."""
+        return tuple(p.id for p in self.directory.covering_for(actor.id, now))
+
     def answer_consult(self, case_id: str, actor: Actor, consult_id: str, answer: str, now: datetime) -> CaseState:
-        return self._run(case_id, lambda st, p: engine.answer_consult(st, actor, consult_id, answer, now), now)[0]
+        covers = self.covers(actor, now)
+        return self._run(case_id, lambda st, p: engine.answer_consult(st, actor, consult_id, answer, now,
+                                                                      covers=covers), now)[0]
+
+    def review_report(self, case_id: str, actor: Actor, report_id: str, findings: dict, now: datetime, *,
+                      suggested_by: str | None, suggestion: dict | None) -> CaseState:
+        return self._run(case_id, lambda st, p: engine.review_report(st, actor, report_id, findings, now,
+                                                                     suggested_by=suggested_by,
+                                                                     suggestion=suggestion), now)[0]
 
     def record_consent(self, case_id: str, actor: Actor, now: datetime) -> CaseState:
         def build(st: CaseState, p: Pathway) -> list[Event]:

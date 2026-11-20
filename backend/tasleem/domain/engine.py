@@ -31,6 +31,7 @@ from .model import (
     EventType,
     Handoff,
     Outcome,
+    ReportReview,
     Signal,
     SignalKind,
     StageEvidence,
@@ -111,7 +112,53 @@ def record_signal(state: CaseState, pathway: Pathway, s: Signal, actor: Actor) -
         if s.appointment_at is not None:
             payload["appointment_at"] = s.appointment_at.isoformat()
         events.append(_ev(EventType.STAGE_REACHED, actor, at, **payload))
+    if s.kind == SignalKind.REPORT_FINAL and (s.text or "").strip() and pathway.checks.report_review:
+        if not any(r.ref == s.ref for r in state.reports.values()):
+            events.append(_ev(EventType.REPORT_TEXT_RECEIVED, actor, at, report_id=f"rpt-{len(state.reports) + 1}",
+                              ref=s.ref, text=s.text.strip()))
     return events
+
+
+REPORT_FIELDS = ("completed", "prep_adequate", "polyps_removed", "pathology_pending", "next_step", "follow_up")
+
+
+def review_report(state: CaseState, actor: Actor, report_id: str, findings: dict[str, object], now: datetime, *,
+                  suggested_by: str | None = None, suggestion: dict[str, object] | None = None) -> list[Event]:
+    """Evidence Reader, the human step (R3 + R5): a clinician confirms or corrects what the report says.
+
+    Only confirmed findings reach the rules. The reader that suggested the values, and every field the clinician
+    changed, are recorded so the AI's accuracy can be monitored from the audit log."""
+    _require_open(state)
+    _require_clinician(actor, "confirm what a report says")
+    r = state.reports.get(report_id)
+    if r is None:
+        raise DomainError("NOT_FOUND", "No such report on this case.", report_id=report_id)
+    if r.reviewed:
+        raise DomainError("REPORT_ALREADY_REVIEWED", "This report has already been confirmed.", report_id=report_id)
+    unknown = sorted(set(findings) - set(REPORT_FIELDS))
+    if unknown:
+        raise DomainError("VALIDATION", "Unknown report fields.", fields=unknown)
+    clean = {k: findings.get(k) for k in REPORT_FIELDS}
+    for k in ("completed", "prep_adequate", "pathology_pending"):
+        if clean[k] is not None and not isinstance(clean[k], bool):
+            raise DomainError("VALIDATION", f"{k} must be yes, no or not stated.", field=k)
+    n = clean["polyps_removed"]
+    if n is not None and (isinstance(n, bool) or not isinstance(n, int) or n < 0):
+        raise DomainError("VALIDATION", "polyps_removed must be a whole number.", field="polyps_removed")
+    for k in ("next_step", "follow_up"):
+        if clean[k] is not None:
+            clean[k] = str(clean[k]).strip()[:300] or None
+    corrected = sorted(k for k in REPORT_FIELDS if suggestion is not None and suggestion.get(k) != clean[k])
+    return [_ev(EventType.REPORT_REVIEWED, actor, now, report_id=report_id, findings=clean,
+                suggested_by=suggested_by, corrected=corrected)]
+
+
+def add_warning(state: CaseState, actor: Actor, at: datetime, text: str) -> list[Event]:
+    """A rule-based warning on an open case (for example a repeat FIT). It informs; it never closes or decides."""
+    _require_open(state)
+    if text in state.warnings:
+        return []
+    return [_ev(EventType.WARNING_ADDED, actor, at, text=text)]
 
 
 def trigger_repeated(state: CaseState, s: Signal, actor: Actor) -> list[Event]:
@@ -196,6 +243,9 @@ def confirm_barrier(
         raise DomainError("NOT_FOUND", "Unknown barrier.", barrier_id=barrier_id)
     if b.status != "reported":
         raise DomainError("BARRIER_STATE", f"Barrier is already {b.status}.")
+    if any(d.barrier_id == barrier_id for d in state.open_distress):
+        raise DomainError("DISTRESS_FIRST", "This message reports a symptom. A clinician must address it before "
+                          "anything else; it is not a barrier.", barrier_id=barrier_id)
     pb = pathway.playbooks.get(code) or pathway.playbooks[BarrierCode.OTHER]
     return [_ev(EventType.BARRIER_CONFIRMED, actor, now, barrier_id=barrier_id, code=code.value,
                 assignee_role=pb.assignee_role, action=pb.action,
@@ -242,19 +292,25 @@ def request_consult(
                 question=question, due_at=due.isoformat())]
 
 
-def answer_consult(state: CaseState, actor: Actor, consult_id: str, answer: str, now: datetime) -> list[Event]:
+def answer_consult(state: CaseState, actor: Actor, consult_id: str, answer: str, now: datetime, *,
+                   covers: Iterable[str] = ()) -> list[Event]:
+    """The consulted specialist answers, or the person named as their cover while they are away (TSL-160)."""
     _require_open(state)
     _require_staff(actor, "answer an e-consult")
     k = state.consults.get(consult_id)
     if k is None:
         raise DomainError("NOT_FOUND", "Unknown consult.", consult_id=consult_id)
+    on_behalf_of = None
     if k.to_id != actor.id:
-        raise DomainError("NOT_CONSULT_TARGET", "Only the consulted specialist can answer.")
+        if k.to_id not in set(covers):
+            raise DomainError("NOT_CONSULT_TARGET", "Only the consulted specialist, or their named cover, can answer.")
+        on_behalf_of = k.to_id
     if k.answer is not None:
         raise DomainError("CONSULT_STATE", "Already answered.")
     if not answer.strip():
         raise DomainError("VALIDATION", "The answer is empty.")
-    return [_ev(EventType.CONSULT_ANSWERED, actor, now, consult_id=consult_id, answer=answer)]
+    extra = {"on_behalf_of": on_behalf_of} if on_behalf_of else {}
+    return [_ev(EventType.CONSULT_ANSWERED, actor, now, consult_id=consult_id, answer=answer, **extra)]
 
 
 def record_consent(state: CaseState, actor: Actor, now: datetime) -> list[Event]:
@@ -314,6 +370,7 @@ def close_case(
     reason = (reason or "").strip() or None
 
     if outcome == Outcome.COMPLETED_WITH_REPORT:
+        _require_report_closes_loop(state)
         missing = [s for s in pathway.closure.completion_stages if not state.reached(s)]
         if missing:
             raise DomainError("R3_EVIDENCE_REQUIRED", "Required clinical evidence has not been received.",
@@ -335,6 +392,20 @@ def close_case(
                                   escalations=state.escalation_count)
     return [_ev(EventType.CASE_CLOSED, actor, now, outcome=outcome.value, evidence_ref=evidence_ref,
                 reason=reason, signed_by=actor.id)]
+
+
+def _require_report_closes_loop(state: CaseState) -> None:
+    """R3, Evidence Reader: a report closes the loop only once a clinician has confirmed it says so."""
+    if state.unreviewed_reports:
+        raise DomainError("R3_REPORT_NOT_REVIEWED", "A clinician must confirm what the report says first.",
+                          report_ids=[r.id for r in state.unreviewed_reports])
+    f = state.confirmed_findings
+    if f.get("completed") is False or f.get("prep_adequate") is False:
+        raise DomainError("R3_PROCEDURE_INCOMPLETE",
+                          "The report says the colonoscopy was incomplete or the preparation inadequate; "
+                          "repeat it, or close with a signed change of plan.")
+    if f.get("pathology_pending") is True:
+        raise DomainError("R3_PATHOLOGY_PENDING", "The pathology result has not arrived yet.")
 
 
 # --------------------------------------------------------------------------------------------------
@@ -453,6 +524,16 @@ def apply(state: CaseState | None, e: Event) -> CaseState:
         k = s.consults[p["consult_id"]]
         k.answer = p["answer"]
         k.answered_at = at
+    elif t == EventType.REPORT_TEXT_RECEIVED:
+        s.reports[p["report_id"]] = ReportReview(id=p["report_id"], ref=p["ref"], text=p["text"], received_at=at)
+    elif t == EventType.REPORT_REVIEWED:
+        r = s.reports[p["report_id"]]
+        r.findings = dict(p["findings"])
+        r.reviewed_by = e.actor_id
+        r.reviewed_at = at
+        r.suggested_by = p.get("suggested_by")
+        r.corrected = list(p.get("corrected") or [])
+        s.last_progress_at = max(s.last_progress_at, at)
     elif t == EventType.CONSENT_RECORDED:
         s.consent_at = at
     elif t == EventType.CASE_CLOSED:
@@ -493,7 +574,10 @@ def reconcile_stalls(state: CaseState, pathway: Pathway, now: datetime, resolver
     for reason, cond in active.items():
         existing = state.stalls.get(reason.value)
         if existing is None:
-            to = resolver(state, ladder[0])
+            # An unanswered e-consult goes first to the specialist it was sent to (or their cover), not back to
+            # the person who asked it (judge finding, 20 Nov). Later levels follow the pathway's ladder.
+            first = "consult_target" if reason == StallReason.CONSULT_UNANSWERED else ladder[0]
+            to = resolver(state, first)
             events.append(_sys(EventType.STALL_FLAGGED, now, reason=reason.value, stage=cond.stage,
                                detail=cond.detail, escalated_to=to))
             events.append(_sys(EventType.ESCALATED, now, reason=reason.value, level=1, to_id=to))

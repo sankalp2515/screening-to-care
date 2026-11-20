@@ -52,7 +52,7 @@ def evaluate(state: CaseState, p: Pathway, now: datetime) -> dict[StallReason, C
         state, c.attended_stage, c.procedure_stage, c.report_stage
     ):
         if state.appointment_missed:
-            add(StallReason.BOOKED_NOT_ATTENDED, c.attended_stage, f"appointment {state.appointment_missed}")
+            add(StallReason.BOOKED_NOT_ATTENDED, c.attended_stage, "missed the appointment" if state.appointment_missed == "noshow" else "the appointment was cancelled")
         elif state.appointment_at and now > state.appointment_at + timedelta(hours=c.attended_grace_hours):
             add(StallReason.BOOKED_NOT_ATTENDED, c.attended_stage,
                 f"appointment on {state.appointment_at.date().isoformat()} has no attendance record")
@@ -101,6 +101,24 @@ def evaluate(state: CaseState, p: Pathway, now: datetime) -> dict[StallReason, C
     if late:
         add(StallReason.CONSULT_UNANSWERED, None, f"{len(late)} e-consult question(s) unanswered")
 
+    # 9. Evidence Reader: a free-text report nobody has confirmed, or one that says the loop is not closed.
+    if c.report_review:
+        unread = state.unreviewed_reports
+        late = [r for r in unread if now > r.received_at + _days(c.report_review_days)]
+        if late:
+            add(StallReason.REPORT_NOT_REVIEWED, c.report_stage,
+                f"report received {late[0].received_at.date().isoformat()}, not yet confirmed by a clinician")
+        f = state.confirmed_findings
+        if not unread and (f.get("completed") is False or f.get("prep_adequate") is False):
+            why = "incomplete" if f.get("completed") is False else "had inadequate bowel preparation"
+            add(StallReason.PROCEDURE_INCOMPLETE, c.procedure_stage, f"colonoscopy {why}: rebook the procedure")
+        if f.get("pathology_pending") is True:
+            reviewed = [r.reviewed_at for r in state.reports.values() if r.reviewed_at is not None]
+            since = max(reviewed) if reviewed else state.last_progress_at
+            if now > since + _days(c.pathology_result_days):
+                add(StallReason.PATHOLOGY_OUTSTANDING, c.report_stage,
+                    f"pathology awaited since {since.date().isoformat()}")
+
     return out
 
 
@@ -129,6 +147,10 @@ def next_check_at(state: CaseState, p: Pathway, now: datetime) -> datetime | Non
     if state.pending_handoff:
         times.append(state.pending_handoff.offered_at + _days(c.handoff_accept_days))
     times.extend(k.due_at for k in state.consults.values() if k.answer is None)
+    if c.report_review:
+        times.extend(r.received_at + _days(c.report_review_days) for r in state.unreviewed_reports)
+        times.extend(r.reviewed_at + _days(c.pathology_result_days) for r in state.reports.values()
+                     if r.reviewed_at is not None)
     for s in state.stalls.values():
         times.append(s.last_escalated_at + _days(c.reescalate_after_days))
     # +1 second so a check at exactly the deadline is evaluated strictly after it.

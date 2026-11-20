@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from ..domain.errors import DomainError, NotFound
 from ..domain.model import Actor, ActorType, CaseState, Signal, SignalKind
 from ..domain.pathways import PathwayRegistry
 from ..infra.db import InboundMessageRow
@@ -77,7 +78,7 @@ class IngestService:
             results.extend(outcome)
         if any(r["effect"] == "unmatched" for r in results):
             status = "unmatched"
-        elif any(r["effect"] in ("opened", "updated", "attached", "replayed") for r in results):
+        elif any(r["effect"] in ("opened", "updated", "attached", "replayed", "warned") for r in results):
             status = "applied"
         result = {"message_id": p.message_id, "resource_type": p.resource_type, "status": status,
                   "ignored_reason": p.ignored_reason, "effects": results}
@@ -102,12 +103,20 @@ class IngestService:
 
         # 1. Triggers: open a case, or attach a repeat trigger to the open one.
         for pathway in self.registry.all():
-            if not pathway.trigger.matches(s):
-                continue
             existing = [c for c in open_cases if c.pathway_id == pathway.id]
+            if not pathway.trigger.matches(s):
+                # The same test, negative, on an open case: warn that it does not cancel the next step (TSL-163).
+                warn = pathway.repeat_trigger_warning
+                if warn and existing and self._same_test(pathway, s) and s.occurred_at > existing[0].opened_at:
+                    self.cases.add_warning(existing[0].id, warn["negative"], actor, now)
+                    effects.append({"effect": "warned", "case_id": existing[0].id, "pathway_id": pathway.id})
+                continue
             if existing:
                 self.cases.trigger_repeated(existing[0].id, s, actor, now)
                 effects.append({"effect": "attached", "case_id": existing[0].id, "pathway_id": pathway.id})
+                warn = pathway.repeat_trigger_warning
+                if warn and s.occurred_at > existing[0].opened_at:
+                    self.cases.add_warning(existing[0].id, warn["positive"], actor, now)
             else:
                 st = self.cases.open_case(patient, pathway, s, actor, now)
                 opened.add(st.id)
@@ -126,6 +135,10 @@ class IngestService:
         if opened:
             effects += self._replay_early_evidence(patient.id, s, opened, actor, now)
         return effects
+
+    @staticmethod
+    def _same_test(pathway: Any, s: Signal) -> bool:
+        return s.kind == pathway.trigger.signal and bool(set(s.codes) & set(pathway.trigger.codes))
 
     def _relevant(self, case: CaseState, s: Signal) -> bool:
         pathway = self.registry.get(case.pathway_id)
@@ -154,3 +167,46 @@ class IngestService:
                 row.status = "applied_late"
                 effects.append({"effect": "replayed", "message_id": row.message_id, "events": applied})
         return effects
+
+
+    # ---- unmatched-patient review queue (TSL-161) -----------------------------------------------------
+    def unmatched(self, limit: int = 100) -> list[dict[str, Any]]:
+        """Messages whose patient is not in the directory. Stored on arrival, never dropped; a coordinator
+        matches each one to a patient (its signals are then applied as if they had matched) or dismisses it."""
+        rows = self.s.execute(select(InboundMessageRow).where(InboundMessageRow.status == "unmatched")
+                              .order_by(InboundMessageRow.received_at.desc(), InboundMessageRow.id.desc())
+                              .limit(limit)).scalars().all()
+        out = []
+        for r in rows:
+            sigs = [Signal.model_validate(x) for x in (r.signals or [])]
+            out.append({"id": r.id, "source": r.source, "message_id": r.message_id, "kind": r.kind,
+                        "received_at": r.received_at.isoformat(), "patient_ref": r.patient_id,
+                        "signals": [{"kind": x.kind.value, "codes": x.codes, "occurred_at": x.occurred_at.isoformat(),
+                                     "interpretation": x.interpretation} for x in sigs]})
+        return out
+
+    def resolve_unmatched(self, row_id: int, action: str, patient_id: str | None, actor: Actor,
+                          now: datetime) -> dict[str, Any]:
+        row = self.s.get(InboundMessageRow, row_id)
+        if row is None or row.status != "unmatched":
+            raise NotFound("unmatched message", str(row_id))
+        resolution: dict[str, Any] = {"action": action, "by": actor.id, "at": now.isoformat()}
+        effects: list[dict[str, Any]] = []
+        if action == "match":
+            patient = self.directory.patient(patient_id or "")
+            if patient is None:
+                raise DomainError("VALIDATION", "Choose a patient who is in the directory.")
+            for raw in row.signals or []:
+                sig = Signal.model_validate({**raw, "patient_id": patient.id})
+                effects += self._apply_signal(sig, actor, now)
+            row.patient_id = patient.id
+            row.status = "matched"
+            resolution["patient_id"] = patient.id
+        elif action == "dismiss":
+            row.status = "dismissed"
+        else:
+            raise DomainError("VALIDATION", "Action must be 'match' or 'dismiss'.")
+        row.result = {**(row.result or {}), "resolution": resolution, "resolution_effects": effects}
+        self.s.commit()
+        self.cases.bump_write_version()
+        return {"id": row.id, "status": row.status, "resolution": resolution, "effects": effects}

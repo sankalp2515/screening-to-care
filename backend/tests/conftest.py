@@ -29,6 +29,9 @@ TARGETS = {"owner": None, "clinic_lead": "lead", "program_coordinator": "coord",
 
 
 def resolver(state: CaseState, target: str) -> str:
+    if target == "consult_target":
+        open_q = [k for k in state.consults.values() if k.answer is None]
+        return open_q[0].to_id if open_q else state.owner_id
     return state.owner_id if target == "owner" else TARGETS[target]
 
 

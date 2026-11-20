@@ -104,10 +104,13 @@ export const useAssist = (id: string) => useGet<Assist>("agent", `/v1/cases/${id
 export const useTrail = (id: string) => useGet<any>("notifier", `/v1/notifications?case_id=${id}`);
 export const useChannels = () => useGet<any>("notifier", "/v1/policy");
 export const useMetrics = (filter: string) => useGet<any>("core", `/v1/program/metrics${filter ? "?" + filter : ""}`);
-export const useUsage = () => useGet<any>("core", "/v1/program/usage");
+const thisMonth = () => { const d = now(); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`; };
+export const useUsage = () => useGet<any>("core", `/v1/program/usage?month=${thisMonth()}`);
+export const useAiOversight = () => useGet<any>("core", "/v1/program/ai-oversight");
+export const useUnmatched = () => useGet<any>("core", MODE === "live" ? "/v1/integration/unmatched" : null);
 export const useScenarios = () => useGet<{ items: { id: string; title: string; why: string }[] }>("core", "/v1/demo/scenarios");
 export const usePatientCases = (lang: string) => useGet<{ items: PatientCase[] }>("core", `/v1/me/cases?lang=${lang}`);
-export const usePrepCheck = (caseId: string | null) => useGet<PrepCheck>("core", caseId ? `/v1/me/cases/${caseId}/prep-check` : null);
+export const usePrepCheck = (caseId: string | null, lang: "en" | "ar" = "en") => useGet<PrepCheck>("core", caseId ? `/v1/me/cases/${caseId}/prep-check?lang=${lang}` : null);
 
 /** One mutation hook for every command. Invalidates everything afterwards so all screens agree. */
 export function useCommand<T = any>(service: Service = "core") {
