@@ -33,8 +33,8 @@ from tasleem_common.ratelimit import RateLimiter
 
 from .assist import draft_outreach, facts, make_brief, translate
 from .classify import suggest_barrier
-from .report_reading import draft_rebook, read_with_model
 from .providers import CachedProvider, LLMProvider, make_provider, with_cache
+from .report_reading import draft_rebook, read_with_model
 
 
 class AgentSettings(BaseSettings):
@@ -262,10 +262,14 @@ def create_app(settings: AgentSettings | None = None, core: ServiceClient | None
         case = core_get(f"/v1/cases/{case_id}", who)
         rpt = next((r for r in case.get("reports") or [] if r.get("id") == report_id), None)
         if rpt is None or not rpt.get("reviewed"):
-            raise HTTPException(409, {"code": "REPORT_NOT_CONFIRMED", "message": "Confirm the report's findings first."})
+            raise HTTPException(
+                409, {"code": "REPORT_NOT_CONFIRMED", "message": "Confirm the report's findings first."}
+            )
         f = rpt.get("findings") or {}
         if f.get("completed") is not False and f.get("prep_adequate") is not False:
-            raise HTTPException(409, {"code": "NOTHING_TO_REBOOK", "message": "The confirmed report does not call for a repeat."})
+            raise HTTPException(
+                409, {"code": "NOTHING_TO_REBOOK", "message": "The confirmed report does not call for a repeat."}
+            )
         name = str(case["patient"]["name"]).split(" (")[0]
         d = draft_rebook(name, rpt["text"], f, llm)
         out = {**d, "provenance": "ai_suggestion" if d["source"] == "llm" else "template", "requires_approval": True}

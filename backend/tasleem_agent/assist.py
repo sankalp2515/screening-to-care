@@ -189,10 +189,18 @@ def choose_template(case: dict[str, Any]) -> tuple[str | None, str]:
         b = open_b[-1]
         code = b.get("confirmed_code") or (b.get("reported_codes") or [None])[0] or b.get("suggested_code")
         if code in OUTREACH:
-            words = {"FEAR": "fear or worry", "NO_ESCORT": "no one to take them home", "PREP_UNCLEAR": "the preparation is unclear",
-                     "TRANSPORT": "transport", "COST_OR_INSURANCE": "cost or insurance", "TIME_OR_WORK": "time off work",
-                     "LANGUAGE": "language", "FEMALE_CLINICIAN": "asks for a female doctor", "WANTS_CALLBACK": "asks for a call",
-                     "DONE_ELSEWHERE": "says it was done elsewhere"}.get(code, "something else")
+            words = {
+                "FEAR": "fear or worry",
+                "NO_ESCORT": "no one to take them home",
+                "PREP_UNCLEAR": "the preparation is unclear",
+                "TRANSPORT": "transport",
+                "COST_OR_INSURANCE": "cost or insurance",
+                "TIME_OR_WORK": "time off work",
+                "LANGUAGE": "language",
+                "FEMALE_CLINICIAN": "asks for a female doctor",
+                "WANTS_CALLBACK": "asks for a call",
+                "DONE_ELSEWHERE": "says it was done elsewhere",
+            }.get(code, "something else")
             return code, f"Drafted for what the patient said got in the way: {words}."
     if case.get("appointment_missed"):
         return "MISSED", "The appointment was missed."

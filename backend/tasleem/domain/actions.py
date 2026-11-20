@@ -153,7 +153,10 @@ def viewer_step(state: CaseState, viewer_id: str, covers: tuple[str, ...] = (),
                 "text": f"{name(h.offered_by)} offered you this case: “{h.reason}”. Accept it, or decline "
                         "with a reason; they stay the owner until you accept.", "provenance": "computed"}
     mine = {viewer_id, *covers}
-    open_q = sorted((k for k in state.consults.values() if k.answer is None and k.to_id in mine), key=lambda k: k.due_at)
+    open_q = sorted(
+        (k for k in state.consults.values() if k.answer is None and k.to_id in mine),
+        key=lambda k: k.due_at,
+    )
     if open_q:
         k = open_q[0]
         on_behalf = f" (for {name(k.to_id)}, whom you cover)" if k.to_id != viewer_id else ""

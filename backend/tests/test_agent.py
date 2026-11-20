@@ -175,7 +175,11 @@ def test_report_reading_keeps_verbatim_quotes_and_drops_invented_ones(core):
     cid = _case(core, "p-khalid")
     rid = core.get(f"/v1/cases/{cid}", headers=FATIMA).json()["reports"][0]["id"]
     reading = ReportReading(
-        completed=BoolReading(value=False, quote="Examination limited to the sigmoid colon: the scope could not be passed beyond 40 cm because of solid faecal residue."),
+        completed=BoolReading(
+            value=False,
+            quote="Examination limited to the sigmoid colon: the scope could not be passed beyond 40 cm "
+            "because of solid faecal residue.",
+        ),
         prep_adequate=BoolReading(value=True, quote="Bowel preparation was excellent."),  # not in the report
         follow_up=TextReading(value="3 months", quote=None),  # a value with no quote
     )
@@ -208,7 +212,8 @@ def test_rebook_draft_after_an_incomplete_report_is_confirmed(core):
     cid = _case(core, "p-khalid")
     rpt = core.get(f"/v1/cases/{cid}", headers=FATIMA).json()["reports"][0]
     with _agent(core) as a:
-        assert a.post(f"/v1/cases/{cid}/reports/{rpt['id']}/rebook-draft", headers=FATIMA).status_code == 409  # not confirmed
+        # The report has not yet been confirmed.
+        assert a.post(f"/v1/cases/{cid}/reports/{rpt['id']}/rebook-draft", headers=FATIMA).status_code == 409
         vals = {k: v["value"] for k, v in rpt["keyword_reading"]["fields"].items()}
         vals.update(completed=False, follow_up="3 months", next_step="Re-scope after an extended two-day preparation")
         core.post(f"/v1/cases/{cid}/reports/{rpt['id']}/review", headers=FATIMA,

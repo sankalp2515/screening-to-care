@@ -118,8 +118,11 @@ def draft_rebook(patient: str, report: str, findings: dict[str, Any], llm: LLMPr
     """The physician edits and sends this as an e-consult; nothing is sent here. A model draft that drops the
     confirmed interval falls back to the template, so the request never loses the one number that matters."""
     template = rebook_template(patient, findings)
-    out = llm.structured(REBOOK_SYSTEM, f"Patient: {patient}\nConfirmed findings: {findings}\nReport:\n<<<\n{report[:4000]}\n>>>",
-                         RebookDraft)
+    out = llm.structured(
+        REBOOK_SYSTEM,
+        f"Patient: {patient}\nConfirmed findings: {findings}\nReport:\n<<<\n{report[:4000]}\n>>>",
+        RebookDraft,
+    )
     interval = str(findings.get("follow_up") or "")
     if out is not None and out.text.strip() and (not interval or interval.split()[0] in out.text):
         return {"text": out.text.strip(), "source": "llm", "model": llm.name}

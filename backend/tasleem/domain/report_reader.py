@@ -69,7 +69,8 @@ _INCOMPLETE = (
     r"لم يتم الوصول",
 )
 _COMPLETE = (
-    r"\b(caecum|cecum|caecal|cecal|terminal ileum|ileocaecal|appendiceal orifice)\b[^.]{0,40}\b(reached|intubated|visuali[sz]ed|identified|seen)",
+    r"\b(caecum|cecum|caecal|cecal|terminal ileum|ileocaecal|appendiceal orifice)\b"
+    r"[^.]{0,40}\b(reached|intubated|visuali[sz]ed|identified|seen)",
     r"\b(reached|intubated|to) (the )?(caecum|cecum|terminal ileum)",
     r"\bcomplete (colonoscopy|examination|procedure)",
     r"\bcaecal intubation\b",
@@ -93,7 +94,8 @@ _BBPS = re.compile(
     r"(?:(\d{1,2})\s*\(\s*(\d)\s*[-/,]\s*(\d)\s*[-/,]\s*(\d)\s*\)|(\d)\s*[-/,]\s*(\d)\s*[-/,]\s*(\d)|(\d{1,2})\b)",
     re.I,
 )
-_PREP_BAD = (r"\b(poor|inadequate|suboptimal|fair|unsatisfactory|insufficient)\b[^.]{0,25}\b(prep|preparation|bowel prep|cleansing)",
+_PREP_BAD = (r"\b(poor|inadequate|suboptimal|fair|unsatisfactory|insufficient)\b"
+             r"[^.]{0,25}\b(prep|preparation|bowel prep|cleansing)",
              r"\b(prep|preparation|cleansing)\b[^.]{0,25}\b(poor|inadequate|suboptimal|unsatisfactory|insufficient)",
              r"تحضير (ضعيف|غير كاف)")
 _PREP_GOOD = (r"\b(good|excellent|adequate|satisfactory)\b[^.]{0,25}\b(prep|preparation|bowel prep|cleansing)",
@@ -143,10 +145,12 @@ def _polyps(sents: list[str]) -> Finding:
     return Finding("polyps_removed", None, None)
 
 
-_PATH_PENDING = (r"\b(histology|histopathology|pathology|biopsy|biopsies|specimens?)\b[^.]{0,40}\b(pending|awaited|to follow|sent|submitted|outstanding)",
+_PATH_PENDING = (r"\b(histology|histopathology|pathology|biopsy|biopsies|specimens?)\b"
+                 r"[^.]{0,40}\b(pending|awaited|to follow|sent|submitted|outstanding)",
                  r"\b(await|awaiting|pending)\b[^.]{0,20}\b(histology|histopathology|pathology|biopsy)",
                  r"(نتيجة|نتائج) (الخزعة|الأنسجة) (قيد الانتظار|لاحقا)")
-_PATH_DONE = (r"\b(histology|histopathology|pathology)\b[^.]{0,15}(:|shows?|showed|confirms?|confirmed|revealed|reports?)",
+_PATH_DONE = (r"\b(histology|histopathology|pathology)\b"
+              r"[^.]{0,15}(:|shows?|showed|confirms?|confirmed|revealed|reports?)",
               r"\b(tubular|tubulovillous|villous|serrated|hyperplastic) (adenoma|polyp)",
               r"\badenocarcinoma\b", r"\bno dysplasia\b")
 
@@ -164,7 +168,8 @@ def _pathology(sents: list[str], polyps: Finding) -> Finding:
 
 
 _NEXT = (r"\b(recommend\w*|plan|advised?|suggest\w*)\b",
-         r"\b(repeat|rebook|re-book|refer\w*|surveillance|follow[- ]?up|ct colonography|routine screening|next screening|screening colonoscopy|return to)\b",
+         r"\b(repeat|rebook|re-book|refer\w*|surveillance|follow[- ]?up|ct colonography|"
+         r"routine screening|next screening|screening colonoscopy|return to)\b",
          r"(يوصى|ننصح|إعادة)")
 
 

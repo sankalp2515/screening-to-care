@@ -9,11 +9,10 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from ..domain.actions import available_actions, next_step, viewer_step
-from ..domain.model import CaseState
 from ..domain.audit import verify
 from ..domain.errors import DomainError, NotFound
 from ..domain.messaging import check_patient_text
-from ..domain.model import Actor, ActorType, BarrierCode, to_utc
+from ..domain.model import Actor, ActorType, BarrierCode, CaseState, to_utc
 from ..services.fhir import ReferralStatusMessage
 from ..services.scheduler import tick
 from ..services.views import case_detail, patient_view, worklist_item
@@ -429,7 +428,8 @@ PREP_REPLY = {
 
 
 @me.post("/cases/{case_id}/prep-check")
-def prep_check_answer(case_id: str, body: PrepAnswersIn, lang: str | None = None, actor: Actor = Depends(require_patient),
+def prep_check_answer(case_id: str, body: PrepAnswersIn, lang: str | None = None,
+                      actor: Actor = Depends(require_patient),
                       ctx: AppContext = Depends(get_ctx), svc: Services = Depends(get_services)) -> dict[str, Any]:
     """A wrong or missing answer opens a barrier (PREP_UNCLEAR, or the question's own code) so a navigator
     goes through it with the patient. The patient is never told they 'failed'."""
@@ -440,7 +440,8 @@ def prep_check_answer(case_id: str, body: PrepAnswersIn, lang: str | None = None
     if codes:
         _, barrier_id = svc.cases.report_barrier(case_id, actor, codes, None, utcnow())
     return {"all_correct": not wrong, "follow_up_needed": bool(wrong), "barrier_id": barrier_id,
-            "barrier_codes": [c.value for c in codes], "message": PREP_REPLY[bool(wrong)][_patient_lang(svc, actor, lang)]}
+            "barrier_codes": [c.value for c in codes],
+            "message": PREP_REPLY[bool(wrong)][_patient_lang(svc, actor, lang)]}
 
 
 # ---- policy -------------------------------------------------------------------------------------

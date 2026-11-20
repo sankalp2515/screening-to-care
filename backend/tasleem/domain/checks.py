@@ -52,7 +52,11 @@ def evaluate(state: CaseState, p: Pathway, now: datetime) -> dict[StallReason, C
         state, c.attended_stage, c.procedure_stage, c.report_stage
     ):
         if state.appointment_missed:
-            add(StallReason.BOOKED_NOT_ATTENDED, c.attended_stage, "missed the appointment" if state.appointment_missed == "noshow" else "the appointment was cancelled")
+            add(
+                StallReason.BOOKED_NOT_ATTENDED,
+                c.attended_stage,
+                "missed the appointment" if state.appointment_missed == "noshow" else "the appointment was cancelled",
+            )
         elif state.appointment_at and now > state.appointment_at + timedelta(hours=c.attended_grace_hours):
             add(StallReason.BOOKED_NOT_ATTENDED, c.attended_stage,
                 f"appointment on {state.appointment_at.date().isoformat()} has no attendance record")

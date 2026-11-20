@@ -22,8 +22,8 @@ from ..domain.model import (
     StallReason,
     to_utc,
 )
-from ..domain.report_reader import FIELD_LABELS, READER_ID, reading_dict
 from ..domain.pathways import Pathway, PathwayRegistry
+from ..domain.report_reader import FIELD_LABELS, READER_ID, reading_dict
 from ..infra.cache import WRITE_VERSION_KEY, Cache
 from ..infra.db import CaseRow
 from .directory import Directory
@@ -142,7 +142,9 @@ def case_detail(st: CaseState, events: list[StoredEvent], registry: PathwayRegis
     for sd in p.stages:
         ev = st.stages.get(sd.id)
         stages.append({"id": sd.id, "label": sd.label, "note": sd.note, "reached": ev is not None,
-                       "status": "incomplete" if ev is not None and sd.id == incomplete else ("verified" if ev else "pending"),
+                       "status": (
+                           "incomplete" if ev is not None and sd.id == incomplete else ("verified" if ev else "pending")
+                       ),
                        "reached_at": ev.reached_at if ev else None, "evidence_ref": ev.ref if ev else None,
                        "provenance": "fact" if ev else None})
     timeline = [{"seq": e.seq, "type": e.type, "at": e.occurred_at, "actor": e.actor_id,

@@ -15,13 +15,16 @@ T, F = True, False
 
 # (report text, {field: expected}) - next_step is scored on presence (a quoted recommendation or None).
 REPORTS: list[tuple[str, dict[str, object]]] = [
-    ("Indication: positive FIT. Caecum reached and identified by appendiceal orifice. Bowel preparation BBPS 8 (3-3-2). "
+    ("Indication: positive FIT. Caecum reached and identified by appendiceal orifice. "
+     "Bowel preparation BBPS 8 (3-3-2). "
      "Two polyps removed by cold snare, 4 mm and 6 mm. Histology pending. Repeat colonoscopy in 3 years if adenomas.",
      dict(completed=T, prep_adequate=T, polyps_removed=2, pathology_pending=T, next_step=T, follow_up="3 years")),
-    ("Positive FIT. Incomplete colonoscopy: unable to advance beyond the hepatic flexure due to inadequate preparation. "
+    ("Positive FIT. Incomplete colonoscopy: unable to advance beyond the hepatic flexure "
+     "due to inadequate preparation. "
      "BBPS 1-1-0. No polyps seen in examined segments. Recommend repeat colonoscopy with extended prep in 3 months.",
      dict(completed=F, prep_adequate=F, polyps_removed=0, pathology_pending=F, next_step=T, follow_up="3 months")),
-    ("Complete colonoscopy to the terminal ileum. Excellent preparation. No polyps. Return to routine screening in 10 years.",
+    ("Complete colonoscopy to the terminal ileum. Excellent preparation. No polyps. "
+     "Return to routine screening in 10 years.",
      dict(completed=T, prep_adequate=T, polyps_removed=0, pathology_pending=F, next_step=T, follow_up="10 years")),
     ("The caecum was intubated. Preparation was fair with residual stool, Boston score 5. "
      "One 8 mm sessile polyp in the sigmoid, removed by snare polypectomy. Specimens sent to pathology. "
@@ -44,7 +47,8 @@ REPORTS: list[tuple[str, dict[str, object]]] = [
     ("Complete examination. Good bowel cleansing. Mass at 20 cm, biopsied and tattooed. Histology pending. "
      "Urgent referral to colorectal surgery.",
      dict(completed=T, prep_adequate=T, polyps_removed=None, pathology_pending=T, next_step=T, follow_up=None)),
-    ("Ileocaecal valve visualised. Poor preparation in the right colon. No polyps seen. Repeat in 6 months with split-dose prep.",
+    ("Ileocaecal valve visualised. Poor preparation in the right colon. No polyps seen. "
+     "Repeat in 6 months with split-dose prep.",
      dict(completed=T, prep_adequate=F, polyps_removed=0, pathology_pending=F, next_step=T, follow_up="6 months")),
     ("Caecum reached. BBPS 7 (2-3-2). Four polyps removed by cold snare. Pathology: hyperplastic polyps, no dysplasia. "
      "Repeat colonoscopy in 5 years.",
@@ -61,12 +65,14 @@ REPORTS: list[tuple[str, dict[str, object]]] = [
     ("Caecum reached and photographed. Excellent preparation, BBPS 9. Multiple polyps removed by snare. "
      "Specimens submitted for histology. Discuss at MDT; repeat colonoscopy in 1 year.",
      dict(completed=T, prep_adequate=T, polyps_removed=2, pathology_pending=T, next_step=T, follow_up="1 year")),
-    ("Incomplete study, stopped at the descending colon due to solid stool. Inadequate preparation. Rebook with 2-day prep.",
+    ("Incomplete study, stopped at the descending colon due to solid stool. Inadequate preparation. "
+     "Rebook with 2-day prep.",
      dict(completed=F, prep_adequate=F, polyps_removed=None, pathology_pending=None, next_step=T, follow_up=None)),
     ("تم الوصول إلى الأعور. تحضير جيد. لا توجد زوائد. يوصى بإعادة المنظار بعد عشر سنوات.",
      dict(completed=T, prep_adequate=T, polyps_removed=0, pathology_pending=F, next_step=T, follow_up="10 years")),
     ("منظار غير مكتمل بسبب تحضير ضعيف. يوصى بإعادة المنظار خلال ثلاثة أشهر.",
-     dict(completed=F, prep_adequate=F, polyps_removed=None, pathology_pending=None, next_step=T, follow_up="3 months")),
+     dict(completed=F, prep_adequate=F, polyps_removed=None, pathology_pending=None,
+          next_step=T, follow_up="3 months")),
     ("تم الوصول إلى الأعور. تحضير جيد. تم استئصال زائدة واحدة. نتيجة الخزعة قيد الانتظار.",
      dict(completed=T, prep_adequate=T, polyps_removed=1, pathology_pending=T, next_step=None, follow_up=None)),
 ]
@@ -92,7 +98,8 @@ HELD_OUT: list[tuple[str, dict[str, object]]] = [
      "Surveillance in 1 year.",
      dict(completed=T, prep_adequate=T, polyps_removed=5, pathology_pending=F, next_step=T, follow_up="1 year")),
     ("تم الوصول إلى الأعور. تحضير ضعيف. يوصى بإعادة المنظار بعد ستة أشهر.",
-     dict(completed=T, prep_adequate=F, polyps_removed=None, pathology_pending=None, next_step=T, follow_up="6 months")),
+     dict(completed=T, prep_adequate=F, polyps_removed=None, pathology_pending=None,
+          next_step=T, follow_up="6 months")),
 ]
 
 

@@ -255,7 +255,10 @@ def test_the_next_step_is_written_for_the_person_looking(client):
     salma = client.get(f"/v1/cases/{fatma}", headers=as_("dr-salma")).json()["next_step"]
     assert salma["reason"] == "HANDOFF_TO_ACCEPT" and salma["text"].startswith("Dr. Fatima offered you")
     # The owner still sees the case's own next step.
-    assert client.get(f"/v1/cases/{ahmed}", headers=as_("dr-fatima")).json()["next_step"]["reason"] != "CONSULT_TO_ANSWER"
+    assert (
+        client.get(f"/v1/cases/{ahmed}", headers=as_("dr-fatima")).json()["next_step"]["reason"]
+        != "CONSULT_TO_ANSWER"
+    )
     work = client.get("/v1/me/work", headers=as_("dr-lina")).json()
     rows = [r for s in work["sections"] for r in s["items"] if r["id"] == ahmed]
     assert rows and rows[0]["next_action"]["reason"] == "CONSULT_TO_ANSWER"
