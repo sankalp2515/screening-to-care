@@ -1,6 +1,8 @@
 # Operations: deploy, configure, observe, recover
 
-**Status:** the full stack runs locally in Docker and passes 32 of 32 end-to-end checks. Nothing is deployed to a cloud yet. Everything below is the production design. Items marked *built* exist in the code.
+**Current status:** the [reviewer demo](https://tasleem.swedencentral.cloudapp.azure.com/demo?tour=1) runs on Azure in Sweden Central with synthetic data and password-free guest personas. The Docker stack also runs locally. The [live Azure test record](../evidence/TEST_CASES.md#z-azure-and-release-checks) documents 32 of 32 passing stack checks (Z7).
+
+The UAE deployment below is the proposed pilot design. Live provider feeds and use of patient data require partner approvals and clinical safety sign-off. Items marked *built* exist in the code.
 
 ## 1. Environments
 | Environment | Purpose | Data | Demo mode |
