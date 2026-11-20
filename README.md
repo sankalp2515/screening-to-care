@@ -6,7 +6,7 @@
 
 Tasleem reconciles referral status with clinical evidence after a positive stool screening test. It flags the gap and names the clinician who acts next.
 
-**[Open the guest tour](https://tasleem.swedencentral.cloudapp.azure.com/demo?tour=1)** · [Choose a demo role](https://tasleem.swedencentral.cloudapp.azure.com/demo) · [Run locally](#run-locally) · [Evidence](#evidence)
+**[Open the guest tour](https://tasleem.swedencentral.cloudapp.azure.com/demo?tour=1)** · [Choose a demo role](https://tasleem.swedencentral.cloudapp.azure.com/demo) · [Technical documentation](#architecture-and-services) · [Evidence](#evidence) · [Run locally](#run-locally)
 
 [![CI](https://github.com/sankalp2515/screening-to-care/actions/workflows/ci.yml/badge.svg)](https://github.com/sankalp2515/screening-to-care/actions/workflows/ci.yml) [![FHIR R4 and HL7 v2](https://img.shields.io/badge/interoperability-FHIR%20R4%20%2F%20HL7%20v2-006247)](#architecture-and-services) [![Synthetic data](https://img.shields.io/badge/demo-synthetic%20data-625851)](#demo-gallery)
 
@@ -20,27 +20,11 @@ Tasleem reconciles referral status with clinical evidence after a positive stool
 
 In the synthetic demo, Rajesh’s referral says **Completed**. His clinical record confirms a gastroenterology (GI) visit, and the colonoscopy is still unverified. Tasleem keeps the case open, names Dr. Fatima as the owner, and asks her to reconcile the missing report. Use **Close case…** in the tour to see the evidence requirement.
 
-The problem has local precedent. In SEHA ambulatory clinics in 2015–16, **30.5%** of Emirati adults with a positive stool screening test underwent follow-up colonoscopy. [SEHA study](https://link.springer.com/article/10.1186/s12885-021-08623-9)
+In a 2015–16 study at Abu Dhabi’s SEHA clinics, **30.5%** of Emirati adults aged 40–75 with a positive stool screening test underwent follow-up colonoscopy. [SEHA study](https://link.springer.com/article/10.1186/s12885-021-08623-9)
 
 ## User journey
 
-```mermaid
-flowchart TD
-  FIT["Screening programme records a positive stool test"] --> Owner["Tasleem opens a case with a named physician"]
-  Owner --> Verify["Care team reconciles referral status with clinical evidence"]
-  Verify --> Gap{"Is follow-up evidence complete?"}
-  Gap -->|No| Review["Physician requests the report or consults GI"]
-  Review --> Reply["If the patient reports a barrier, a navigator follows up"]
-  Review --> Escalate["Missed deadline escalates to a named person"]
-  Reply --> Verify
-  Escalate --> Verify
-  Gap -->|Yes| Document["Clinician documents that the outcome was shared"]
-  Document --> Close["Authorized clinician records the completed outcome"]
-  classDef stage fill:#f4efe6,stroke:#806b63,color:#14251e
-  classDef decision fill:#e5f2ea,stroke:#006247,color:#14251e
-  class FIT,Owner,Review,Reply,Escalate,Document stage
-  class Verify,Gap,Close decision
-```
+[![Screening-to-care workflow. A positive stool test opens a case with a named owner. Missing evidence keeps the case open and triggers follow-up or escalation. With the required evidence, a clinician can record the completed outcome.](docs/assets/readme/user-journey.png)](docs/assets/readme/user-journey.png)
 
 A handoff transfers ownership after the recipient accepts. Other closure outcomes still require their specified evidence or signed clinical decision. See [all user journeys](docs/product/USER_JOURNEYS.md) and the [integration workflow](docs/product/WORKFLOW_AND_INTEGRATION.md).
 
@@ -110,6 +94,8 @@ The team-built referral-status-only monitor received fewer inputs by design. The
 | First alerts per 100 patients | 53.5 | 38.5 |
 
 [Benchmark and assumptions](docs/evidence/REAL_WORLD_FIT.md) · [72 of 75 hard cases, including misses](docs/evidence/HARD_CASES.md) · [Test inventory](docs/evidence/TEST_CASES.md) · [PostgreSQL load test](docs/evidence/SCALE_POSTGRES.md)
+
+The simulation assumes a rate of referrals marked complete without supporting evidence. In the headline run, distress routing reached a clinician within 24 hours for 10 of 11 messages. A provider pilot must establish the local baseline, test escalation on unseen replies and measure staff workload and verified follow-up.
 
 ## Run locally
 
